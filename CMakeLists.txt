@@ -216,7 +216,7 @@ find_anyproject(PROJ4 REQUIRED)
 find_anyproject(GEOS REQUIRED)
 find_anyproject(FREEXL REQUIRED)
 find_anyproject(ICONV REQUIRED)
-find_anyproject(SQLite3 REQUIRED)
+find_anyproject(Sqlite3 REQUIRED)
 find_anyproject(ZLIB REQUIRED)
 find_anyproject(LibXml2 REQUIRED)
 
