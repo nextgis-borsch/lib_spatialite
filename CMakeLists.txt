@@ -234,7 +234,7 @@ endif()
 
 target_link_extlibraries(${LIB_NAME})
 
-export(TARGETS ${LIB_NAME} FILE ${LIB_NAME}-exports.cmake)
+export(TARGETS ${LIB_NAME} FILE ${LIB_NAME}-exports.cmake EXPORT_LINK_INTERFACE_LIBRARIES)
 
 #------------------------------------------------------------------------------
 # targets installation
