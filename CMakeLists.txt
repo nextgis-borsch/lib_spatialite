@@ -215,7 +215,7 @@ include(FindAnyProject)
 
 find_anyproject(PROJ4 REQUIRED)
 find_anyproject(GEOS REQUIRED)
-find_anyproject(FREEXL REQUIRED)
+find_anyproject(Freexl REQUIRED)
 find_anyproject(ICONV REQUIRED)
 find_anyproject(Sqlite3 REQUIRED)
 find_anyproject(ZLIB REQUIRED)
