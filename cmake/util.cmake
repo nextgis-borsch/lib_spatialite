@@ -20,15 +20,39 @@
 # along with this script.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
+function(check_version major minor rev)
+
+    set(CHECK_FILE ${CMAKE_CURRENT_SOURCE_DIR}/config-msvc.h)
+    file(READ ${CHECK_FILE} _VERSION_H_CONTENTS)
+
+    string(REGEX MATCH "PACKAGE_VERSION[ \t]+\"([0-9].[0-9].[0-9]+)"
+        VERSION ${_VERSION_H_CONTENTS})
+    string (REGEX MATCH "([0-9].[0-9].[0-9]+)"
+        VERSION ${VERSION})
+
+    string(SUBSTRING ${VERSION} 0 1 MAJOR_VERSION)
+    string(SUBSTRING ${VERSION} 2 1 MINOR_VERSION)
+    string(SUBSTRING ${VERSION} 4 1 REV_VERSION)
+
+    set(${major} ${MAJOR_VERSION} PARENT_SCOPE)
+    set(${minor} ${MINOR_VERSION} PARENT_SCOPE)
+    set(${rev} ${REV_VERSION} PARENT_SCOPE)
+
+    # Store version string in file for installer needs
+    file(TIMESTAMP ${CHECK_FILE} VERSION_DATETIME "%Y-%m-%d %H:%M:%S" UTC)
+    file(WRITE ${CMAKE_BINARY_DIR}/version.str "${MAJOR_VERSION}.${MINOR_VERSION}.${REV_VERSION}\n${VERSION_DATETIME}")
+
+endfunction(check_version)
+
 function(report_version name ver)
 
     string(ASCII 27 Esc)
     set(BoldYellow  "${Esc}[1;33m")
     set(ColourReset "${Esc}[m")
-        
+
     message(STATUS "${BoldYellow}${name} version ${ver}${ColourReset}")
-    
-endfunction()  
+
+endfunction()
 
 
 # macro to find packages on the host OS

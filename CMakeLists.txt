@@ -2,8 +2,9 @@
 # Project:  Lib spatialite
 # Purpose:  CMake build scripts
 # Author:   Alexander Lisovenko, alexander.lisovenko@nexgis.com
+# Author:   Dmitry Baryshnikov, <dmitry.baryshnikov@nextgis.com>
 ################################################################################
-# Copyright (C) 2016, NextGIS <info@nextgis.com>
+# Copyright (C) 2016-2017, NextGIS <info@nextgis.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -32,212 +33,103 @@ project(spatialite)
 #------------------------------------------------------------------------------
 set(CMAKE_COLOR_MAKEFILE ON)
 
-SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
-include(GNUInstallDirs)
-set(INSTALL_BIN_DIR ${CMAKE_INSTALL_FULL_BINDIR} CACHE INTERNAL "Installation directory for executables" FORCE)
-set(INSTALL_LIB_DIR ${CMAKE_INSTALL_FULL_LIBDIR} CACHE INTERNAL "Installation directory for libraries" FORCE)
-set(INSTALL_INC_DIR "${CMAKE_INSTALL_FULL_INCLUDEDIR}/${PROJECT_NAME}" CACHE INTERNAL "Installation directory for headers" FORCE)
+if(OSX_FRAMEWORK AND (BUILD_SHARED_LIBS OR BUILD_STATIC_LIBS))
+  message(FATAL_ERROR "Only OSX_FRAMEWORK key or any or both BUILD_SHARED_LIBS
+                       and BUILD_STATIC_LIBS keys are permitted")
+endif()
 
-include(CheckTypeSize)
-include(CheckFunctionExists)
-include(CheckIncludeFile)
-include(CheckCSourceCompiles)
-include(util)
-
-#------------------------------------------------------------------------------
-# Source files specification
-#------------------------------------------------------------------------------
-set(SOURCES
-    src/gaiaaux/gg_sqlaux.c
-    src/gaiaaux/gg_utf8.c
-    
-	src/gaiaexif/gaia_exif.c
-    
-    src/gaiageo/gg_advanced.c
-	src/gaiageo/gg_endian.c
-    src/gaiageo/gg_ewkt.c
-	src/gaiageo/gg_geodesic.c
-    src/gaiageo/gg_geoJSON.c
-	src/gaiageo/gg_geometries.c
-    src/gaiageo/gg_geoscvt.c
-	src/gaiageo/gg_gml.c
-    src/gaiageo/gg_kml.c
-	src/gaiageo/gg_relations.c
-    src/gaiageo/gg_shape.c
-	src/gaiageo/gg_transform.c
-    src/gaiageo/gg_vanuatu.c
-	src/gaiageo/gg_wkb.c
-    src/gaiageo/gg_wkt.c
-	src/gaiageo/gg_extras.c
-    src/gaiageo/gg_xml.c
-	src/gaiageo/gg_voronoj.c
-    src/gaiageo/gg_matrix.c
-	src/gaiageo/gg_relations_ext.c
-    
-    src/connection_cache/alloc_cache.c
-    
-    src/shapefiles/shapefiles.c
-	
-    src/spatialite/mbrcache.c
-    src/spatialite/spatialite.c
-    src/spatialite/virtualdbf.c
-	src/spatialite/virtualfdo.c
-    src/spatialite/virtualnetwork.c
-	src/spatialite/virtualshape.c
-    src/spatialite/virtualspatialindex.c
-	src/spatialite/statistics.c
-    src/spatialite/metatables.c
-	src/spatialite/virtualXL.c
-    src/spatialite/extra_tables.c
-	src/spatialite/virtualxpath.c
-    src/spatialite/virtualbbox.c
-	src/spatialite/spatialite_init.c
-    src/spatialite/se_helpers.c
-	src/spatialite/srid_aux.c
-    src/spatialite/table_cloner.c
-	src/spatialite/virtualelementary.c
-	
-    src/wfs/wfs_in.c
-	
-    src/dxf/dxf_parser.c
-    src/dxf/dxf_loader.c
-    src/dxf/dxf_writer.c
-	src/dxf/dxf_load_distinct.c
-    src/dxf/dxf_load_mixed.c
-    
-	src/shapefiles/validator.c
-    
-    src/md5/md5.c
-    src/md5/gaia_md5.c
-	
-    src/srsinit/srs_init.c
-    src/srsinit/epsg_inlined_00.c
-    src/srsinit/epsg_inlined_01.c
-	src/srsinit/epsg_inlined_02.c
-    src/srsinit/epsg_inlined_03.c
-	src/srsinit/epsg_inlined_04.c
-    src/srsinit/epsg_inlined_05.c
-	src/srsinit/epsg_inlined_06.c
-    src/srsinit/epsg_inlined_07.c
-	src/srsinit/epsg_inlined_08.c
-    src/srsinit/epsg_inlined_09.c
-	src/srsinit/epsg_inlined_10.c
-    src/srsinit/epsg_inlined_11.c
-	src/srsinit/epsg_inlined_12.c
-    src/srsinit/epsg_inlined_13.c
-	src/srsinit/epsg_inlined_14.c
-    src/srsinit/epsg_inlined_15.c
-	src/srsinit/epsg_inlined_16.c
-    src/srsinit/epsg_inlined_17.c
-	src/srsinit/epsg_inlined_18.c
-    src/srsinit/epsg_inlined_19.c
-	src/srsinit/epsg_inlined_20.c
-    src/srsinit/epsg_inlined_21.c
-	src/srsinit/epsg_inlined_22.c
-    src/srsinit/epsg_inlined_23.c
-	src/srsinit/epsg_inlined_24.c
-    src/srsinit/epsg_inlined_25.c
-	src/srsinit/epsg_inlined_26.c
-    src/srsinit/epsg_inlined_27.c
-	src/srsinit/epsg_inlined_28.c
-    src/srsinit/epsg_inlined_29.c
-	src/srsinit/epsg_inlined_30.c
-    src/srsinit/epsg_inlined_31.c
-	src/srsinit/epsg_inlined_32.c
-    src/srsinit/epsg_inlined_33.c
-	src/srsinit/epsg_inlined_34.c
-    src/srsinit/epsg_inlined_35.c
-	src/srsinit/epsg_inlined_36.c
-    src/srsinit/epsg_inlined_37.c
-	src/srsinit/epsg_inlined_38.c
-    src/srsinit/epsg_inlined_39.c
-	src/srsinit/epsg_inlined_40.c
-    src/srsinit/epsg_inlined_41.c
-	src/srsinit/epsg_inlined_42.c
-    src/srsinit/epsg_inlined_43.c
-	src/srsinit/epsg_inlined_44.c
-    src/srsinit/epsg_inlined_45.c
-	src/srsinit/epsg_inlined_46.c
-    src/srsinit/epsg_inlined_extra.c
-	src/srsinit/epsg_inlined_prussian.c
-	src/srsinit/epsg_inlined_wgs84_00.c
-    src/srsinit/epsg_inlined_wgs84_01.c
-	
-    src/versioninfo/version.c
-    
-    src/virtualtext/virtualtext.c
-)
-
-include_directories("${PROJECT_SOURCE_DIR}")
-include_directories("${PROJECT_SOURCE_DIR}/src/headers")
-include_directories("${PROJECT_SOURCE_DIR}/src/gaiageo")
-include_directories("${PROJECT_SOURCE_DIR}/src/connection_cache")
-include_directories("${PROJECT_SOURCE_DIR}/src/md5")
-
-#------------------------------------------------------------------------------
-# Platform and compiler specific settings
-#------------------------------------------------------------------------------
-if(WIN32)
-    if (MSVC)
-        add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-        add_definitions(-DDLL_EXPORT)
-        add_definitions(-DYY_NO_UNISTD_H)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:precise")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Ox")
-        if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-            string(REGEX REPLACE "/W[0-4]" "/W3"
-                CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}"
-            )
-        else()
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W3")
-        endif()
-        
-        if (MSVC12)
-            add_definitions(-DRINT_PRESENT)
-        endif()
-        
-    endif()
+if(OSX_FRAMEWORK)
+  set(INSTALL_BIN_DIR "${CMAKE_INSTALL_PREFIX}/Applications" CACHE INTERNAL "Installation directory for executables" FORCE)
+  set(INSTALL_LIB_DIR "${CMAKE_INSTALL_PREFIX}/Library/Frameworks" CACHE INTERNAL "Installation directory for libraries" FORCE)
+  set(INSTALL_INC_DIR "${INSTALL_LIB_DIR}/${PROJECT_NAME}.framework/Headers" CACHE INTERNAL "Installation directory for headers" FORCE)
+#  set(SKIP_INSTALL_HEADERS ON)
+  set(SKIP_INSTALL_EXECUTABLES ON)
+  set(SKIP_INSTALL_FILES ON)
+  set(SKIP_INSTALL_EXPORT ON)
+  set(CMAKE_MACOSX_RPATH ON)
 else()
-    #TODO
-endif(WIN32)
+    include(GNUInstallDirs)
+    set(INSTALL_BIN_DIR ${CMAKE_INSTALL_FULL_BINDIR} CACHE INTERNAL "Installation directory for executables" FORCE)
+    set(INSTALL_LIB_DIR ${CMAKE_INSTALL_FULL_LIBDIR} CACHE INTERNAL "Installation directory for libraries" FORCE)
+    set(INSTALL_INC_DIR "${CMAKE_INSTALL_FULL_INCLUDEDIR}/${PROJECT_NAME}" CACHE INTERNAL "Installation directory for headers" FORCE)
+endif()
 
-#
-# Check for unistd.h
-#
-check_include_file(unistd.h Z_HAVE_UNISTD_H)
+include(util)
+check_version(SPL_MAJOR_VERSION SPL_MINOR_VERSION SPL_REV_VERSION)
+set(VERSION ${SPL_MAJOR_VERSION}.${SPL_MINOR_VERSION}.${SPL_REV_VERSION})
 
+if(OSX_FRAMEWORK)
+    set(FRAMEWORK_VERSION "${SPL_MAJOR_VERSION}")
+endif()
+report_version(${PROJECT_NAME} ${VERSION})
 
 #------------------------------------------------------------------------------
 # search for dependencies
 #------------------------------------------------------------------------------
 include(FindAnyProject)
 
-find_anyproject(PROJ4 REQUIRED)
-find_anyproject(GEOS REQUIRED)
-find_anyproject(Freexl REQUIRED)
-find_anyproject(ICONV REQUIRED)
 find_anyproject(Sqlite3 REQUIRED)
+if(SQLITE3_FOUND)
+    set(HAVE_LIBSQLITE3 ON)
+endif()
 find_anyproject(ZLIB REQUIRED)
-find_anyproject(LibXml2 REQUIRED)
-
-set(LIB_NAME ${PROJECT_NAME})
-if(BUILD_SHARED_LIBS)
-    add_library(${LIB_NAME} SHARED ${SOURCES})
-    set_target_properties(${LIB_NAME} PROPERTIES DEFINE_SYMBOL DLL_EXPORTS)
-    set_target_properties(${LIB_NAME} PROPERTIES SOVERSION 1)
-else()
-    add_library(${LIB_NAME} STATIC ${SOURCES})
-    set_target_properties(${LIB_NAME} PROPERTIES SOVERSION 1)
+if(ZLIB_FOUND)
+    set(HAVE_LIBZ ON)
 endif()
 
-target_link_extlibraries(${LIB_NAME})
+option(OMIT_GEOS "Should be defined in order to disable GEOS support" OFF)
+if(NOT OMIT_GEOS)
+    option(GEOS_ADVANCED "Should be defined in order to enable GEOS_ADVANCED support" ON)
+    option(GEOS_TRUNK "Should be defined in order to enable GEOS_TRUNK experimental support" OFF)
+    if(GEOS_ADVANCED)
+        find_anyproject(GEOS VERSION 3.4.0 REQUIRED)
+    else()
+        find_anyproject(GEOS VERSION 3.3.0 REQUIRED)
+    endif()
+endif()
+
+option(ENABLE_GCP "Should be defined in order to enable GCP support" ON)
+option(OMIT_PROJ "Should be defined in order to disable PROJ.4 support" OFF)
+if(NOT OMIT_PROJ)
+    find_anyproject(PROJ4 REQUIRED)
+endif()
+option(OMIT_ICONV "Should be defined in order to disable ICONV support" OFF)
+if(NOT OMIT_ICONV)
+    find_anyproject(ICONV REQUIRED)
+endif()
+option(OMIT_MATHSQL "Should be defined in order to disable MATHSQL support" OFF)
+option(OMIT_EPSG "Should be defined in order to disable EPSG full support" OFF)
+option(OMIT_GEOCALLBACKS "Should be defined in order to disable GEOCALLBACKS support" OFF)
+option(OMIT_FREEXL "Should be defined in order to disable FREEXL support" OFF)
+if(NOT OMIT_FREEXL)
+    find_anyproject(Freexl REQUIRED)
+endif()
+option(ENABLE_LIBXML2 "Should be defined in order to enable LIBXML2 support" ON)
+if(ENABLE_LIBXML2)
+    find_anyproject(LibXml2 REQUIRED)
+endif()
+option(ENABLE_GEOPACKAGE "Should be defined in order to enable GeoPackage support" ON)
+
+option(ENABLE_LWGEOM "Should be defined in order to enable LWGEOM support" ON)
+if(ENABLE_LWGEOM)
+    set(POSTGIS_2_1 ON)
+    # TODO find_anyproject(LWGEOM DEFAULT ON)
+endif()
+
+include(configure)
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+set(LIB_NAME ${PROJECT_NAME})
+
+add_subdirectory(src)
 
 if (REGISTER_PACKAGE)
     export(TARGETS ${LIB_NAME} FILE ${LIB_NAME}-exports.cmake)
 
-    set(EXPORT_PACKAGE_NAME SPATIALITE)
-    set(EXPORT_PACKAGE_NAME_UPPER ${EXPORT_PACKAGE_NAME})
+    set(EXPORT_PACKAGE_NAME Spatialite)
+    set(EXPORT_PACKAGE_NAME_UPPER SPATIALITE)
     set(EXPORT_PACKAGE_LIB_NAME ${LIB_NAME})
 
     export(PACKAGE ${EXPORT_PACKAGE_NAME})
@@ -246,7 +138,7 @@ if (REGISTER_PACKAGE)
     configure_package_config_file(
         ${CMAKE_SOURCE_DIR}/cmake/PackageConfig.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_PACKAGE_NAME}Config.cmake
-        INSTALL_DESTINATION ${INSTALL_LIB_DIR}/cmake
+        INSTALL_DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
         PATH_VARS INSTALL_INC_DIR )
     write_basic_package_version_file(
         ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_PACKAGE_NAME}ConfigVersion.cmake
@@ -256,16 +148,4 @@ else()
     export(TARGETS ${LIB_NAME} FILE ${LIB_NAME}-exports.cmake EXPORT_LINK_INTERFACE_LIBRARIES)
 endif()
 
-#------------------------------------------------------------------------------
-# targets installation
-#------------------------------------------------------------------------------
-
-install(TARGETS ${LIB_NAME}
-  RUNTIME DESTINATION ${INSTALL_BIN_DIR}
-  LIBRARY DESTINATION ${INSTALL_LIB_DIR}
-  ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
-)
-
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/src/headers/"
-    DESTINATION ${INSTALL_INC_DIR}
-)
+add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
