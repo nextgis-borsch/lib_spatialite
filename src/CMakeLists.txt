@@ -33,7 +33,6 @@ add_subdirectory(headers)
 add_subdirectory(gaiaaux)
 add_subdirectory(gaiaexif)
 add_subdirectory(gaiageo)
-add_subdirectory(geopackage)
 add_subdirectory(spatialite)
 add_subdirectory(shapefiles)
 add_subdirectory(srsinit)
@@ -42,7 +41,13 @@ add_subdirectory(virtualtext)
 add_subdirectory(wfs)
 add_subdirectory(dxf)
 add_subdirectory(md5)
-add_subdirectory(control_points)
+
+if(ENABLE_GCP)
+    add_subdirectory(control_points)
+endif()
+if(ENABLE_GEOPACKAGE)
+    add_subdirectory(geopackage)
+endif()
 
 set(CSOURCES
     versioninfo/version.c
