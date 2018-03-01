@@ -106,10 +106,6 @@ endif()
 
 check_function_exists(memmove HAVE_MEMMOVE)
 check_function_exists(memset HAVE_MEMSET)
-
-#message("PROJ4_INCLUDE_DIRS ${PROJ4_INCLUDE_DIRS}")
-set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${PROJ4_INCLUDE_DIRS})
-check_include_file("proj_api.h" HAVE_PROJ_API_H)
 check_function_exists(sqrt HAVE_SQRT)
 check_function_exists(strcasecmp HAVE_STRCASECMP)
 check_function_exists(strerror HAVE_STRERROR)

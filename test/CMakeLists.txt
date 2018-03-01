@@ -93,10 +93,8 @@ if(BUILD_TESTING)
 		check_virtualtable1
 		# check_virtualtable2
 		# check_virtualtable3
-		check_virtualtable4
 		check_virtualtable5
 		check_virtualtable6
-		check_virtual_ovflw
 		check_mbrcache
 		check_exif
 		check_exif2
@@ -107,7 +105,6 @@ if(BUILD_TESTING)
 		check_styling
 		check_virtualxpath
 		check_virtualbbox
-		check_wfsin
 		check_virtualelem
 		check_srid_fncts
 		check_control_points
@@ -129,6 +126,9 @@ if(BUILD_TESTING)
     		shape_utf8_1ex
     		shape_utf8_2
     		check_dxf
+    		check_wfsin
+    		check_virtual_ovflw
+    		check_virtualtable4
         )
     endif()
 
@@ -179,11 +179,16 @@ if(BUILD_TESTING)
         file(GLOB_RECURSE IMPORTED_WIN_DLLS ${CMAKE_BINARY_DIR}/third-party/*.dll)
         foreach(IMPORTED_WIN_DLL ${IMPORTED_WIN_DLLS})
             add_custom_command(TARGET check_control_points
-                                POST_BUILD
-                                COMMAND ${CMAKE_COMMAND} -E copy ${IMPORTED_WIN_DLL} $<TARGET_FILE_DIR:check_control_points>
-                                COMMENT "Copy ${IMPORTED_WIN_DLL} to check_control_points"
-                            )
+                            POST_BUILD
+                            COMMAND ${CMAKE_COMMAND} -E copy ${IMPORTED_WIN_DLL} $<TARGET_FILE_DIR:check_control_points>
+                            COMMENT "Copy ${IMPORTED_WIN_DLL} to check_control_points location"
+                        )
         endforeach()
+        add_custom_command(TARGET check_control_points
+                        POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIB_NAME}> $<TARGET_FILE_DIR:check_control_points>
+                        COMMENT "Copy ${LIB_NAME} to check_control_points location"
+                    )
     endif()
 
 endif()

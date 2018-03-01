@@ -26,7 +26,25 @@
 
 set(TARGET_NAME gaiaaux)
 
-set(CSOURCES gg_sqlaux.c gg_utf8.c)
+set(CSOURCES gg_sqlaux.c)
+
+if(MSVC_VERSION GREATER 1600)
+    # This is HACK for strange and not normal dependency of library on OSGeo4W
+
+    file(READ gg_utf8.c gg_utf8_CONTENTS)
+    string(REPLACE "#if defined(__MINGW32__) || defined(_WIN32)" "#if 0" gg_utf8_CONTENTS "${gg_utf8_CONTENTS}")
+    string(REPLACE "#if defined(__APPLE__) || defined(__ANDROID__)" "#if 1" gg_utf8_CONTENTS "${gg_utf8_CONTENTS}")
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/gg_utf8.c "${gg_utf8_CONTENTS}")
+
+    set(CSOURCES ${CSOURCES}
+    	${CMAKE_CURRENT_BINARY_DIR}/gg_utf8.c
+    )
+
+else()
+    set(CSOURCES ${CSOURCES}
+    	gg_utf8.c
+    )
+endif()
 
 add_library(${TARGET_NAME} OBJECT ${CSOURCES})
 
