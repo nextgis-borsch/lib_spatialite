@@ -42,9 +42,8 @@ if(WIN32)
             set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W3")
         endif()
 
-        if (MSVC12)
-            add_definitions(-DRINT_PRESENT)
-        endif()
+        add_definitions(-Dstrcasecmp=_stricmp -Dstrncasecmp=_strnicmp)
+
     endif()
 else()
     exec_program(${CMAKE_C_COMPILER}

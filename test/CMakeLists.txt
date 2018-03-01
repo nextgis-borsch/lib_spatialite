@@ -77,23 +77,12 @@ if(BUILD_TESTING)
 		check_geom_aux
 		check_geometry_cols
 		check_create
-		check_bufovflw
-		check_fdo1
 		check_fdo2
-		check_fdo3
 		check_fdo_bufovflw
 		check_md5
 		check_dbf_load
 		check_shp_load
 		check_shp_load_3d
-		shape_cp1252
-		shape_primitives
-		shape_utf8_1
-		shape_utf8_1ex
-		shape_utf8_2
-		shape_3d
-		check_clone_table
-		check_xls_load
 		check_math_funcs
 		check_gaia_util
 		check_gaia_utf8
@@ -109,7 +98,6 @@ if(BUILD_TESTING)
 		check_virtualtable6
 		check_virtual_ovflw
 		check_mbrcache
-		check_spatialindex
 		check_exif
 		check_exif2
 		check_relations_fncts
@@ -120,12 +108,29 @@ if(BUILD_TESTING)
 		check_virtualxpath
 		check_virtualbbox
 		check_wfsin
-		check_dxf
-		check_metacatalog
 		check_virtualelem
 		check_srid_fncts
 		check_control_points
     )
+
+    if(UNIX)
+        set(check_PROGRAMS ${check_PROGRAMS}
+		    check_fdo1
+    		check_fdo3
+    		check_spatialindex
+    		check_bufovflw
+    		check_xls_load
+    		check_clone_table
+    		shape_3d
+    		shape_cp1252
+    		check_metacatalog
+    		shape_primitives
+    		shape_utf8_1
+    		shape_utf8_1ex
+    		shape_utf8_2
+    		check_dxf
+        )
+    endif()
 
     if(ENABLE_GEOPACKAGE)
         set(check_PROGRAMS ${check_PROGRAMS}

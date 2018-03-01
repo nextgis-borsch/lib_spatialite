@@ -34,7 +34,6 @@ set(CSOURCES gg_advanced.c
 	gg_relations.c
 	gg_relations_ext.c
 	gg_lwgeom.c
-	gg_extras.c
 	gg_shape.c
 	gg_transform.c
 	gg_wkb.c
@@ -53,6 +52,20 @@ set(CSOURCES gg_advanced.c
 #	Kml.h Kml.c lex.Kml.c
 #	vanuatuWkt.c lex.VanuatuWkt.c
 )
+
+if(MSVC_VERSION GREATER_OR_EQUAL_TO 1700)
+    # The rint is already defied so replace it rint_tmp
+    file(READ gg_extras.c gg_extras_CONTENTS)
+    string(REPLACE "rint (double x)" "rint_tmp (double x)" gg_extras_CONTENTS "${gg_extras_CONTENTS}")
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/gg_extras.c "${gg_extras_CONTENTS}")
+    set(CSOURCES ${CSOURCES}
+    	${CMAKE_CURRENT_BINARY_DIR}/gg_extras.c
+    )
+else()
+    set(CSOURCES ${CSOURCES}
+    	gg_extras.c
+    )
+endif()
 
 add_library(${TARGET_NAME} OBJECT ${CSOURCES})
 
