@@ -26,6 +26,10 @@
 
 if(BUILD_TESTING)
 
+    if(LIBXML2_FOUND)
+        find_anyproject(LibLZMA REQUIRED)
+    endif()
+
     set(EXTRA_DIST
         shp
         sql_stmt_tests
@@ -161,5 +165,16 @@ if(BUILD_TESTING)
     foreach(TEST ${check_PROGRAMS})
         spatialite_test(${TEST})
     endforeach()
+
+    if(WIN32)
+        file(GLOB_RECURSE IMPORTED_WIN_DLLS ${CMAKE_BINARY_DIR}/third-party/*.dll)
+        foreach(IMPORTED_WIN_DLL ${IMPORTED_WIN_DLLS})
+            add_custom_command(TARGET check_control_points
+                                POST_BUILD
+                                COMMAND ${CMAKE_COMMAND} -E copy ${IMPORTED_WIN_DLL} $<TARGET_FILE_DIR:check_control_points>
+                                COMMENT "Copy ${IMPORTED_WIN_DLL} to check_control_points"
+                            )
+        endforeach()
+    endif()
 
 endif()
