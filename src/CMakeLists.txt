@@ -29,8 +29,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers)
 
 set(TARGET_OBJECTS)
 
-add_definitions(-DLOADABLE_EXTENSION)
-
 add_subdirectory(headers)
 add_subdirectory(gaiaaux)
 add_subdirectory(gaiaexif)
