@@ -27,6 +27,10 @@
 if(BUILD_TESTING)
 
     if(LIBXML2_FOUND)
+        set(WITH_LibLZMA ON CACHE INTERNAL "Get liblzma")
+        if(WITH_LibXml2_EXTERNAL)
+            set(WITH_LibLZMA_EXTERNAL ON CACHE INTERNAL "Get external liblzma")
+        endif()
         find_anyproject(LibLZMA REQUIRED)
     endif()
 
