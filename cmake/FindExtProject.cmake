@@ -73,7 +73,7 @@ endfunction()
 function(find_extproject name)
     set(options OPTIONAL EXACT)
     set(oneValueArgs VERSION SHARED)
-    set(multiValueArgs CMAKE_ARGS NAMES)
+    set(multiValueArgs CMAKE_ARGS COMPONENTS NAMES)
     cmake_parse_arguments(find_extproject "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     # Set default third party lib path.
@@ -121,6 +121,11 @@ function(find_extproject name)
         else()
             set(CMAKE_PREFIX_PATH ${EXT_INSTALL_DIR}/${BINARY_NAME})
         endif()
+
+        if(find_extproject_COMPONENTS)
+            set(FIND_PROJECT_ARG ${FIND_PROJECT_ARG} COMPONENTS ${find_extproject_COMPONENTS})
+        endif()
+
         if(find_extproject_NAMES)
             set(FIND_PROJECT_ARG ${FIND_PROJECT_ARG} NAMES ${find_extproject_NAMES})
         endif()
