@@ -150,12 +150,22 @@ endif()
 
 include(configure)
 
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+if(COMPILER_SUPPORTS_CXX11)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif()
+
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 set(LIB_NAME ${PROJECT_NAME})
 set(PACKAGE_NAME ${PROJECT_NAME})
 string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
 
 add_subdirectory(src)
+if(BUILD_QT4)
+    add_subdirectory(qt4)
+endif()
+
 enable_testing()
 add_subdirectory(test)
 
