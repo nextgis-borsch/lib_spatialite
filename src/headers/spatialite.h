@@ -52,7 +52,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #ifdef DLL_EXPORT
 #define SPATIALITE_DECLARE __declspec(dllexport)
 #else
-#define SPATIALITE_DECLARE extern
+#define SPATIALITE_DECLARE __declspec(dllimport)
 #endif
 #else
 #define SPATIALITE_DECLARE __attribute__ ((visibility("default")))

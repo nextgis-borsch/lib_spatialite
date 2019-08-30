@@ -49,6 +49,12 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include <string.h>
 #include <math.h>
 
+#if defined(_WIN32) && !defined(__MINGW32__)
+#include <windows.h>
+#else
+#include <pthread.h>
+#endif
+
 #if defined(_WIN32)
 #include <libloaderapi.h>
 #endif

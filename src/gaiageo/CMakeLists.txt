@@ -47,31 +47,9 @@ set(CSOURCES gg_advanced.c
 	gg_voronoj.c 
 	gg_xml.c 
 	gg_matrix.c
+	gg_extras.c
+	gg_shape.c
 )
-
-if(MSVC_VERSION GREATER 1600)
-    # This is HACK for strange and not normal dependency of library on OSGeo4W
-    # The rint is already defied so replace it rint_tmp
-    file(READ gg_extras.c gg_extras_CONTENTS)
-    string(REPLACE "rint (double x)" "rint_tmp (double x)" gg_extras_CONTENTS "${gg_extras_CONTENTS}")
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/gg_extras.c "${gg_extras_CONTENTS}")
-
-    file(READ gg_shape.c gg_shape_CONTENTS)
-    string(REPLACE "#if defined(__MINGW32__) || defined(_WIN32)" "#if 0" gg_shape_CONTENTS "${gg_shape_CONTENTS}")
-    string(REPLACE "#if defined(__APPLE__) || defined(__ANDROID__)" "#if 1" gg_shape_CONTENTS "${gg_shape_CONTENTS}")
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/gg_shape.c "${gg_shape_CONTENTS}")
-
-    set(CSOURCES ${CSOURCES}
-    	${CMAKE_CURRENT_BINARY_DIR}/gg_extras.c
-        ${CMAKE_CURRENT_BINARY_DIR}/gg_shape.c
-    )
-
-else()
-    set(CSOURCES ${CSOURCES}
-    	gg_extras.c
-    	gg_shape.c
-    )
-endif()
 
 add_library(${TARGET_NAME} OBJECT ${CSOURCES})
 
