@@ -62,6 +62,15 @@ extern "C"
 {
 #endif
 
+/* supporting files bigger than 2 GB */
+#ifdef _WIN32			/* windows */
+#define gaia_off_t	__int64
+#define gaia_fseek	_fseeki64
+#else				/* not windows */
+#define gaia_off_t	off_t
+#define gaia_fseek	fseeko
+#endif
+
 /**
  Container for OGC POINT Geometry
  */
@@ -499,7 +508,7 @@ extern "C"
     {
 /* a struct representing a full LINE (aka Record) */
 /** current offset (parsing) */
-	off_t offset;
+	gaia_off_t offset;
 /** line length (in bytes) */
 	int len;
 /** array of field offsets (where each field starts) */
@@ -519,7 +528,7 @@ extern "C"
 /** Line Number */
 	int line_no;
 /** start offset */
-	off_t offset;
+	gaia_off_t offset;
 /** record (line) length (in bytes) */
 	int len;
 /** number of fields into this record */
@@ -652,6 +661,12 @@ extern "C"
 	int IsReadOnly;
 /** Hidden layer: TRUE or FALSE */
 	int IsHidden;
+/** Flag indicating if the Capabilities of the SpatialView supports Inserting: TRUE or FALSE */
+	int HasTriggerInsert;
+/** Flag indicating if the Capabilities of the SpatialView supports Updating: TRUE or FALSE */
+	int HasTriggerUpdate;
+/** Flag indicating if the Capabilities of the SpatialView supports Deleting: TRUE or FALSE */
+	int HasTriggerDelete;
     } gaiaLayerAuth;
 
 /**
@@ -812,6 +827,24 @@ extern "C"
  \sa gaiaVectorLayersList
  */
     typedef gaiaVectorLayersList *gaiaVectorLayersListPtr;
+
+/**
+ BBOX corresponding to PROJ.6 AREA
+ */
+    typedef struct gaiaProjAreaStr
+    {
+	double WestLongitude;
+	double SouthLatitude;
+	double EastLongitude;
+	double NorthLatitude;
+    } gaiaProjArea;
+
+/**
+ Typedef for BBOX corresponding to PROJ.6 AREA
+
+ \sa gaiaProjArea
+ */
+    typedef gaiaProjArea *gaiaProjAreaPtr;
 
 #ifdef __cplusplus
 }

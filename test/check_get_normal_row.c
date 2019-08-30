@@ -125,7 +125,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesTable(\"test1_matrix_tiles\", 4326, -180.0, -90.0, 180.0, 90.0)",
+		      "SELECT gpkgCreateTilesTable('test1_matrix_tiles', 4326, -180.0, -90.0, 180.0, 90.0)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -139,7 +139,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
     /* create matrix levels 0, 1, 2 and 4 */
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesZoomLevel(\"test1_matrix_tiles\", 0, 360, 180)",
+		      "SELECT gpkgCreateTilesZoomLevel('test1_matrix_tiles', 0, 360, 180)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -151,7 +151,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
       }
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesZoomLevel(\"test1_matrix_tiles\", 1, 360, 180)",
+		      "SELECT gpkgCreateTilesZoomLevel('test1_matrix_tiles', 1, 360, 180)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -163,7 +163,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
       }
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesZoomLevel(\"test1_matrix_tiles\", 2, 360, 180)",
+		      "SELECT gpkgCreateTilesZoomLevel('test1_matrix_tiles', 2, 360, 180)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -175,7 +175,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
       }
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesZoomLevel(\"test1_matrix_tiles\", 4, 360, 180)",
+		      "SELECT gpkgCreateTilesZoomLevel('test1_matrix_tiles', 4, 360, 180)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -200,7 +200,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_get_table (db_handle,
-			   "SELECT gpkgGetNormalRow(\"test1_matrix_tiles\", 0, 0)",
+			   "SELECT gpkgGetNormalRow('test1_matrix_tiles', 0, 0)",
 			   &results, &rows, &columns, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -226,7 +226,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_get_table (db_handle,
-			   "SELECT gpkgGetNormalRow(\"test1_matrix_tiles\", 2, 0)",
+			   "SELECT gpkgGetNormalRow('test1_matrix_tiles', 2, 0)",
 			   &results, &rows, &columns, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -253,7 +253,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
     /* test an out-of-range zoom number - expect exception */
     ret =
 	sqlite3_get_table (db_handle,
-			   "SELECT gpkgGetNormalRow(\"test1_matrix_tiles\", 5, 0)",
+			   "SELECT gpkgGetNormalRow('test1_matrix_tiles', 5, 0)",
 			   &results, &rows, &columns, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -275,7 +275,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_get_table (db_handle,
-			   "SELECT gpkgGetNormalRow(\"test1_matrix_tiles\", -1, 0)",
+			   "SELECT gpkgGetNormalRow('test1_matrix_tiles', -1, 0)",
 			   &results, &rows, &columns, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -298,7 +298,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
     /* test bad table name */
     ret =
 	sqlite3_get_table (db_handle,
-			   "SELECT gpkgGetNormalRow(\"no_such_table\", 0, 0)",
+			   "SELECT gpkgGetNormalRow('no_such_table', 0, 0)",
 			   &results, &rows, &columns, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -342,7 +342,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
     /* test bad argument types */
     ret =
 	sqlite3_get_table (db_handle,
-			   "SELECT gpkgGetNormalRow(\"test1_matrix_tiles\", 3.2, 0)",
+			   "SELECT gpkgGetNormalRow('test1_matrix_tiles', 3.2, 0)",
 			   &results, &rows, &columns, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -365,7 +365,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
     /* test bad argument types */
     ret =
 	sqlite3_get_table (db_handle,
-			   "SELECT gpkgGetNormalRow(\"test1_matrix_tiles\", 2, 1.6)",
+			   "SELECT gpkgGetNormalRow('test1_matrix_tiles', 2, 1.6)",
 			   &results, &rows, &columns, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -388,7 +388,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
     /* test overrange row number */
     ret =
 	sqlite3_get_table (db_handle,
-			   "SELECT gpkgGetNormalRow(\"test1_matrix_tiles\", 2, 4)",
+			   "SELECT gpkgGetNormalRow('test1_matrix_tiles', 2, 4)",
 			   &results, &rows, &columns, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -413,7 +413,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
     /* test underrange row number */
     ret =
 	sqlite3_get_table (db_handle,
-			   "SELECT gpkgGetNormalRow(\"test1_matrix_tiles\", 2, -1)",
+			   "SELECT gpkgGetNormalRow('test1_matrix_tiles', 2, -1)",
 			   &results, &rows, &columns, &err_msg);
     if (ret != SQLITE_ERROR)
       {

@@ -103,7 +103,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgAddGeometryColumn(\"testfeats1\", \"thegeom\", \"POINT\", 0, 0, 4326)",
+		      "SELECT gpkgAddGeometryColumn('testfeats1', 'thegeom', 'POINT', 0, 0, 4326)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -116,7 +116,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgAddGeometryColumn(\"testfeats1\", \"thegeom\", \"POINT\", 0, 0, 4326)",
+		      "SELECT gpkgAddGeometryColumn('testfeats1', 'thegeom', 'POINT', 0, 0, 4326)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -295,7 +295,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
       }
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgAddGeometryColumn(\"ctd\", 2.4, \"POINT\", 0, 0, 4326)",
+		      "SELECT gpkgAddGeometryColumn('ctd', 2.4, 'POINT', 0, 0, 4326)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -321,7 +321,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgAddGeometryColumn(\"ctd\", \"the_geom\", 4, 0, 0, 4326)",
+		      "SELECT gpkgAddGeometryColumn('ctd', 'the_geom', 4, 0, 0, 4326)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -346,7 +346,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgAddGeometryColumn(8.3, \"the_geom\", \"POINT\", 0, 0, 4326)",
+		      "SELECT gpkgAddGeometryColumn(8.3, 'the_geom', 'POINT', 0, 0, 4326)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -371,7 +371,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgAddGeometryColumn(\"ctd\", \"the_geom\", \"POINT\", \"z\", 0, 4326)",
+		      "SELECT gpkgAddGeometryColumn('ctd', 'the_geom', 'POINT', 'z', 0, 4326)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -396,7 +396,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgAddGeometryColumn(\"ctd\", \"the_geom\", \"POINT\", 0, \"m\", 4326)",
+		      "SELECT gpkgAddGeometryColumn('ctd', 'the_geom', 'POINT', 0, 'm', 4326)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -421,7 +421,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgAddGeometryColumn(\"ctd\", \"the_geom\", \"POINT\", 3, 0, 4326)",
+		      "SELECT gpkgAddGeometryColumn('ctd', 'the_geom', 'POINT', 3, 0, 4326)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -446,7 +446,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgAddGeometryColumn(\"ctd\", \"the_geom\", \"POINT\", 0, 3, 4326)",
+		      "SELECT gpkgAddGeometryColumn('ctd', 'the_geom', 'POINT', 0, 3, 4326)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -471,7 +471,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgAddGeometryColumn(\"ctd\", \"the_geom\", \"POINT\", 0, 2, \"srid\")",
+		      "SELECT gpkgAddGeometryColumn('ctd', 'the_geom', 'POINT', 0, 2, 'srid')",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -496,7 +496,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgAddGeometryColumn(\"ctd\", \"the_geom\", \"blah\", 0, 1, 4326)",
+		      "SELECT gpkgAddGeometryColumn('ctd', 'the_geom', 'blah', 0, 1, 4326)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {

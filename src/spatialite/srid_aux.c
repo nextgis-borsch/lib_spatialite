@@ -64,6 +64,14 @@ Regione Toscana - Settore Sistema Informativo Territoriale ed Ambientale
 #include "config.h"
 #endif
 
+#ifndef OMIT_PROJ		/* including PROJ.4 */
+#ifdef PROJ_NEW			/* supporting PROJ.6 */
+#include <proj.h>
+#else /* supporting old PROJ.4 */
+#include <proj_api.h>
+#endif
+#endif
+
 #include <spatialite/sqlite.h>
 #include <spatialite/debug.h>
 #include <spatialite.h>
@@ -1653,7 +1661,7 @@ srid_get_axis (sqlite3 * sqlite, int srid, char axis, char mode)
     char *result = NULL;
     int ret;
     sqlite3_stmt *stmt = NULL;
-    const char *sql;
+    const char *sql = "";
 
     if ((axis == SPLITE_AXIS_1 || axis == SPLITE_AXIS_2)
 	&& (mode == SPLITE_AXIS_NAME || mode == SPLITE_AXIS_ORIENTATION))
@@ -1739,7 +1747,7 @@ static void
 getProjParamsFromSpatialReferenceSystemTable (sqlite3 * sqlite, int srid,
 					      char **proj_params)
 {
-/* retrives the PROJ params from SPATIAL_SYS_REF table, if possible */
+/* retrieves the PROJ params from SPATIAL_SYS_REF table, if possible */
     char *sql;
     char **results;
     int rows;
@@ -1767,8 +1775,11 @@ getProjParamsFromSpatialReferenceSystemTable (sqlite3 * sqlite, int srid,
 	  if (proj4text != NULL)
 	    {
 		len = strlen (proj4text);
-		*proj_params = malloc (len + 1);
-		strcpy (*proj_params, proj4text);
+		if (len > 0)
+		  {
+		      *proj_params = malloc (len + 1);
+		      strcpy (*proj_params, proj4text);
+		  }
 	    }
       }
     if (*proj_params == NULL)
@@ -1888,10 +1899,10 @@ getProjParamsFromGeopackageTable (sqlite3 * sqlite, int srid,
 }
 
 SPATIALITE_PRIVATE void
-getProjParamsEx (void *p_sqlite, int srid, char **proj_params,
-		 int gpkg_amphibious_mode)
+getProjParams (void *p_sqlite, int srid, char **proj_params)
 {
-/* retrives the PROJ params - generic interface */sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+/* retrieves the PROJ params from SPATIAL_SYS_REF table */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
     *proj_params = NULL;
 
 /* searching within "vanilla" spatial_reference_sys */
@@ -1904,11 +1915,88 @@ getProjParamsEx (void *p_sqlite, int srid, char **proj_params,
 }
 
 SPATIALITE_PRIVATE void
-getProjParams (void *p_sqlite, int srid, char **proj_params)
+getProjWkt (void *p_sqlite, int srid, char **wkt)
 {
-/* 
-* retrives the PROJ params from SPATIAL_SYS_REF table, if possible 
-* convenience method - disabling GPKG amphibious mode
-*/
-    getProjParamsEx (p_sqlite, srid, proj_params, 0);
+/* retrieves the WKT definition from SPATIAL_SYS_REF table */
+    char *sql;
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    char **results;
+    int rows;
+    int columns;
+    int i;
+    int ret;
+    int len;
+    const char *srtext;
+    char *errMsg = NULL;
+    *wkt = NULL;
+    sql =
+	sqlite3_mprintf
+	("SELECT srtext FROM spatial_ref_sys WHERE srid = %d", srid);
+    ret = sqlite3_get_table (sqlite, sql, &results, &rows, &columns, &errMsg);
+    sqlite3_free (sql);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("unknown SRID: %d\t<%s>\n", srid, errMsg);
+	  sqlite3_free (errMsg);
+	  return;
+      }
+    for (i = 1; i <= rows; i++)
+      {
+	  srtext = results[(i * columns)];
+	  if (srtext != NULL)
+	    {
+		len = strlen (srtext);
+		*wkt = malloc (len + 1);
+		strcpy (*wkt, srtext);
+	    }
+      }
+    if (*wkt == NULL)
+      {
+	  spatialite_e ("unknown SRID: %d\n", srid);
+      }
+    sqlite3_free_table (results);
+}
+
+SPATIALITE_PRIVATE void
+getProjAuthNameSrid (void *p_sqlite, int srid, char **auth_name_srid)
+{
+/* retrieves the AUTH_NAME:AUTH_SRID definition from SPATIAL_SYS_REF table */
+    char *sql;
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    char **results;
+    int rows;
+    int columns;
+    int i;
+    int ret;
+    int len;
+    const char *auth;
+    char *errMsg = NULL;
+    *auth_name_srid = NULL;
+    sql =
+	sqlite3_mprintf
+	("SELECT Upper(auth_name) || ':' || CastToText(auth_srid) FROM spatial_ref_sys WHERE srid = %d",
+	 srid);
+    ret = sqlite3_get_table (sqlite, sql, &results, &rows, &columns, &errMsg);
+    sqlite3_free (sql);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("unknown SRID: %d\t<%s>\n", srid, errMsg);
+	  sqlite3_free (errMsg);
+	  return;
+      }
+    for (i = 1; i <= rows; i++)
+      {
+	  auth = results[(i * columns)];
+	  if (auth != NULL)
+	    {
+		len = strlen (auth);
+		*auth_name_srid = malloc (len + 1);
+		strcpy (*auth_name_srid, auth);
+	    }
+      }
+    if (*auth_name_srid == NULL)
+      {
+	  spatialite_e ("unknown SRID: %d\n", srid);
+      }
+    sqlite3_free_table (results);
 }

@@ -113,16 +113,18 @@ text_clean_integer (char *value)
 {
 /* cleaning an integer value */
     char last;
-    char buffer[35536];
+    char *buffer;
     int len = strlen (value);
     last = value[len - 1];
     if (last == '-' || last == '+')
       {
 	  /* trailing sign; transforming into a leading sign */
+	  buffer = malloc (len + 1);
 	  *buffer = last;
 	  strcpy (buffer + 1, value);
 	  buffer[len - 1] = '\0';
 	  strcpy (value, buffer);
+	  free (buffer);
       }
 }
 
@@ -132,16 +134,18 @@ text_clean_double (char *value)
 /* cleaning an integer value */
     char *p;
     char last;
-    char buffer[35536];
+    char *buffer;
     int len = strlen (value);
     last = value[len - 1];
     if (last == '-' || last == '+')
       {
 	  /* trailing sign; transforming into a leading sign */
+	  buffer = malloc (len + 1);
 	  *buffer = last;
 	  strcpy (buffer + 1, value);
 	  buffer[len - 1] = '\0';
 	  strcpy (value, buffer);
+	  free (buffer);
       }
     p = value;
     while (*p != '\0')
@@ -504,8 +508,8 @@ vtxt_eval_constraints (VirtualTextCursorPtr cursor)
     char buf[4096];
     int type;
     const char *value = NULL;
-    sqlite3_int64 int_value;
-    double dbl_value;
+    sqlite3_int64 int_value = 0;
+    double dbl_value = 0.0;
     char *txt_value = NULL;
     int is_int = 0;
     int is_dbl = 0;
@@ -1100,7 +1104,7 @@ gaiaTextReaderAlloc (const char *path, char field_separator,
 }
 
 static void
-vrttxt_line_init (struct vrttxt_line *line, off_t offset)
+vrttxt_line_init (struct vrttxt_line *line, gaia_off_t offset)
 {
 /* initializing a LINE struct */
     line->offset = offset;
@@ -1110,14 +1114,14 @@ vrttxt_line_init (struct vrttxt_line *line, off_t offset)
 }
 
 static void
-vrttxt_line_end (struct vrttxt_line *line, off_t offset)
+vrttxt_line_end (struct vrttxt_line *line, gaia_off_t offset)
 {
 /* completing a Line struct (EndOfLine encountered) */
     line->len = offset - line->offset;
 }
 
 static void
-vrttxt_add_field (struct vrttxt_line *line, off_t offset)
+vrttxt_add_field (struct vrttxt_line *line, gaia_off_t offset)
 {
 /* adding a Field offset to the current Line */
     if (line->num_fields >= VRTTXT_FIELDS_MAX)
@@ -1164,9 +1168,60 @@ vrttxt_is_integer (const char *value)
 }
 
 static int
-vrttxt_is_double (const char *value, char decimal_separator)
+vrttxt_is_scientific_double (const char *value, char decimal_separator)
 {
-/* checking if this value can be a DOUBLE */
+/* checking if this value can be a DOUBLE (scientific notation: -1.567E-16) */
+    int points = 0;
+    int exp = 0;
+    int sign = 0;
+    int invalid = 0;
+    int digit2 = 0;
+    int digit3 = 0;
+    const char *p = value;
+    if (*p == '-' || *p == '+')
+	p++;			/* skipping the first sign */
+    while (*p != '\0')
+      {
+	  if (*p == decimal_separator)
+	    {
+		if (digit2 == 0)
+		    points++;
+		else
+		    invalid++;
+	    }
+	  else if ((*p >= 'A' && *p <= 'Z') || (*p >= 'a' && *p <= 'z'))
+	    {
+		if (*p == 'E' || *p == 'e')
+		    exp++;
+		else
+		    invalid++;
+	    }
+	  else if (*p == '-' || *p == '+')
+	    {
+		if (exp && !digit3)
+		    sign++;
+		else
+		    invalid++;
+	    }
+	  else if (*p >= '0' && *p <= '9')
+	    {
+		if (exp)
+		    digit3++;
+		else if (points)
+		    digit2++;
+	    }
+	  p++;
+      }
+    if (digit2 >= 0 && exp == 1 && (sign == 0 || sign == 1) && digit3
+	&& !invalid)
+	return 1;
+    return 0;
+}
+
+static int
+vrttxt_is_plain_double (const char *value, char decimal_separator)
+{
+/* checking if this value can be a DOUBLE (normal case: -123.567 */
     int invalids = 0;
     int digits = 0;
     int signs = 0;
@@ -1216,6 +1271,17 @@ vrttxt_is_double (const char *value, char decimal_separator)
 }
 
 static int
+vrttxt_is_double (const char *value, char decimal_separator)
+{
+/* checking if this value can be a DOUBLE */
+    if (vrttxt_is_plain_double (value, decimal_separator))
+	return 1;
+    if (vrttxt_is_scientific_double (value, decimal_separator))
+	return 1;
+    return 0;
+}
+
+static int
 vrttxt_check_type (const char *value, char decimal_separator)
 {
 /* checking the Field type */
@@ -1226,6 +1292,33 @@ vrttxt_check_type (const char *value, char decimal_separator)
     if (vrttxt_is_double (value, decimal_separator))
 	return VRTTXT_DOUBLE;
     return VRTTXT_TEXT;
+}
+
+static void
+vrttxt_unmask (char *string, char separator)
+{
+/* unmasking double separators */
+    int len = strlen (string);
+    char *buffer = malloc (len + 1);
+    char *in = buffer;
+    char *out = string;
+    char prevchar = '\0';
+    strcpy (buffer, string);
+    while (*in != '\0')
+      {
+	  if (*in == separator)
+	    {
+		if (prevchar == separator)
+		    *out++ = separator;
+		in++;
+		prevchar = separator;
+		continue;
+	    }
+	  prevchar = *in;
+	  *out++ = *in++;
+      }
+    *out = '\0';
+    free (buffer);
 }
 
 static int
@@ -1247,6 +1340,7 @@ vrttxt_set_column_title (gaiaTextReaderPtr txt, int col_no, const char *name)
 	  len -= 2;
 	  if (len <= 0)
 	      return 0;
+	  vrttxt_unmask (str, txt->text_separator);
       }
     utf8text = gaiaConvertToUTF8 (txt->toUtf8, str, len, &err);
     if (err)
@@ -1377,6 +1471,8 @@ vrttxt_add_line (gaiaTextReaderPtr txt, struct vrttxt_line *line)
 	  if (txt->first_line_titles && first_line)
 	    {
 		/* first line: the current value is the Column Name */
+		if (strlen (txt->field_buffer) == 0)
+		    strcpy (txt->field_buffer, "empty");
 		if (!vrttxt_set_column_title (txt, ind, txt->field_buffer))
 		    txt->error = 1;
 	    }
@@ -1520,16 +1616,46 @@ gaiaTextReaderParse (gaiaTextReaderPtr txt)
     int ind;
     int i2;
     int c;
+    int c1 = EOF;
+    int c2 = EOF;
+    int c3 = EOF;
+    int prevchar = '\0';
     int masked = 0;
     int token_start = 1;
     int row_offset = 0;
-    off_t offset = 0;
+    gaia_off_t offset = 0;
     struct vrttxt_line line;
     vrttxt_line_init (&line, 0);
     txt->current_buf_off = 0;
 
-    while ((c = getc (txt->text_file)) != EOF)
+/* attempting to discard an eventual UTF-8 BOM */
+    c1 = getc (txt->text_file);
+    c2 = getc (txt->text_file);
+    c3 = getc (txt->text_file);
+    if (c1 == 0xEF && c2 == 0xBB && c3 == 0xBF)
       {
+	  /* all right, it's a BOM */
+	  offset = 3;
+	  line.offset = 3;
+      }
+    else
+	rewind (txt->text_file);
+
+    while (1)
+      {
+	  c = getc (txt->text_file);
+	  if (c == EOF)
+	    {
+		/* EOF found */
+		if (txt->current_buf_off > 0)
+		  {
+		      /* the last line in the input file is not properly terminated */
+		      vrttxt_add_field (&line, offset);
+		      vrttxt_line_end (&line, offset);
+		      vrttxt_add_line (txt, &line);
+		  }
+		break;
+	    }
 	  if (c == txt->text_separator)
 	    {
 		if (masked)
@@ -1538,20 +1664,24 @@ gaiaTextReaderParse (gaiaTextReaderPtr txt)
 		  {
 		      if (token_start)
 			  masked = 1;
+		      if (prevchar == txt->text_separator)
+			  masked = 1;
 		  }
-		vrttxt_line_push (txt, c);
+		vrttxt_line_push (txt, (char) c);
 		if (txt->error)
 		    return 0;
 		row_offset++;
 		offset++;
+		prevchar = c;
 		continue;
 	    }
+	  prevchar = c;
 	  token_start = 0;
 	  if (c == '\r')
 	    {
 		if (masked)
 		  {
-		      vrttxt_line_push (txt, c);
+		      vrttxt_line_push (txt, (char) c);
 		      if (txt->error)
 			  return 0;
 		      row_offset++;
@@ -1563,7 +1693,7 @@ gaiaTextReaderParse (gaiaTextReaderPtr txt)
 	    {
 		if (masked)
 		  {
-		      vrttxt_line_push (txt, c);
+		      vrttxt_line_push (txt, (char) c);
 		      if (txt->error)
 			  return 0;
 		      row_offset++;
@@ -1582,18 +1712,20 @@ gaiaTextReaderParse (gaiaTextReaderPtr txt)
 		offset++;
 		continue;
 	    }
+	  if (c == EOF)
+	      break;
 	  if (c == txt->field_separator)
 	    {
 		if (masked)
 		  {
-		      vrttxt_line_push (txt, c);
+		      vrttxt_line_push (txt, (char) c);
 		      if (txt->error)
 			  return 0;
 		      row_offset++;
 		      offset++;
 		      continue;
 		  }
-		vrttxt_line_push (txt, c);
+		vrttxt_line_push (txt, (char) c);
 		if (txt->error)
 		    return 0;
 		row_offset++;
@@ -1602,7 +1734,7 @@ gaiaTextReaderParse (gaiaTextReaderPtr txt)
 		offset++;
 		continue;
 	    }
-	  vrttxt_line_push (txt, c);
+	  vrttxt_line_push (txt, (char) c);
 	  if (txt->error)
 	      return 0;
 	  row_offset++;
@@ -1617,6 +1749,14 @@ gaiaTextReaderParse (gaiaTextReaderPtr txt)
 	    {
 		for (i2 = 0; i2 < ind; i2++)
 		  {
+		      if (txt->columns[ind].name == NULL)
+			{
+			    if (!vrttxt_set_column_title (txt, ind, "empty"))
+			      {
+				  txt->error = 1;
+				  return 0;
+			      }
+			}
 		      if (strcasecmp
 			  (txt->columns[i2].name, txt->columns[ind].name) == 0)
 			{
@@ -1657,22 +1797,26 @@ gaiaTextReaderGetRow (gaiaTextReaderPtr txt, int line_no)
 /* reading a Line (identified by relative number */
     int i;
     char c;
+    char prevchar = '\0';
     int masked = 0;
     int token_start = 1;
     int fld = 0;
     int offset = 0;
     struct vrttxt_row *p_row;
+    if (txt == NULL)
+	return 0;
     txt->current_line_ready = 0;
     txt->max_current_field = 0;
     if (line_no < 0 || line_no >= txt->num_rows || txt->rows == NULL)
 	return 0;
     p_row = *(txt->rows + line_no);
-    if (fseek (txt->text_file, p_row->offset, SEEK_SET) != 0)
+    if (gaia_fseek (txt->text_file, p_row->offset, SEEK_SET) != 0)
 	return 0;
     if (fread (txt->line_buffer, 1, p_row->len, txt->text_file) !=
 	(unsigned int) (p_row->len))
 	return 0;
     txt->field_offsets[0] = 0;
+
     for (i = 0; i < p_row->len; i++)
       {
 	  /* parsing Fields */
@@ -1685,10 +1829,14 @@ gaiaTextReaderGetRow (gaiaTextReaderPtr txt, int line_no)
 		  {
 		      if (token_start)
 			  masked = 1;
+		      if (prevchar == txt->text_separator)
+			  masked = 1;
 		  }
 		offset++;
+		prevchar = c;
 		continue;
 	    }
+	  prevchar = c;
 	  token_start = 0;
 	  if (c == '\r')
 	    {
@@ -1787,6 +1935,7 @@ gaiaTextReaderFetchField (gaiaTextReaderPtr txt, int field_idx, int *type,
 		      *value = NULL;
 		      return 1;
 		  }
+		vrttxt_unmask (str, txt->text_separator);
 	    }
 	  utf8text = gaiaConvertToUTF8 (txt->toUtf8, str, len, &err);
 	  if (err)

@@ -80,6 +80,7 @@ extern const char *locale_charset (void);
 
 #include <spatialite/sqlite.h>
 #include <spatialite/gaiaaux.h>
+#include <spatialite_private.h>
 
 GAIAAUX_DECLARE const char *
 gaiaGetLocaleCharset ()
@@ -100,7 +101,7 @@ GAIAAUX_DECLARE int
 gaiaConvertCharset (char **buf, const char *fromCs, const char *toCs)
 {
 /* converting a string from a charset to another "on-the-fly" */
-    char utf8buf[65536];
+    char *utf8buf;
 #if !defined(__MINGW32__) && defined(_WIN32)
     const char *pBuf;
 #else /* not WIN32 */
@@ -109,21 +110,37 @@ gaiaConvertCharset (char **buf, const char *fromCs, const char *toCs)
     size_t len;
     size_t utf8len;
     char *pUtf8buf;
+    int maxlen;
     iconv_t cvt = iconv_open (toCs, fromCs);
     if (cvt == (iconv_t) (-1))
 	goto unsupported;
     len = strlen (*buf);
-    utf8len = 65536;
+    if (len == 0)
+      {
+	  /* empty string */
+	  utf8buf = sqlite3_malloc (1);
+	  *utf8buf = '\0';
+	  sqlite3_free (*buf);
+	  *buf = utf8buf;
+	  iconv_close (cvt);
+	  return 1;
+      }
+    maxlen = len * 4;
+    utf8len = maxlen;
     pBuf = *buf;
+    utf8buf = sqlite3_malloc (utf8len);
     pUtf8buf = utf8buf;
     if (iconv (cvt, &pBuf, &len, &pUtf8buf, &utf8len) == (size_t) (-1))
 	goto error;
-    utf8buf[65536 - utf8len] = '\0';
-    memcpy (*buf, utf8buf, (65536 - utf8len) + 1);
+    utf8buf[maxlen - utf8len] = '\0';
+    sqlite3_free (*buf);
+    *buf = utf8buf;
     iconv_close (cvt);
     return 1;
   error:
     iconv_close (cvt);
+    sqlite3_free (*buf);
+    *buf = NULL;
   unsupported:
     return 0;
 }
@@ -179,6 +196,84 @@ gaiaConvertToUTF8 (void *cvtCS, const char *buf, int buflen, int *err)
       }
     utf8buf[maxlen - utf8len] = '\0';
     return utf8buf;
+}
+
+SPATIALITE_PRIVATE char *
+url_toUtf8 (const char *url, const char *in_charset)
+{
+/* converting an URL to UTF-8 */
+    iconv_t cvt;
+    size_t len;
+    size_t utf8len;
+    int maxlen;
+    char *utf8buf;
+    char *pUtf8buf;
+#if !defined(__MINGW32__) && defined(_WIN32)
+    const char *pBuf = url;
+#else /* not WIN32 */
+    char *pBuf = (char *)url;
+#endif
+
+    if (url == NULL || in_charset == NULL)
+	return NULL;
+    cvt = iconv_open ("UTF-8", in_charset);
+    if (cvt == (iconv_t) (-1))
+	goto unsupported;
+    len = strlen (url);
+    maxlen = len * 4;
+    utf8len = maxlen;
+    utf8buf = malloc (maxlen);
+    pUtf8buf = utf8buf;
+    if (iconv (cvt, &pBuf, &len, &pUtf8buf, &utf8len) == (size_t) (-1))
+	goto error;
+    utf8buf[maxlen - utf8len] = '\0';
+    iconv_close (cvt);
+    return utf8buf;
+
+  error:
+    iconv_close (cvt);
+    free (utf8buf);
+  unsupported:
+    return NULL;
+}
+
+SPATIALITE_PRIVATE char *
+url_fromUtf8 (const char *url, const char *out_charset)
+{
+/* converting an URL from UTF-8 */
+    iconv_t cvt;
+    size_t len;
+    size_t utf8len;
+    int maxlen;
+    char *utf8buf;
+    char *pUtf8buf;
+#if !defined(__MINGW32__) && defined(_WIN32)
+    const char *pBuf = url;
+#else /* not WIN32 */
+    char *pBuf = (char *)url;
+#endif
+
+    if (url == NULL || out_charset == NULL)
+	return NULL;
+    cvt = iconv_open (out_charset, "UTF-8");
+    if (cvt == (iconv_t) (-1))
+	goto unsupported;
+    len = strlen (url);
+    maxlen = len * 4;
+    utf8len = maxlen;
+    utf8buf = malloc (maxlen);
+    pUtf8buf = utf8buf;
+    if (iconv (cvt, &pBuf, &len, &pUtf8buf, &utf8len) == (size_t) (-1))
+	goto error;
+    utf8buf[maxlen - utf8len] = '\0';
+    iconv_close (cvt);
+    return utf8buf;
+
+  error:
+    iconv_close (cvt);
+    free (utf8buf);
+  unsupported:
+    return NULL;
 }
 
 #endif /* ICONV enabled/disabled */

@@ -101,7 +101,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
       }
     ret =
 	sqlite3_exec (db_handle,
-		      "INSERT INTO gpkg_tile_matrix VALUES (\"test1_matrix_tiles\", 0, 0, \"foo\")",
+		      "INSERT INTO gpkg_tile_matrix VALUES ('test1_matrix_tiles', 0, 0, 'foo')",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -112,7 +112,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
       }
     ret =
 	sqlite3_exec (db_handle,
-		      "INSERT INTO gpkg_tile_matrix VALUES (\"test1_matrix_tiles\", 1, 0, \"4000000000\")",
+		      "INSERT INTO gpkg_tile_matrix VALUES ('test1_matrix_tiles', 1, 0, '4000000000')",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -124,7 +124,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_get_table (db_handle,
-			   "SELECT gpkgGetNormalRow(\"test1_matrix_tiles\", 0, 0)",
+			   "SELECT gpkgGetNormalRow('test1_matrix_tiles', 0, 0)",
 			   &results, &rows, &columns, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -147,7 +147,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_get_table (db_handle,
-			   "SELECT gpkgGetNormalRow(\"test1_matrix_tiles\", 1, 0)",
+			   "SELECT gpkgGetNormalRow('test1_matrix_tiles', 1, 0)",
 			   &results, &rows, &columns, &err_msg);
     if (ret != SQLITE_ERROR)
       {

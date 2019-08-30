@@ -52,10 +52,6 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include "sqlite3.h"
 #include "spatialite.h"
 
-#ifdef _WIN32
-#include "asprintf4win.h"
-#endif
-
 int
 main (int argc, char *argv[])
 {
@@ -68,9 +64,6 @@ main (int argc, char *argv[])
     int rows;
     int columns;
     void *cache = spatialite_alloc_connection ();
-
-    if (argc > 1 || argv[0] == NULL)
-	argc = 1;		/* silencing stupid compiler warnings */
 
     ret =
 	sqlite3_open_v2 (":memory:", &db_handle,
@@ -88,7 +81,7 @@ main (int argc, char *argv[])
 
     ret =
 	sqlite3_exec (db_handle,
-		      "create VIRTUAL TABLE places USING VirtualText(\"testcase1.csv\", UTF-8, 0, POINT, DOUBLEQUOTE);",
+		      "create VIRTUAL TABLE places USING VirtualText('testcase1.csv', UTF-8, 0, POINT, DOUBLEQUOTE);",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -97,12 +90,13 @@ main (int argc, char *argv[])
 	  return -2;
       }
 
-    asprintf (&sql_statement,
-	      "select col003, col005, col006, col008 from places WHERE col003 = \"Canal Creek\";");
+    sql_statement =
+	sqlite3_mprintf
+	("select col003, col005, col006, col008 from places WHERE col003 = 'Canal Creek';");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -489,6 +483,9 @@ main (int argc, char *argv[])
     sqlite3_close (db_handle);
     spatialite_cleanup_ex (cache);
 #endif /* end ICONV conditional */
+
+    if (argc > 1 || argv[0] == NULL)
+	argc = 1;		/* silencing stupid compiler warnings */
 
     spatialite_shutdown ();
     return 0;

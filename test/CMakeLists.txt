@@ -63,7 +63,8 @@ if(BUILD_TESTING)
     	22.dxf f06.dxf l02.dxf p05.dxf
     	archaic.dxf linked.dxf hatch.dxf
     	symbol.dxf gpkg_test.sqlite gpkg_test.gpkg
-    	gpkg_test_broken.gpkg gpkg_test_extrasrid.gpkg
+		gpkg_test_broken.gpkg gpkg_test_extrasrid.gpkg
+		000323485.gpx Gpx-sample.gpx
     )
 
     foreach(EXTRA ${EXTRA_DIST})
@@ -173,22 +174,19 @@ if(BUILD_TESTING)
 
     foreach(TEST ${check_PROGRAMS})
         spatialite_test(${TEST})
-    endforeach()
+	endforeach()
+	
+	if(WIN32)
+		add_custom_command(TARGET check_control_points
+			POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -DDST_PATH="$<TARGET_FILE_DIR:check_control_points>" -DSRC_PATH="${PROJECT_BINARY_DIR}" -P ${PROJECT_SOURCE_DIR}/cmake/test_dependency.cmake
+			COMMENT "Copy DLLs"
+		)
 
-    if(WIN32)
-        file(GLOB_RECURSE IMPORTED_WIN_DLLS ${CMAKE_BINARY_DIR}/third-party/*.dll)
-        foreach(IMPORTED_WIN_DLL ${IMPORTED_WIN_DLLS})
-            add_custom_command(TARGET check_control_points
-                            POST_BUILD
-                            COMMAND ${CMAKE_COMMAND} -E copy ${IMPORTED_WIN_DLL} $<TARGET_FILE_DIR:check_control_points>
-                            COMMENT "Copy ${IMPORTED_WIN_DLL} to check_control_points location"
-                        )
-        endforeach()
         add_custom_command(TARGET check_control_points
-                        POST_BUILD
-                        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIB_NAME}> $<TARGET_FILE_DIR:check_control_points>
-                        COMMENT "Copy ${LIB_NAME} to check_control_points location"
-                    )
+			POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${LIB_NAME}> $<TARGET_FILE_DIR:check_control_points>
+			COMMENT "Copy ${LIB_NAME} to check_control_points location"
+		)
     endif()
-
 endif()

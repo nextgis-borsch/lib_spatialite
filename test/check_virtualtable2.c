@@ -53,10 +53,6 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include "sqlite3.h"
 #include "spatialite.h"
 
-#ifdef _WIN32
-#include "asprintf4win.h"
-#endif
-
 int
 do_test (sqlite3 * db_handle)
 {
@@ -70,7 +66,7 @@ do_test (sqlite3 * db_handle)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "create VIRTUAL TABLE shapetest USING VirtualShape(\"shapetest1\", UTF-8, 4326);",
+		      "create VIRTUAL TABLE shapetest USING VirtualShape('shapetest1', UTF-8, 4326);",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -78,6 +74,17 @@ do_test (sqlite3 * db_handle)
 	  sqlite3_free (err_msg);
 	  return -2;
       }
+
+    ret =
+	sqlite3_exec (db_handle, "SELECT GetVirtualTableExtent('shapetest');",
+		      NULL, NULL, &err_msg);
+    if (ret != SQLITE_OK)
+      {
+	  fprintf (stderr, "GetVirtualTableExtent() error: %s\n", err_msg);
+	  sqlite3_free (err_msg);
+	  return -222;
+      }
+
     ret =
 	sqlite3_get_table (db_handle,
 			   "SELECT RegisterVirtualGeometry('shapetest')",
@@ -105,12 +112,13 @@ do_test (sqlite3 * db_handle)
     sqlite3_free_table (results);
 
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2, AsText(Geometry) from shapetest where testcase2 < 20;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2, AsText(Geometry) from shapetest where testcase2 < 20;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -150,12 +158,13 @@ do_test (sqlite3 * db_handle)
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2, AsText(Geometry) from shapetest where testcase2 <= 19;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2, AsText(Geometry) from shapetest where testcase2 <= 19;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -195,12 +204,13 @@ do_test (sqlite3 * db_handle)
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2, AsText(Geometry) from shapetest where testcase2 = 20;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2, AsText(Geometry) from shapetest where testcase2 = 20;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -240,12 +250,13 @@ do_test (sqlite3 * db_handle)
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2, AsText(Geometry) from shapetest where testcase2 > 2;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2, AsText(Geometry) from shapetest where testcase2 > 2;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -285,12 +296,13 @@ do_test (sqlite3 * db_handle)
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2, AsText(Geometry) from shapetest where testcase2 >= 20;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2, AsText(Geometry) from shapetest where testcase2 >= 20;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -330,12 +342,13 @@ do_test (sqlite3 * db_handle)
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2, AsText(Geometry) from shapetest where testcase1 < \"p\";");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2, AsText(Geometry) from shapetest where testcase1 < 'p';");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -375,12 +388,13 @@ do_test (sqlite3 * db_handle)
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2, AsText(Geometry) from shapetest where testcase1 <= \"p\";");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2, AsText(Geometry) from shapetest where testcase1 <= 'p';");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -429,12 +443,13 @@ do_test (sqlite3 * db_handle)
 	  return -47;
       }
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2, AsText(Geometry) from shapetest where testcase1 > \"p\";");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2, AsText(Geometry) from shapetest where testcase1 > 'p';");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -493,12 +508,13 @@ do_test (sqlite3 * db_handle)
 	  return -55;
       }
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2, AsText(Geometry) from shapetest where testcase1 >= \"p\";");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2, AsText(Geometry) from shapetest where testcase1 >= 'p';");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -538,12 +554,13 @@ do_test (sqlite3 * db_handle)
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2, AsText(Geometry) from shapetest where testcase1 = \"windward\";");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2, AsText(Geometry) from shapetest where testcase1 = 'windward';");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -583,12 +600,13 @@ do_test (sqlite3 * db_handle)
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2, AsText(Geometry) from shapetest where PKUID = 1;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2, AsText(Geometry) from shapetest where PKUID = 1;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -628,12 +646,13 @@ do_test (sqlite3 * db_handle)
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2, AsText(Geometry) from shapetest where PKUID < 2;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2, AsText(Geometry) from shapetest where PKUID < 2;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -673,12 +692,13 @@ do_test (sqlite3 * db_handle)
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2, AsText(Geometry) from shapetest where PKUID <= 1;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2, AsText(Geometry) from shapetest where PKUID <= 1;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -718,12 +738,13 @@ do_test (sqlite3 * db_handle)
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2, AsText(Geometry) from shapetest where PKUID > 1;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2, AsText(Geometry) from shapetest where PKUID > 1;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -763,12 +784,13 @@ do_test (sqlite3 * db_handle)
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2, AsText(Geometry) from shapetest where PKUID >= 2;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2, AsText(Geometry) from shapetest where PKUID >= 2;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -808,12 +830,13 @@ do_test (sqlite3 * db_handle)
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select PKUID, testcase1, testcase2, AsText(Geometry) from shapetest where testcase1 LIKE \"wind%%\";");
+    sql_statement =
+	sqlite3_mprintf
+	("select PKUID, testcase1, testcase2, AsText(Geometry) from shapetest where testcase1 LIKE 'wind%%';");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -827,7 +850,7 @@ do_test (sqlite3 * db_handle)
 		   rows, columns);
 	  return -99;
       }
-    if (strcmp (results[0], "PKUID") != 0)
+    if (strcmp (results[0], "pkuid") != 0)
       {
 	  fprintf (stderr, "Unexpected error: header uid bad result: %s.\n",
 		   results[0]);
@@ -880,7 +903,7 @@ do_test (sqlite3 * db_handle)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "create VIRTUAL TABLE shapetest2 USING VirtualShape(\"shp/merano-3d/roads\", CP1252, 25832);",
+		      "create VIRTUAL TABLE shapetest2 USING VirtualShape('shp/merano-3d/roads', CP1252, 25832);",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -967,7 +990,7 @@ do_test (sqlite3 * db_handle)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "create VIRTUAL TABLE shapetest3 USING VirtualShape(\"shp/merano-3d/points\", CP1252, 25832);",
+		      "create VIRTUAL TABLE shapetest3 USING VirtualShape('shp/merano-3d/points', CP1252, 25832);",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -1029,7 +1052,7 @@ do_test (sqlite3 * db_handle)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "create VIRTUAL TABLE shapetest4 USING VirtualShape(\"shp/merano-3d/polygons\", CP1252, 25832);",
+		      "create VIRTUAL TABLE shapetest4 USING VirtualShape('shp/merano-3d/polygons', CP1252, 25832);",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -1110,6 +1133,9 @@ do_test (sqlite3 * db_handle)
 	  sqlite3_close (db_handle);
 	  return -132;
       }
+#else
+    if (db_handle != NULL)
+	db_handle = NULL;	/* silencing stupid compiler warnings */
 #endif /* end ICONV conditional */
 
     return 0;
@@ -1123,9 +1149,6 @@ main (int argc, char *argv[])
     int ret;
     char *err_msg = NULL;
     void *cache = spatialite_alloc_connection ();
-
-    if (argc > 1 || argv[0] == NULL)
-	argc = 1;		/* silencing stupid compiler warnings */
 
 /* testing current style metadata layout >= v.4.0.0 */
     ret =
@@ -1204,6 +1227,9 @@ main (int argc, char *argv[])
       }
 
 #endif /* end ICONV conditional */
+
+    if (argc > 1 || argv[0] == NULL)
+	argc = 1;		/* silencing stupid compiler warnings */
 
     spatialite_shutdown ();
     return 0;

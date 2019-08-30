@@ -99,7 +99,7 @@ fnct_gpkgGetNormalRow (sqlite3_context * context, int argc UNUSED,
 
     sql_stmt =
 	sqlite3_mprintf
-	("SELECT matrix_height FROM gpkg_tile_matrix WHERE table_name=\"%q\" AND zoom_level=%i",
+	("SELECT matrix_height FROM gpkg_tile_matrix WHERE table_name = %Q AND zoom_level=%i",
 	 table, zoom_level);
 
     sqlite = sqlite3_context_db_handle (context);

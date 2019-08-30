@@ -30,6 +30,9 @@ the Initial Developer. All Rights Reserved.
 Contributor(s):
 Pepijn Van Eeckhoudt <pepijnvaneeckhoudt@luciad.com>
 (implementing Android support)
+ 
+Mark Johnson <mj10777@googlemail.com>
+(checking triggers supporting a supposed Writable Spatial View)
 
 Alternatively, the contents of this file may be used under the terms of
 either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -69,6 +72,15 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #ifdef _WIN32
 #define strcasecmp	_stricmp
 #endif /* not WIN32 */
+
+struct rtree_envelope
+{
+    int valid;
+    double minx;
+    double maxx;
+    double miny;
+    double maxy;
+};
 
 struct spatial_index_str
 {
@@ -220,6 +232,13 @@ create_views_geometry_columns (sqlite3 * sqlite)
     char sql[4186];
     char *errMsg = NULL;
     int ret;
+
+    if (sqlite3_db_readonly (sqlite, "MAIN") == 1)
+      {
+	  /* ignoring a read-only database */
+	  return 1;
+      }
+
 /* creating the VIEWS_GEOMETRY_COLUMNS table */
     strcpy (sql, "CREATE TABLE IF NOT EXISTS ");
     strcat (sql, "views_geometry_columns (\n");
@@ -503,6 +522,13 @@ create_virts_geometry_columns (sqlite3 * sqlite)
     char sql[4186];
     char *errMsg = NULL;
     int ret;
+
+    if (sqlite3_db_readonly (sqlite, "MAIN") == 1)
+      {
+	  /* ignoring a read-only database */
+	  return 1;
+      }
+
 /* creating the VIRTS_GEOMETRY_COLUMNS table */
     strcpy (sql, "CREATE TABLE IF NOT EXISTS ");
     strcat (sql, "virts_geometry_columns (\n");
@@ -706,6 +732,13 @@ create_geometry_columns_statistics (sqlite3 * sqlite)
     char sql[4186];
     char *errMsg = NULL;
     int ret;
+
+    if (sqlite3_db_readonly (sqlite, "MAIN") == 1)
+      {
+	  /* ignoring a read-only database */
+	  return 1;
+      }
+
 /* creating the GEOMETRY_COLUMNS_STATISTICS table */
     strcpy (sql, "CREATE TABLE IF NOT EXISTS ");
     strcat (sql, "geometry_columns_statistics (\n");
@@ -836,6 +869,13 @@ create_views_geometry_columns_statistics (sqlite3 * sqlite)
     char sql[4186];
     char *errMsg = NULL;
     int ret;
+
+    if (sqlite3_db_readonly (sqlite, "MAIN") == 1)
+      {
+	  /* ignoring a read-only database */
+	  return 1;
+      }
+
 /* creating the VIEWS_GEOMETRY_COLUMNS_STATISTICS table */
     strcpy (sql, "CREATE TABLE IF NOT EXISTS ");
     strcat (sql, "views_geometry_columns_statistics (\n");
@@ -964,6 +1004,13 @@ create_virts_geometry_columns_statistics (sqlite3 * sqlite)
     char sql[4186];
     char *errMsg = NULL;
     int ret;
+
+    if (sqlite3_db_readonly (sqlite, "MAIN") == 1)
+      {
+	  /* ignoring a read-only database */
+	  return 1;
+      }
+
 /* creating the VIRTS_GEOMETRY_COLUMNS_STATISTICS table */
     strcpy (sql, "CREATE TABLE IF NOT EXISTS ");
     strcat (sql, "virts_geometry_columns_statistics (\n");
@@ -1092,6 +1139,13 @@ create_geometry_columns_field_infos (sqlite3 * sqlite)
     char sql[4186];
     char *errMsg = NULL;
     int ret;
+
+    if (sqlite3_db_readonly (sqlite, "MAIN") == 1)
+      {
+	  /* ignoring a read-only database */
+	  return 1;
+      }
+
 /* creating the GEOMETRY_COLUMNS_FIELD_INFOS table */
     strcpy (sql, "CREATE TABLE IF NOT EXISTS ");
     strcat (sql, "geometry_columns_field_infos (\n");
@@ -1230,6 +1284,13 @@ create_views_geometry_columns_field_infos (sqlite3 * sqlite)
     char sql[4186];
     char *errMsg = NULL;
     int ret;
+
+    if (sqlite3_db_readonly (sqlite, "MAIN") == 1)
+      {
+	  /* ignoring a read-only database */
+	  return 1;
+      }
+
 /* creating the VIEWS_COLUMNS_FIELD_INFOS table */
     strcpy (sql, "CREATE TABLE IF NOT EXISTS ");
     strcat (sql, "views_geometry_columns_field_infos (\n");
@@ -1364,6 +1425,13 @@ create_virts_geometry_columns_field_infos (sqlite3 * sqlite)
     char sql[4186];
     char *errMsg = NULL;
     int ret;
+
+    if (sqlite3_db_readonly (sqlite, "MAIN") == 1)
+      {
+	  /* ignoring a read-only database */
+	  return 1;
+      }
+
 /* creating the VIRTS_GEOMETRY_COLUMNS_FIELD_INFOS table */
     strcpy (sql, "CREATE TABLE IF NOT EXISTS ");
     strcat (sql, "virts_geometry_columns_field_infos (\n");
@@ -1498,6 +1566,13 @@ create_geometry_columns_times (sqlite3 * sqlite)
     char sql[4186];
     char *errMsg = NULL;
     int ret;
+
+    if (sqlite3_db_readonly (sqlite, "MAIN") == 1)
+      {
+	  /* ignoring a read-only database */
+	  return 1;
+      }
+
 /* creating the GEOMETRY_COLUMNS_TIME table */
     strcpy (sql, "CREATE TABLE IF NOT EXISTS ");
     strcat (sql, "geometry_columns_time (\n");
@@ -1631,6 +1706,13 @@ create_geometry_columns_auth (sqlite3 * sqlite)
     char sql[4186];
     char *errMsg = NULL;
     int ret;
+
+    if (sqlite3_db_readonly (sqlite, "MAIN") == 1)
+      {
+	  /* ignoring a read-only database */
+	  return 1;
+      }
+
 /* creating the GEOMETRY_COLUMNS_AUTH table */
     strcpy (sql, "CREATE TABLE IF NOT EXISTS ");
     strcat (sql, "geometry_columns_auth (\n");
@@ -1764,6 +1846,13 @@ create_views_geometry_columns_auth (sqlite3 * sqlite)
     char sql[4186];
     char *errMsg = NULL;
     int ret;
+
+    if (sqlite3_db_readonly (sqlite, "MAIN") == 1)
+      {
+	  /* ignoring a read-only database */
+	  return 1;
+      }
+
 /* creating the VIEWS_GEOMETRY_COLUMNS_AUTH table */
     strcpy (sql, "CREATE TABLE IF NOT EXISTS ");
     strcat (sql, "views_geometry_columns_auth (\n");
@@ -1890,6 +1979,13 @@ create_virts_geometry_columns_auth (sqlite3 * sqlite)
     char sql[4186];
     char *errMsg = NULL;
     int ret;
+
+    if (sqlite3_db_readonly (sqlite, "MAIN") == 1)
+      {
+	  /* ignoring a read-only database */
+	  return 1;
+      }
+
 /* creating the VIRTS_GEOMETRY_COLUMNS_AUTH table */
     strcpy (sql, "CREATE TABLE IF NOT EXISTS ");
     strcat (sql, "virts_geometry_columns_auth (\n");
@@ -2016,6 +2112,13 @@ create_geometry_columns_views (sqlite3 * sqlite)
     char sql[4186];
     char *errMsg = NULL;
     int ret;
+
+    if (sqlite3_db_readonly (sqlite, "MAIN") == 1)
+      {
+	  /* ignoring a read-only database */
+	  return 1;
+      }
+
 /* creating the VECTOR_LAYERS view */
     strcpy (sql, "CREATE VIEW  IF NOT EXISTS ");
     strcat (sql, "vector_layers AS\n");
@@ -2183,6 +2286,141 @@ create_geometry_columns_views (sqlite3 * sqlite)
     strcat (sql, "double_min AS double_min, ");
     strcat (sql, "double_max double_max\n");
     strcat (sql, "FROM virts_geometry_columns_field_infos");
+    ret = sqlite3_exec (sqlite, sql, NULL, NULL, &errMsg);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("SQL error: %s: %s\n", sql, errMsg);
+	  sqlite3_free (errMsg);
+	  return 0;
+      }
+    return 1;
+}
+
+static int
+create_data_licenses (sqlite3 * sqlite)
+{
+    char sql[4186];
+    char *errMsg = NULL;
+    int ret;
+
+    if (sqlite3_db_readonly (sqlite, "MAIN") == 1)
+      {
+	  /* ignoring a read-only database */
+	  return 1;
+      }
+
+/* creating the DATA_LICENSES table */
+    strcpy (sql, "CREATE TABLE IF NOT EXISTS data_licenses (\n");
+    strcat (sql, "\tid INTEGER PRIMARY KEY AUTOINCREMENT,\n");
+    strcat (sql, "\tname TEXT NOT NULL UNIQUE,\n");
+    strcat (sql, "\turl TEXT)");
+    ret = sqlite3_exec (sqlite, sql, NULL, NULL, &errMsg);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("SQL error: %s: %s\n", sql, errMsg);
+	  sqlite3_free (errMsg);
+	  return 0;
+      }
+/* inserting the UNDEFINED license */
+    strcpy (sql, "INSERT OR IGNORE INTO data_licenses (id, name, url) ");
+    strcat (sql, "VALUES (0, 'Undefined', NULL)");
+    ret = sqlite3_exec (sqlite, sql, NULL, NULL, &errMsg);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("SQL error: %s: %s\n", sql, errMsg);
+	  sqlite3_free (errMsg);
+	  return 0;
+      }
+/* inserting the PROPRIETARY license */
+    strcpy (sql, "INSERT OR IGNORE INTO data_licenses (id, name, url) ");
+    strcat (sql, "VALUES (1, 'Proprietary - Non Free', NULL)");
+    ret = sqlite3_exec (sqlite, sql, NULL, NULL, &errMsg);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("SQL error: %s: %s\n", sql, errMsg);
+	  sqlite3_free (errMsg);
+	  return 0;
+      }
+/* inserting the PUBLIC DOMAIN license */
+    strcpy (sql, "INSERT OR IGNORE INTO data_licenses (id, name, url) ");
+    strcat (sql, "VALUES (2, 'PD - Public Domain', NULL)");
+    ret = sqlite3_exec (sqlite, sql, NULL, NULL, &errMsg);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("SQL error: %s: %s\n", sql, errMsg);
+	  sqlite3_free (errMsg);
+	  return 0;
+      }
+/* inserting the CC0 1.0 license */
+    strcpy (sql, "INSERT OR IGNORE INTO data_licenses (id, name, url) ");
+    strcat (sql,
+	    "VALUES (3, 'CC0 1.0', 'https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt')");
+    ret = sqlite3_exec (sqlite, sql, NULL, NULL, &errMsg);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("SQL error: %s: %s\n", sql, errMsg);
+	  sqlite3_free (errMsg);
+	  return 0;
+      }
+/* inserting the CC BY 3.0 license */
+    strcpy (sql, "INSERT OR IGNORE INTO data_licenses (id, name, url) ");
+    strcat (sql,
+	    "VALUES (4, 'CC BY 3.0', 'https://creativecommons.org/licenses/by/3.0/legalcode.txt')");
+    ret = sqlite3_exec (sqlite, sql, NULL, NULL, &errMsg);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("SQL error: %s: %s\n", sql, errMsg);
+	  sqlite3_free (errMsg);
+	  return 0;
+      }
+/* inserting the CC BY 4.0 license */
+    strcpy (sql, "INSERT OR IGNORE INTO data_licenses (id, name, url) ");
+    strcat (sql,
+	    "VALUES (5, 'CC BY 4.0', 'https://creativecommons.org/licenses/by/4.0/legalcode.txt')");
+    ret = sqlite3_exec (sqlite, sql, NULL, NULL, &errMsg);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("SQL error: %s: %s\n", sql, errMsg);
+	  sqlite3_free (errMsg);
+	  return 0;
+      }
+/* inserting the CC BY-SA 3.0 license */
+    strcpy (sql, "INSERT OR IGNORE INTO data_licenses (id, name, url) ");
+    strcat (sql,
+	    "VALUES (6, 'CC BY-SA 3.0', 'https://creativecommons.org/licenses/by-sa/3.0/legalcode.txt')");
+    ret = sqlite3_exec (sqlite, sql, NULL, NULL, &errMsg);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("SQL error: %s: %s\n", sql, errMsg);
+	  sqlite3_free (errMsg);
+	  return 0;
+      }
+/* inserting the CC BY-SA 4.0 license */
+    strcpy (sql, "INSERT OR IGNORE INTO data_licenses (id, name, url) ");
+    strcat (sql,
+	    "VALUES (7, 'CC BY-SA 4.0', 'https://creativecommons.org/licenses/by-sa/4.0/legalcode.txt')");
+    ret = sqlite3_exec (sqlite, sql, NULL, NULL, &errMsg);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("SQL error: %s: %s\n", sql, errMsg);
+	  sqlite3_free (errMsg);
+	  return 0;
+      }
+/* inserting the CC BY-SA-NC 3.0 license */
+    strcpy (sql, "INSERT OR IGNORE INTO data_licenses (id, name, url) ");
+    strcat (sql,
+	    "VALUES (8, 'CC BY-SA-NC 3.0', 'https://creativecommons.org/licenses/by-nc-sa/3.0/legalcode.txt')");
+    ret = sqlite3_exec (sqlite, sql, NULL, NULL, &errMsg);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("SQL error: %s: %s\n", sql, errMsg);
+	  sqlite3_free (errMsg);
+	  return 0;
+      }
+/* inserting the CC BY-SA-NC 4.0 license */
+    strcpy (sql, "INSERT OR IGNORE INTO data_licenses (id, name, url) ");
+    strcat (sql,
+	    "VALUES (9, 'CC BY-SA-NC 4.0', 'https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.txt')");
     ret = sqlite3_exec (sqlite, sql, NULL, NULL, &errMsg);
     if (ret != SQLITE_OK)
       {
@@ -2549,6 +2787,8 @@ createAdvancedMetaData (void *p_sqlite)
 	return 0;
     if (!create_geometry_columns_views (sqlite))
 	return 0;
+    if (!create_data_licenses (sqlite))
+	return 0;
     if (!create_sql_statements_log (sqlite))
 	return 0;
 
@@ -2786,7 +3026,7 @@ upgradeGeometryTriggers (void *p_sqlite)
     int ret;
     sqlite3_stmt *stmt = NULL;
     char *sql_statement;
-    int retcode;
+    int retcode = 0;
     int metadata_version = checkSpatialMetaData (sqlite);
     if (metadata_version < 3)
 	return 0;
@@ -3816,6 +4056,11 @@ validateRowid (void *p_sqlite, const char *table)
     char *sql;
     int ret;
     const char *name;
+    const char *type;
+    const char *pk;
+    int rowid_pk = 0;
+    int int_pk = 0;
+    int pk_cols = 0;
     int i;
     char **results;
     int rows;
@@ -3836,11 +4081,24 @@ validateRowid (void *p_sqlite, const char *table)
 		name = results[(i * columns) + 1];
 		if (strcasecmp (name, "rowid") == 0)
 		    rowid = 1;
+		type = results[(i * columns) + 2];
+		if (strcasecmp (type, "INTEGER") == 0)
+		    int_pk = 1;
+		pk = results[(i * columns) + 5];
+		if (atoi (pk) != 0)
+		    pk_cols++;
+		if (strcasecmp (name, "rowid") == 0 && atoi (pk) != 0)
+		    rowid_pk = 1;
 	    }
       }
     sqlite3_free_table (results);
     if (rowid == 0)
 	return 1;
+    if (rowid_pk == 1 && pk_cols == 1 && int_pk == 1)
+      {
+	  /* OK, found: ROWID INTEGER PRIMARY KEY */
+	  return 1;
+      }
     return 0;
 }
 
@@ -4281,8 +4539,71 @@ addVectorLayerExtent (void *x_list, const char *table_name,
 }
 
 static void
-addVectorLayerAuth (gaiaVectorLayersListPtr list, const char *table_name,
-		    const char *geometry_column, int read_only, int hidden)
+doCheckWritableSpatialView (sqlite3 * handle, const char *view_name,
+			    int *has_trigger_insert, int *has_trigger_update,
+			    int *has_trigger_delete, int *is_read_only)
+{
+/*
+* checking if a supposed Writable Spatial View do 
+* effectively declares all expected Triggers
+* 
+* patch kindly submitted by Mark Johnson <mj10777@googlemail.com>
+* see ticket: https://www.gaia-gis.it/fossil/libspatialite/tktview/597fce55f2884668a24b591840162ffebda390e1
+*/
+    int ret;
+    char *sql;
+    sqlite3_stmt *stmt;
+
+/* Claims to be a Writable SpatialView, we shall see ... */
+    *has_trigger_insert = 0;
+    *has_trigger_update = 0;
+    *has_trigger_delete = 0;
+    *is_read_only = 1;
+
+    sql =
+	sqlite3_mprintf ("SELECT "
+			 "(SELECT Exists(SELECT rootpage FROM  sqlite_master "
+			 "WHERE (type = 'trigger' AND Lower(tbl_name) = Lower(%Q) AND "
+			 "(instr(upper(sql),'INSTEAD OF INSERT') > 0)))), "
+			 "(SELECT Exists(SELECT rootpage FROM  sqlite_master "
+			 "WHERE (type = 'trigger' AND Lower(tbl_name) = Lower(%Q) AND "
+			 "(instr(upper(sql),'INSTEAD OF UPDATE') > 0)))), "
+			 "(SELECT Exists(SELECT rootpage FROM  sqlite_master "
+			 "WHERE (type = 'trigger' AND Lower(tbl_name) = Lower(%Q) AND "
+			 "(instr(upper(sql),'INSTEAD OF DELETE') > 0))))",
+			 view_name, view_name, view_name);
+    ret = sqlite3_prepare_v2 (handle, sql, strlen (sql), &stmt, NULL);
+    sqlite3_free (sql);
+    if (ret == SQLITE_OK)
+      {
+	  while (sqlite3_step (stmt) == SQLITE_ROW)
+	    {
+		if (sqlite3_column_type (stmt, 0) != SQLITE_NULL)
+		  {
+		      if (sqlite3_column_int (stmt, 0) == 1)
+			  *has_trigger_insert = 1;
+		  }
+		if (sqlite3_column_type (stmt, 1) != SQLITE_NULL)
+		  {
+		      if (sqlite3_column_int (stmt, 1) == 1)
+			  *has_trigger_update = 1;
+		  }
+		if (sqlite3_column_type (stmt, 2) != SQLITE_NULL)
+		  {
+		      if (sqlite3_column_int (stmt, 2) == 1)
+			  *has_trigger_delete = 1;
+		  }
+	    }
+	  ret = sqlite3_finalize (stmt);
+      }
+    if (*has_trigger_insert || *has_trigger_update || *has_trigger_delete)
+	*is_read_only = 0;	/* Yes, this could be a functional Writable SpatialView */
+}
+
+static void
+addVectorLayerAuth (sqlite3 * handle, gaiaVectorLayersListPtr list,
+		    const char *table_name, const char *geometry_column,
+		    int read_only, int hidden)
 {
 /* appending a LayerAuth object to the corresponding VectorLayer */
     gaiaVectorLayerPtr lyr = list->First;
@@ -4295,6 +4616,25 @@ addVectorLayerAuth (gaiaVectorLayersListPtr list, const char *table_name,
 		lyr->AuthInfos = auth;
 		auth->IsReadOnly = read_only;
 		auth->IsHidden = hidden;
+		auth->HasTriggerInsert = 0;
+		auth->HasTriggerUpdate = 0;
+		auth->HasTriggerDelete = 0;
+		if ((lyr->LayerType == GAIA_VECTOR_VIEW) && (!auth->IsReadOnly))
+		  {
+		      int has_trigger_insert = 0;
+		      int has_trigger_update = 0;
+		      int has_trigger_delete = 0;
+		      int is_read_only = 1;
+		      doCheckWritableSpatialView (handle, table_name,
+						  &has_trigger_insert,
+						  &has_trigger_update,
+						  &has_trigger_delete,
+						  &is_read_only);
+		      auth->HasTriggerInsert = has_trigger_insert;
+		      auth->HasTriggerUpdate = has_trigger_update;
+		      auth->HasTriggerDelete = has_trigger_delete;
+		      auth->IsReadOnly = is_read_only;
+		  }
 		return;
 	    }
 	  lyr = lyr->Next;
@@ -4319,7 +4659,7 @@ freeLayerAttributeField (gaiaLayerAttributeFieldPtr fld)
 static void
 freeVectorLayer (gaiaVectorLayerPtr lyr)
 {
-/* destroyng a VectorLayer object */
+/* destroying a VectorLayer object */
     gaiaLayerAttributeFieldPtr fld;
     gaiaLayerAttributeFieldPtr fldn;
     if (!lyr)
@@ -4370,6 +4710,15 @@ gaiaGetVectorLayersList_v4 (sqlite3 * handle, const char *table,
     int ret;
     sqlite3_stmt *stmt;
     int error = 0;
+
+/* 
+* attempting first to recover all SpatialViews registered into 
+* views_geometry_columns but not into views_geometry_columns_auth
+*/
+    sql = "INSERT OR IGNORE INTO views_geometry_columns_auth "
+	"(view_name, view_geometry, hidden) "
+	"SELECT view_name, view_geometry, 0 FROM views_geometry_columns";
+    sqlite3_exec (handle, sql, NULL, NULL, NULL);
 
 /* querying the vector_layers view */
     if (table == NULL)
@@ -4552,8 +4901,8 @@ gaiaGetVectorLayersList_v4 (sqlite3 * handle, const char *table,
 		    (const char *) sqlite3_column_text (stmt, 0);
 		const char *geometry_column =
 		    (const char *) sqlite3_column_text (stmt, 1);
-		int read_only;
-		int hidden;
+		int read_only = 0;
+		int hidden = 0;
 		if (sqlite3_column_type (stmt, 2) == SQLITE_NULL)
 		    is_null = 1;
 		else
@@ -4563,8 +4912,8 @@ gaiaGetVectorLayersList_v4 (sqlite3 * handle, const char *table,
 		else
 		    hidden = sqlite3_column_int (stmt, 3);
 		if (!is_null)
-		    addVectorLayerAuth (list, table_name, geometry_column,
-					read_only, hidden);
+		    addVectorLayerAuth (handle, list, table_name,
+					geometry_column, read_only, hidden);
 	    }
       }
     ret = sqlite3_finalize (stmt);
@@ -4797,6 +5146,8 @@ get_table_layers_legacy (sqlite3 * handle, const char *table,
 		addVectorLayer (list, "SpatialTable", table_name,
 				geometry_column, geometry_type, srid,
 				spatial_index);
+		addVectorLayerAuth (handle, list, table_name, geometry_column,
+				    1, 0);
 	    }
 	  else
 	      error = 1;
@@ -5335,8 +5686,8 @@ get_table_auth_legacy (sqlite3 * handle, const char *table,
 		    (const char *) sqlite3_column_text (stmt, 0);
 		const char *geometry_column =
 		    (const char *) sqlite3_column_text (stmt, 1);
-		int read_only;
-		int hidden;
+		int read_only = 0;
+		int hidden = 0;
 		if (sqlite3_column_type (stmt, 2) == SQLITE_NULL)
 		    is_null = 1;
 		else
@@ -5346,8 +5697,8 @@ get_table_auth_legacy (sqlite3 * handle, const char *table,
 		else
 		    hidden = sqlite3_column_int (stmt, 3);
 		if (!is_null)
-		    addVectorLayerAuth (list, table_name, geometry_column,
-					read_only, hidden);
+		    addVectorLayerAuth (handle, list, table_name,
+					geometry_column, read_only, hidden);
 	    }
       }
     ret = sqlite3_finalize (stmt);
@@ -6027,7 +6378,7 @@ gaiaGetLayerExtent (sqlite3 * handle, const char *table,
     double miny = -DBL_MAX;
     double maxx = DBL_MAX;
     double maxy = DBL_MAX;
-    int srid;
+    int srid = 0;
     gaiaGeomCollPtr bbox;
     gaiaPolygonPtr polyg;
     gaiaRingPtr rect;
@@ -6120,4 +6471,167 @@ gaiaStatisticsInvalidate (sqlite3 * sqlite, const char *table,
       }
     else
 	return 0;
+}
+
+static int
+rtree_bbox_callback (sqlite3_rtree_query_info * info)
+{
+/*
+
+ R*Tree Query Callback function 
+
+----------------------------------------------------------
+
+ this function will evaluate all first-level R*Tree Nodes
+ (direct children of the Root Node) so to get the Full
+ Extent of the R*Tree as a whole.
+
+ further descending in the Tree's hierarchy will be
+ carefully avoided, so to ensure that also in the case  
+ of an R*Tree containing many million entries just few
+ dozens of top level Nodes will require to be evaluated.
+ 
+*/
+    double minx;
+    double maxx;
+    double miny;
+    double maxy;
+    struct rtree_envelope *data = (struct rtree_envelope *) (info->pContext);
+    if (info->nCoord != 4)
+      {
+	  /* invalid RTree; not 2D */
+	  goto end;
+      }
+
+/* fetching the Node's BBOX */
+    minx = info->aCoord[0];
+    maxx = info->aCoord[1];
+    miny = info->aCoord[2];
+    maxy = info->aCoord[3];
+
+/* updating the Full Extent BBOX */
+    if (data->valid == 0)
+      {
+	  /* first Node retrieved */
+	  data->valid = 1;
+	  data->minx = minx;
+	  data->maxx = maxx;
+	  data->miny = miny;
+	  data->maxy = maxy;
+      }
+    else
+      {
+	  /* any other further Node */
+	  if (minx < data->minx)
+	      data->minx = minx;
+	  if (maxx > data->maxx)
+	      data->maxx = maxx;
+	  if (miny < data->miny)
+	      data->miny = miny;
+	  if (maxy > data->maxy)
+	      data->maxy = maxy;
+      }
+
+  end:
+/* setting NOT_WITHIN so to stop further descending into the tree */
+    info->eWithin = NOT_WITHIN;
+    return SQLITE_OK;
+}
+
+SPATIALITE_DECLARE gaiaGeomCollPtr
+gaiaGetRTreeFullExtent (sqlite3 * db_handle, const char *db_prefix,
+			const char *name, int srid)
+{
+/* Will attempt to retrieve the Full Extent from an R*Tree - SpatiaLite */
+    char *sql;
+    int ret;
+    char *xprefix;
+    char *xname;
+    gaiaGeomCollPtr envelope;
+    gaiaPolygonPtr polyg;
+    gaiaRingPtr rect;
+    struct rtree_envelope data;
+
+    data.valid = 0;
+
+/* registering the Geometry Query Callback SQL function */
+    sqlite3_rtree_query_callback (db_handle, "rtree_bbox",
+				  rtree_bbox_callback, &data, NULL);
+
+/* executing the SQL Query statement */
+    xprefix = gaiaDoubleQuotedSql (db_prefix);
+    xname = gaiaDoubleQuotedSql (name);
+    sql =
+	sqlite3_mprintf
+	("SELECT pkid FROM \"%s\".\"%s\" WHERE pkid MATCH rtree_bbox(1)",
+	 xprefix, xname);
+    free (xprefix);
+    free (xname);
+    ret = sqlite3_exec (db_handle, sql, NULL, NULL, NULL);
+    sqlite3_free (sql);
+    if (ret != SQLITE_OK)
+	return NULL;
+    if (data.valid == 0)
+	return NULL;
+
+/* building the Envelope of the R*Tree */
+    envelope = gaiaAllocGeomColl ();
+    envelope->Srid = srid;
+    polyg = gaiaAddPolygonToGeomColl (envelope, 5, 0);
+    rect = polyg->Exterior;
+    gaiaSetPoint (rect->Coords, 0, data.minx, data.miny);	/* vertex # 1 */
+    gaiaSetPoint (rect->Coords, 1, data.maxx, data.miny);	/* vertex # 2 */
+    gaiaSetPoint (rect->Coords, 2, data.maxx, data.maxy);	/* vertex # 3 */
+    gaiaSetPoint (rect->Coords, 3, data.minx, data.maxy);	/* vertex # 4 */
+    gaiaSetPoint (rect->Coords, 4, data.minx, data.miny);	/* vertex # 5 [same as vertex # 1 to close the polygon] */
+    return envelope;
+}
+
+SPATIALITE_DECLARE gaiaGeomCollPtr
+gaiaGetGpkgRTreeFullExtent (sqlite3 * db_handle, const char *db_prefix,
+			    const char *name, int srid)
+{
+/* Will attempt to retrieve the Full Extent from an R*Tree - GeoPacage */
+    char *sql;
+    int ret;
+    char *xprefix;
+    char *xname;
+    gaiaGeomCollPtr envelope;
+    gaiaPolygonPtr polyg;
+    gaiaRingPtr rect;
+    struct rtree_envelope data;
+
+    data.valid = 0;
+
+/* registering the Geometry Query Callback SQL function */
+    sqlite3_rtree_query_callback (db_handle, "rtree_bbox",
+				  rtree_bbox_callback, &data, NULL);
+
+/* executing the SQL Query statement */
+    xprefix = gaiaDoubleQuotedSql (db_prefix);
+    xname = gaiaDoubleQuotedSql (name);
+    sql =
+	sqlite3_mprintf
+	("SELECT id FROM \"%s\".\"%s\" WHERE id MATCH rtree_bbox(1)",
+	 xprefix, xname);
+    free (xprefix);
+    free (xname);
+    ret = sqlite3_exec (db_handle, sql, NULL, NULL, NULL);
+    sqlite3_free (sql);
+    if (ret != SQLITE_OK)
+	return NULL;
+    if (data.valid == 0)
+	return NULL;
+
+/* building the Envelope of the R*Tree */
+    envelope = gaiaAllocGeomColl ();
+    envelope->Srid = srid;
+    polyg = gaiaAddPolygonToGeomColl (envelope, 5, 0);
+    rect = polyg->Exterior;
+    gaiaSetPoint (rect->Coords, 0, data.minx, data.miny);	/* vertex # 1 */
+    gaiaSetPoint (rect->Coords, 1, data.maxx, data.miny);	/* vertex # 2 */
+    gaiaSetPoint (rect->Coords, 2, data.maxx, data.maxy);	/* vertex # 3 */
+    gaiaSetPoint (rect->Coords, 3, data.minx, data.maxy);	/* vertex # 4 */
+    gaiaSetPoint (rect->Coords, 4, data.minx, data.miny);	/* vertex # 5 [same as vertex # 1 to close the polygon] */
+    return envelope;
 }

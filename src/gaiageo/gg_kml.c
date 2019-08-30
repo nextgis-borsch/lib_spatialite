@@ -670,6 +670,8 @@ kml_check_coord (const char *value)
 {
 /* checking a KML coordinate */
     int decimal = 0;
+    int exp = 0;
+    int expsign = 0;
     const char *p = value;
     if (*p == '+' || *p == '-')
 	p++;
@@ -684,10 +686,20 @@ kml_check_coord (const char *value)
 	    }
 	  else if (*p >= '0' && *p <= '9')
 	      ;
+	  else if (*p == 'e' || *p == 'E')
+	      exp++;
+	  else if (*p == '+' || *p == '-')
+	    {
+		if (!exp)
+		    return 0;
+		expsign++;
+	    }
 	  else
 	      return 0;
 	  p++;
       }
+    if (exp > 1 || expsign > 1)
+	return 0;
     return 1;
 }
 
@@ -1217,7 +1229,7 @@ kml_parse_polygon (struct kml_data *p_data, gaiaGeomCollPtr geom,
     int has_z;
     int inners;
     int outers;
-    int points;
+    int points = 0;
     int iv;
     int ib = 0;
     gaiaGeomCollPtr pg;
@@ -1226,7 +1238,7 @@ kml_parse_polygon (struct kml_data *p_data, gaiaGeomCollPtr geom,
     gaiaRingPtr ring;
     gaiaDynamicLinePtr dyn;
     gaiaPointPtr pt;
-    gaiaDynamicLinePtr exterior_ring;
+    gaiaDynamicLinePtr exterior_ring = NULL;
     kmlNodePtr next;
     kmlDynamicRingPtr dyn_rng;
     kmlDynamicPolygonPtr dyn_pg = kml_alloc_dyn_polygon (p_data);
@@ -1449,7 +1461,7 @@ kml_validate_geometry (struct kml_data *p_data, gaiaGeomCollPtr chain)
     int pgs = 0;
     gaiaPointPtr pt;
     gaiaLinestringPtr ln;
-    gaiaPolygonPtr pg;
+    gaiaPolygonPtr pg = NULL;
     gaiaPointPtr save_pt = NULL;
     gaiaLinestringPtr save_ln = NULL;
     gaiaPolygonPtr save_pg = NULL;

@@ -4,6 +4,8 @@
 #define UNUSED
 #endif
 
+#include <ctype.h>
+
 #ifdef __WIN32
 /*
  * Windows replacement for strcastr
@@ -36,7 +38,7 @@ strcasestr (const char *haystack, const char *needle)
 }
 #endif
 
-#ifdef __WIN32
+#if defined(__WIN32) && !defined(__MINGW32__)
 /* 
  * public domain strtok_r() by Charlie Gordon
  *

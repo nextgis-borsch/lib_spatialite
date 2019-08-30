@@ -461,8 +461,8 @@ do_test (sqlite3 * handle, int legacy)
       }
     ret =
 	sqlite3_exec (handle,
-		      "SELECT UpgradeGeometryTriggers(1);",
-		      NULL, NULL, &err_msg);
+		      "SELECT UpgradeGeometryTriggers(1);", NULL, NULL,
+		      &err_msg);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "UpgradeGeometryTriggers (1) error: %s\n", err_msg);
@@ -578,7 +578,7 @@ do_test (sqlite3 * handle, int legacy)
 
     ret =
 	sqlite3_exec (handle,
-		      "UPDATE Councils SET geom = GeomFromText('MULTIPOLYGON(((987226.750031 4627372.000018, 997301.750031 4627331.000018, 997402.500032 4627344.000018, 997541.500031 4627326.500018, 987226.750031 4627372.000018)))', 23032) WHERE lc_name = \"Quairading\";",
+		      "UPDATE Councils SET geom = GeomFromText('MULTIPOLYGON(((987226.750031 4627372.000018, 997301.750031 4627331.000018, 997402.500032 4627344.000018, 997541.500031 4627326.500018, 987226.750031 4627372.000018)))', 23032) WHERE lc_name = 'Quairading';",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -626,7 +626,7 @@ do_test (sqlite3 * handle, int legacy)
 
     ret =
 	sqlite3_exec (handle,
-		      "DELETE FROM Councils WHERE lc_name = \"Ascoli Satriano\";",
+		      "DELETE FROM Councils WHERE lc_name = 'Ascoli Satriano';",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -1252,7 +1252,9 @@ do_test (sqlite3 * handle, int legacy)
 	  sqlite3_close (handle);
 	  return -100;
       }
-
+#else
+    if (handle != NULL && legacy == 0)
+	handle = NULL;		/* silencing stupid compiler warnings */
 #endif /* end ICONV conditional */
 
 /* ok, succesfull termination */
@@ -1338,7 +1340,7 @@ do_test_rowid (sqlite3 * handle)
     columns = 0;
     ret =
 	sqlite3_get_table (handle,
-			   "SELECT CheckSpatialIndex('Councils', 'geom');",
+			   "SELECT RecoverSpatialIndex('Councils', 'geom');",
 			   &results, &rows, &columns, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -1425,7 +1427,7 @@ do_test_rowid (sqlite3 * handle)
     columns = 0;
     ret =
 	sqlite3_get_table (handle,
-			   "SELECT CheckSpatialIndex('Councils', 'geom');",
+			   "SELECT RecoverSpatialIndex('Councils', 'geom');",
 			   &results, &rows, &columns, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -1623,6 +1625,9 @@ do_test_rowid (sqlite3 * handle)
       }
     sqlite3_free_table (results);
 
+#else
+    if (handle != NULL)
+	handle = NULL;		/* silencing stupid compiler warnings */
 #endif /* end ICONV conditional */
 
 /* ok, succesfull termination */
@@ -1638,9 +1643,6 @@ main (int argc, char *argv[])
     char *err_msg = NULL;
     void *cache = spatialite_alloc_connection ();
 
-    if (argc > 1 || argv[0] == NULL)
-	argc = 1;		/* silencing stupid compiler warnings */
-
 /* testing current style metadata layout >= v.4.0.0 */
     ret =
 	sqlite3_open_v2 (":memory:", &handle,
@@ -1654,6 +1656,28 @@ main (int argc, char *argv[])
       }
 
     spatialite_init_ex (handle, cache, 0);
+
+/* expected failures */
+    ret =
+	sqlite3_exec (handle, "SELECT InitSpatialMetadata('a', 1)", NULL, NULL,
+		      &err_msg);
+    if (ret != SQLITE_OK)
+      {
+	  fprintf (stderr, "InitSpatialMetadata('a', 1) error: %s\n", err_msg);
+	  sqlite3_free (err_msg);
+	  sqlite3_close (handle);
+	  return -113;
+      }
+    ret =
+	sqlite3_exec (handle, "SELECT InitSpatialMetadata(1, 2)", NULL, NULL,
+		      &err_msg);
+    if (ret != SQLITE_OK)
+      {
+	  fprintf (stderr, "InitSpatialMetadata(1, 2) error: %s\n", err_msg);
+	  sqlite3_free (err_msg);
+	  sqlite3_close (handle);
+	  return -114;
+      }
 
     ret =
 	sqlite3_exec (handle, "SELECT InitSpatialMetadata()", NULL, NULL,
@@ -1860,6 +1884,9 @@ main (int argc, char *argv[])
       }
 
 #endif /* end ICONV conditional */
+
+    if (argc > 1 || argv[0] == NULL)
+	argc = 1;		/* silencing stupid compiler warnings */
 
     spatialite_shutdown ();
     return 0;

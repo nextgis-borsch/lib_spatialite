@@ -93,7 +93,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesTable(\"testtiles1\", 4326, -180.0, -90.0, 180.0, 90.0)",
+		      "SELECT gpkgCreateTilesTable('testtiles1', 4326, -180.0, -90.0, 180.0, 90.0)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -107,7 +107,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
     /* same, but using integer bounds */
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesTable(\"testtiles2\", 4326, -180, -90, 180, 90)",
+		      "SELECT gpkgCreateTilesTable('testtiles2', 4326, -180, -90, 180, 90)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -299,7 +299,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesTable(\"test2\", \"srid\", -180, -90, 180, 90)",
+		      "SELECT gpkgCreateTilesTable('test2', 'srid', -180, -90, 180, 90)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -324,7 +324,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesTable(\"test2\", 0, \"minx\", -90, 180, 90)",
+		      "SELECT gpkgCreateTilesTable('test2', 0, 'minx', -90, 180, 90)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -349,7 +349,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesTable(\"test2\", 0, -180, \"min_y\", 180, 90)",
+		      "SELECT gpkgCreateTilesTable('test2', 0, -180, 'min_y', 180, 90)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -374,7 +374,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesTable(\"test2\", 0, -180, -90, \"max_x\", 90)",
+		      "SELECT gpkgCreateTilesTable('test2', 0, -180, -90, 'max_x', 90)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -399,7 +399,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesTable(\"test2\", 0, -180, -90, 180, \"max_y\")",
+		      "SELECT gpkgCreateTilesTable('test2', 0, -180, -90, 180, 'max_y')",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -425,7 +425,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
     /* try duplicate entry */
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesTable(\"testtiles2\", 0, -180, -85, 180, 85)",
+		      "SELECT gpkgCreateTilesTable('testtiles2', 0, -180, -85, 180, 85)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -452,7 +452,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
       }
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesTable(\"alreadythere\", 0, -180, -85, 180, 85)",
+		      "SELECT gpkgCreateTilesTable('alreadythere', 0, -180, -85, 180, 85)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -462,7 +462,8 @@ main (int argc UNUSED, char *argv[]UNUSED)
 	  sqlite3_free (err_msg);
 	  return -165;
       }
-    if (strcmp (err_msg, "table alreadythere already exists") != 0)
+    if (strcmp (err_msg, "table alreadythere already exists") != 0 &&
+	strcmp (err_msg, "table \"alreadythere\" already exists") != 0)
       {
 	  fprintf (stderr,
 		   "Unexpected error message for gpkgCreateTilesTable dupe manual table: %s\n",

@@ -37,7 +37,7 @@ add_subdirectory(spatialite)
 add_subdirectory(shapefiles)
 add_subdirectory(srsinit)
 add_subdirectory(connection_cache)
-add_subdirectory(virtualtext)
+# add_subdirectory(virtualtext)
 add_subdirectory(wfs)
 add_subdirectory(dxf)
 add_subdirectory(md5)
@@ -51,14 +51,23 @@ endif()
 
 set(CSOURCES
     versioninfo/version.c
+    virtualtext/virtualtext.c
+    cutter/gaia_cutter.c
+    stored_procedures/stored_procedures.c
 )
+
+if(ENABLE_RTTOPO)
+    add_subdirectory(topology)
+else()
+    set(CSOURCES ${CSOURCES} topology/gaia_auxtopo.c)
+endif()
 
 if(BUILD_SHARED_LIBS)
     add_library(${LIB_NAME} SHARED ${CSOURCES} ${TARGET_OBJECTS} ${PRIV_HEADERS} ${MAIN_HEADERS})
     set_target_properties (${LIB_NAME} PROPERTIES
         VERSION ${VERSION}
         SOVERSION ${SPL_MAJOR_VERSION}
-        DEFINE_SYMBOL DLL_EXPORTS)
+        DEFINE_SYMBOL DLL_EXPORT)
 elseif(OSX_FRAMEWORK)
     add_library(${LIB_NAME} SHARED ${CSOURCES} ${TARGET_OBJECTS} ${PRIV_HEADERS} ${MAIN_HEADERS})
     set_source_files_properties("${SPL_HEADERS}" PROPERTIES MACOSX_PACKAGE_LOCATION "Headers/spatialite")

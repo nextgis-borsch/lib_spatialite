@@ -103,7 +103,8 @@ extern "C"
  \note you are expected to pass an input buffer corresponding to an
  allocation size of (at least) 4 bytes.
  */
-    GAIAGEO_DECLARE int gaiaImport32 (const unsigned char *p, int little_endian,
+    GAIAGEO_DECLARE int gaiaImport32 (const unsigned char *p,
+				      int little_endian,
 				      int little_endian_arch);
 
 /**
@@ -337,7 +338,7 @@ extern "C"
 						const char *text);
 
 /**
- Creates a BLOB-Geometry representing a Point
+ Creates a BLOB-Geometry representing a Point (BLOB-Geometry)
 
  \param x Point X coordinate.
  \param y Point Y coordinate.
@@ -346,7 +347,7 @@ extern "C"
  NULL on failure.
  \param size on completion this variable will contain the BLOB's size (in bytes)
 
- \sa gaiaFromSpatiaLiteBlobWkb
+ \sa gaiaFromSpatiaLiteBlobWkb, gaiaMakePointEx
 
  \note the BLOB buffer corresponds to dynamically allocated memory:
  so you are responsible to free() it [unless SQLite will take care
@@ -356,7 +357,7 @@ extern "C"
 					unsigned char **result, int *size);
 
 /**
- Creates a BLOB-Geometry representing a PointZ
+ Creates a BLOB-Geometry representing a PointZ (BLOB-Geometry)
 
  \param x Point X coordinate.
  \param y Point Y coordinate.
@@ -366,17 +367,18 @@ extern "C"
  NULL on failure.
  \param size on completion this variable will contain the BLOB's size (in bytes)
 
- \sa gaiaFromSpatiaLiteBlobWkb
+ \sa gaiaFromSpatiaLiteBlobWkb, gaiaMakePointZEx
 
  \note the BLOB buffer corresponds to dynamically allocated memory:
  so you are responsible to free() it [unless SQLite will take care
  of memory cleanup via buffer binding].
  */
-    GAIAGEO_DECLARE void gaiaMakePointZ (double x, double y, double z, int srid,
-					 unsigned char **result, int *size);
+    GAIAGEO_DECLARE void gaiaMakePointZ (double x, double y, double z,
+					 int srid, unsigned char **result,
+					 int *size);
 
 /**
- Creates a BLOB-Geometry representing a PointM
+ Creates a BLOB-Geometry representing a PointM (BLOB-Geometry)
 
  \param x Point X coordinate.
  \param y Point Y coordinate.
@@ -386,17 +388,18 @@ extern "C"
  NULL on failure.
  \param size on completion this variable will contain the BLOB's size (in bytes)
 
- \sa gaiaFromSpatiaLiteBlobWkb
+ \sa gaiaFromSpatiaLiteBlobWkb, gaiaMakePointMEx
 
  \note the BLOB buffer corresponds to dynamically allocated memory:
  so you are responsible to free() it [unless SQLite will take care
  of memory cleanup via buffer binding].
  */
-    GAIAGEO_DECLARE void gaiaMakePointM (double x, double y, double m, int srid,
-					 unsigned char **result, int *size);
+    GAIAGEO_DECLARE void gaiaMakePointM (double x, double y, double m,
+					 int srid, unsigned char **result,
+					 int *size);
 
 /**
- Creates a BLOB-Geometry representing a PointZM
+ Creates a BLOB-Geometry representing a PointZM (BLOB-Geometry)
 
  \param x Point X coordinate.
  \param y Point Y coordinate.
@@ -407,7 +410,7 @@ extern "C"
  NULL on failure.
  \param size on completion this variable will contain the BLOB's size (in bytes)
 
- \sa gaiaFromSpatiaLiteBlobWkb
+ \sa gaiaFromSpatiaLiteBlobWkb, gaiaMakePointZMEx
 
  \note the BLOB buffer corresponds to dynamically allocated memory:
  so you are responsible to free() it [unless SQLite will take care
@@ -416,6 +419,98 @@ extern "C"
     GAIAGEO_DECLARE void gaiaMakePointZM (double x, double y, double z,
 					  double m, int srid,
 					  unsigned char **result, int *size);
+
+/**
+ Creates a BLOB-Geometry representing a Point (BLOB-Geometry or BLOB-TinyPoint)
+
+ \param tiny_point if set to TRUE the POINT Geometry will be encoded
+ by using the TinyPoint BLOB format.
+ \param x Point X coordinate.
+ \param y Point Y coordinate.
+ \param srid the SRID to be set for the Point.
+ \param result on completion will containt a pointer to BLOB-Geometry:
+ NULL on failure.
+ \param size on completion this variable will contain the BLOB's size (in bytes)
+
+ \sa gaiaFromSpatiaLiteBlobWkb, gaiaMakePoint
+
+ \note the BLOB buffer corresponds to dynamically allocated memory:
+ so you are responsible to free() it [unless SQLite will take care
+ of memory cleanup via buffer binding].
+ */
+    GAIAGEO_DECLARE void gaiaMakePointEx (int tiny_point, double x, double y,
+					  int srid, unsigned char **result,
+					  int *size);
+
+/**
+ Creates a BLOB-Geometry representing a PointZ (BLOB-Geometry or BLOB-TinyPoint)
+
+ \param tiny_point if set to TRUE the POINT Geometry will be encoded
+ by using the TinyPoint BLOB format.
+ \param x Point X coordinate.
+ \param y Point Y coordinate.
+ \param z Point Z coordinate.
+ \param srid the SRID to be set for the Point.
+ \param result on completion will containt a pointer to BLOB-Geometry:
+ NULL on failure.
+ \param size on completion this variable will contain the BLOB's size (in bytes)
+
+ \sa gaiaFromSpatiaLiteBlobWkb, gaiaMakePointZ
+
+ \note the BLOB buffer corresponds to dynamically allocated memory:
+ so you are responsible to free() it [unless SQLite will take care
+ of memory cleanup via buffer binding].
+ */
+    GAIAGEO_DECLARE void gaiaMakePointZEx (int tiny_point, double x, double y,
+					   double z, int srid,
+					   unsigned char **result, int *size);
+
+/**
+ Creates a BLOB-Geometry representing a PointM (BLOB-Geometry or BLOB-TinyPoint)
+
+ \param tiny_point if set to TRUE the POINT Geometry will be encoded
+ by using the TinyPoint BLOB format.
+ \param x Point X coordinate.
+ \param y Point Y coordinate.
+ \param m Point M coordinate.
+ \param srid the SRID to be set for the Point.
+ \param result on completion will containt a pointer to BLOB-Geometry:
+ NULL on failure.
+ \param size on completion this variable will contain the BLOB's size (in bytes)
+
+ \sa gaiaFromSpatiaLiteBlobWkb, gaiaMakePointM
+
+ \note the BLOB buffer corresponds to dynamically allocated memory:
+ so you are responsible to free() it [unless SQLite will take care
+ of memory cleanup via buffer binding].
+ */
+    GAIAGEO_DECLARE void gaiaMakePointMEx (int tiny_point, double x, double y,
+					   double m, int srid,
+					   unsigned char **result, int *size);
+
+/**
+ Creates a BLOB-Geometry representing a PointZM (BLOB-Geometry or BLOB-TinyPoint)
+
+ \param tiny_point if set to TRUE the POINT Geometry will be encoded
+ by using the TinyPoint BLOB format.
+ \param x Point X coordinate.
+ \param y Point Y coordinate.
+ \param z Point Z coordinate.
+ \param m Point M coordinate.
+ \param srid the SRID to be set for the Point.
+ \param result on completion will containt a pointer to BLOB-Geometry:
+ NULL on failure.
+ \param size on completion this variable will contain the BLOB's size (in bytes)
+
+ \sa gaiaFromSpatiaLiteBlobWkb, gaiaMakePointZM
+
+ \note the BLOB buffer corresponds to dynamically allocated memory:
+ so you are responsible to free() it [unless SQLite will take care
+ of memory cleanup via buffer binding].
+ */
+    GAIAGEO_DECLARE void gaiaMakePointZMEx (int tiny_point, double x, double y,
+					    double z, double m, int srid,
+					    unsigned char **result, int *size);
 
 /**
  Creates a BLOB-Geometry representing a Segment (2-Points Linestring)
@@ -475,11 +570,13 @@ extern "C"
  in this case destroying the higher order object will implicitly destroy any 
  contained child object. 
  */
-    GAIAGEO_DECLARE gaiaGeomCollPtr gaiaFromSpatiaLiteBlobWkbEx (const unsigned
-								 char *blob,
+    GAIAGEO_DECLARE gaiaGeomCollPtr gaiaFromSpatiaLiteBlobWkbEx (const
+								 unsigned char
+								 *blob,
 								 unsigned int
 								 size,
-								 int gpkg_mode,
+								 int
+								 gpkg_mode,
 								 int
 								 gpkg_amphibious);
 
@@ -508,9 +605,10 @@ extern "C"
  \param result on completion will containt a pointer to BLOB-Geometry:
  NULL on failure.
  \param size on completion this variable will contain the BLOB's size (in bytes)
- \param gpkg_mode is set to TRUE will always return GPKG Geometry-BLOBs
+ \param gpkg_mode if set to TRUE will always return GPKG Geometry-BLOBs
 
- \sa gaiaFromSpatiaLiteBlobWkb, gaiaToCompressedBlobWkb
+ \sa gaiaFromSpatiaLiteBlobWkb, gaiaToCompressedBlobWkb,
+ gaiaToSpatiaLiteBlobWkbEx2
 
  \note the BLOB buffer corresponds to dynamically allocated memory:
  so you are responsible to free() it [unless SQLite will take care
@@ -519,6 +617,29 @@ extern "C"
     GAIAGEO_DECLARE void gaiaToSpatiaLiteBlobWkbEx (gaiaGeomCollPtr geom,
 						    unsigned char **result,
 						    int *size, int gpkg_mode);
+
+/**
+ Creates a BLOB-Geometry corresponding to a Geometry object
+
+ \param geom pointer to the Geometry object.
+ \param result on completion will containt a pointer to BLOB-Geometry:
+ NULL on failure.
+ \param size on completion this variable will contain the BLOB's size (in bytes)
+ \param gpkg_mode if set to TRUE will always return GPKG Geometry-BLOBs
+ \param tiny_point if set to TRUE all POINT Geometries will be encoded
+ by using the TinyPoint BLOB format.
+
+ \sa gaiaFromSpatiaLiteBlobWkb, gaiaToCompressedBlobWkb,
+ gaiaToSpatiaLiteBlobWkbEx
+
+ \note the BLOB buffer corresponds to dynamically allocated memory:
+ so you are responsible to free() it [unless SQLite will take care
+ of memory cleanup via buffer binding].
+ */
+    GAIAGEO_DECLARE void gaiaToSpatiaLiteBlobWkbEx2 (gaiaGeomCollPtr geom,
+						     unsigned char **result,
+						     int *size, int gpkg_mode,
+						     int tiny_point);
 
 /**
  Creates a Compressed BLOB-Geometry corresponding to a Geometry object
@@ -1381,7 +1502,38 @@ extern "C"
 					  const char *charTo);
 
 /**
- Open a Shapefile in read mode
+ Open a Shapefile in write mode - extended
+
+ \param shp pointer to the Shapefile object.
+ \param path \e abstract pathname to the corresponding file-system files.
+ \param shape the SHAPE code; expected to be one of GAIA_SHP_POINT,
+ GAIA_SHP_POLYLINE, GAIA_SHP_POLYGON, GAIA_SHP_MULTIPOINT, GAIA_SHP_POINTZ,
+ GAIA_SHP_POLYLINEZ, GAIA_SHP_POLYGONZ, GAIA_SHP_MULTIPOINTZ, 
+ GAIA_SHP_POINTM, GAIA_SHP_POLYLINEM, GAIA_SHP_POLYGONM, GAIA_SHP_MULTIPOINTM
+ \param list pointer to DBF List object representing the corresponding
+ data attributes.
+ \param charFrom GNU ICONV name identifying the input charset encoding.
+ \param charTo GNU ICONV name identifying the output charset encoding.
+ \param colname_case one between GAIA_DBF_COLNAME_LOWERCASE, 
+	GAIA_DBF_COLNAME_UPPERCASE or GAIA_DBF_COLNAME_CASE_IGNORE.
+
+ \sa gaiaAllocShapefile, gaiaFreeShapefile, gaiaOpenShpRead, 
+ gaiaReadShpEntity, gaiaShpAnalyze, gaiaWriteShpEntity, gaiaFlushShpHeaders,
+ gaiaOpenShpWrite
+ 
+ \note on failure the object member \e Valid will be set to 0; and the
+ object member \e LastError will contain the appropriate error message.
+ \n the \e abstract pathname should not contain any suffix at all.
+ */
+    GAIAGEO_DECLARE void gaiaOpenShpWriteEx (gaiaShapefilePtr shp,
+					     const char *path, int shape,
+					     gaiaDbfListPtr list,
+					     const char *charFrom,
+					     const char *charTo,
+					     int colname_case);
+
+/**
+ Open a Shapefile in write mode
 
  \param shp pointer to the Shapefile object.
  \param path \e abstract pathname to the corresponding file-system files.
@@ -1395,11 +1547,10 @@ extern "C"
  \param charTo GNU ICONV name identifying the output charset encoding.
 
  \sa gaiaAllocShapefile, gaiaFreeShapefile, gaiaOpenShpRead, 
- gaiaReadShpEntity, gaiaShpAnalyze, gaiaWriteShpEntity, gaiaFlushShpHeaders
+ gaiaReadShpEntity, gaiaShpAnalyze, gaiaWriteShpEntity, gaiaFlushShpHeaders,
+ gaiaOpenShpWriteEx
  
- \note on failure the object member \e Valid will be set to 0; and the
- object member \e LastError will contain the appropriate error message.
- \n the \e abstract pathname should not contain any suffix at all.
+ \note simply calls gaiaOpenShpWriteEx() by specifying GAIA_DBF_COLNAME_LOWERCASE
  */
     GAIAGEO_DECLARE void gaiaOpenShpWrite (gaiaShapefilePtr shp,
 					   const char *path, int shape,
@@ -1415,6 +1566,7 @@ extern "C"
  \param srid feature's SRID 
 
  \return 0 on failure: any other value on success.
+ -1 when the corresponding DBF record is marked as DELETED.
 
  \sa gaiaAllocShapefile, gaiaFreeShapefile, gaiaOpenShpRead, gaiaOpenShpWrite,
  gaiaShpAnalyze, gaiaWriteShpEntity, gaiaFlushShpHeaders
@@ -1549,6 +1701,29 @@ extern "C"
 					  const char *charTo);
 
 /** 
+ Open a DBF File in write mode,- extended
+
+ \param dbf pointer to the DBF File object.
+ \param path pathname to the corresponding file-system file.
+ \param charFrom GNU ICONV name identifying the input charset encoding.
+ \param charTo GNU ICONV name identifying the output charset encoding.
+ \param colname_case one between GAIA_DBF_COLNAME_LOWERCASE, 
+	GAIA_DBF_COLNAME_UPPERCASE or GAIA_DBF_COLNAME_CASE_IGNORE.
+
+ \sa gaiaAllocDbf, gaiaFreeDbf, gaiaOpenDbfRead, 
+ gaiaReadDbfEntity, gaiaWriteDbfEntity, gaiaFlushDbfHeader,
+ gaiaOpenDbfWrite
+ 
+ \note on failure the object member \e Valid will be set to 0; and the
+ object member \e LastError will contain the appropriate error message.
+ */
+    GAIAGEO_DECLARE void gaiaOpenDbfWriteEx (gaiaDbfPtr dbf,
+					     const char *path,
+					     const char *charFrom,
+					     const char *charTo,
+					     int colname_case);
+
+/** 
  Open a DBF File in write mode
 
  \param dbf pointer to the DBF File object.
@@ -1557,10 +1732,11 @@ extern "C"
  \param charTo GNU ICONV name identifying the output charset encoding.
 
  \sa gaiaAllocDbf, gaiaFreeDbf, gaiaOpenDbfRead, 
- gaiaReadDbfEntity, gaiaWriteDbfEntity, gaiaFlushDbfHeader
+ gaiaReadDbfEntity, gaiaWriteDbfEntity, gaiaFlushDbfHeader, 
+ gaiaOpenDbfWriteEx
  
- \note on failure the object member \e Valid will be set to 0; and the
- object member \e LastError will contain the appropriate error message.
+ 
+ \note simply calls gaiaOpenDbfWriteEx() by specifying GAIA_DBF_COLNAME_LOWERCASE
  */
     GAIAGEO_DECLARE void gaiaOpenDbfWrite (gaiaDbfPtr dbf,
 					   const char *path,
@@ -1671,8 +1847,10 @@ extern "C"
  Reader object.
  */
     GAIAGEO_DECLARE gaiaTextReaderPtr gaiaTextReaderAlloc (const char *path,
-							   char field_separator,
-							   char text_separator,
+							   char
+							   field_separator,
+							   char
+							   text_separator,
 							   char
 							   decimal_separator,
 							   int

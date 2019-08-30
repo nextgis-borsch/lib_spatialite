@@ -52,6 +52,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include "spatialite.h"
 
 #ifdef ENABLE_LIBXML2		/* only if LIBXML2 is supported */
+#ifndef OMIT_ICONV		/* only if ICONV is supported */
 
 #define ISO_METADATA	1
 #define SLD_SE_STYLE	2
@@ -544,10 +545,10 @@ check_parse (void *cache, const char *path)
 			 doc_sz);
 		return 0;
 	    }
-	  if (formatted_sz != 864)
+	  if (formatted_sz != 863)
 	    {
 		fprintf (stderr,
-			 "books.xml: unexpected formatted size %d (expected 864)\n",
+			 "books.xml: unexpected formatted size %d (expected 863)\n",
 			 formatted_sz);
 		return 0;
 	    }
@@ -582,10 +583,10 @@ check_parse (void *cache, const char *path)
 			 doc_sz);
 		return 0;
 	    }
-	  if (formatted_sz != 970)
+	  if (formatted_sz != 969)
 	    {
 		fprintf (stderr,
-			 "opera.xml: unexpected formatted size %d (expected 970)\n",
+			 "opera.xml: unexpected formatted size %d (expected 969)\n",
 			 formatted_sz);
 		return 0;
 	    }
@@ -620,10 +621,10 @@ check_parse (void *cache, const char *path)
 			 doc_sz);
 		return 0;
 	    }
-	  if (formatted_sz != 945)
+	  if (formatted_sz != 944)
 	    {
 		fprintf (stderr,
-			 "movies.xml: unexpected formatted size %d (expected 945)\n",
+			 "movies.xml: unexpected formatted size %d (expected 944)\n",
 			 formatted_sz);
 		return 0;
 	    }
@@ -640,6 +641,139 @@ check_parse (void *cache, const char *path)
     return 1;
 }
 
+static int
+check_mline_gpx (sqlite3 * handle, void *cache, const char *path)
+{
+/* parsing an XML Sample */
+    FILE *fl;
+    int sz = 0;
+    int rd;
+    unsigned char *xml = NULL;
+    int uncompressed_sz;
+    unsigned char *p_result = NULL;
+    gaiaGeomCollPtr geom;
+    gaiaLinestringPtr ln;
+    double x;
+    double y;
+    double z;
+    double m;
+
+/* loading the XMLDocument */
+    fl = fopen (path, "rb");
+    if (!fl)
+      {
+	  fprintf (stderr, "cannot open \"%s\"\n", path);
+	  return 0;
+      }
+    if (fseek (fl, 0, SEEK_END) == 0)
+	sz = ftell (fl);
+    xml = malloc (sz);
+    rewind (fl);
+    rd = fread (xml, 1, sz, fl);
+    if (rd != sz)
+      {
+	  fprintf (stderr, "read error \"%s\"\n", path);
+	  return 0;
+      }
+    fclose (fl);
+
+/* parsing the GPX document (no validation / not compressed) */
+    gaiaXmlToBlob (cache, xml, rd, 0, NULL, &p_result, &uncompressed_sz, NULL,
+		   NULL);
+    if (p_result == NULL)
+      {
+	  fprintf (stderr, "unable to parse(gpx)\"%s\"\n", path);
+	  return 0;
+      }
+
+    geom = gaiaXmlBlobMLineFromGPX (p_result, uncompressed_sz, handle);
+    if (geom == NULL)
+      {
+	  fprintf (stderr, "XB_MLineFromGPX: unexpected failure \"%s\"\n",
+		   path);
+	  return 0;
+      }
+
+    if (geom->Srid != 4326)
+      {
+	  fprintf (stderr, "XB_MLineFromGPX: invalid SRID (%d) \"%s\"\n",
+		   geom->Srid, path);
+	  return 0;
+      }
+    ln = geom->FirstLinestring;
+    if (ln == NULL)
+      {
+	  fprintf (stderr, "XB_MLineFromGPX: not a Linestring \"%s\"\n", path);
+	  return 0;
+      }
+    if (ln->Points < 5)
+      {
+	  fprintf (stderr, "XB_MLineFromGPX: too few points \"%s\"\n", path);
+	  return 0;
+      }
+    gaiaGetPointXYZM (ln->Coords, 4, &x, &y, &z, &m);
+    if (strcmp (path, "Gpx-sample.gpx") == 0)
+      {
+	  if (x != 37.808177)
+	    {
+		fprintf (stderr, "XB_MLineFromGPX: unexpected X=%f \"%s\"\n", x,
+			 path);
+		return 0;
+	    }
+	  if (y != 55.753587)
+	    {
+		fprintf (stderr, "XB_MLineFromGPX: unexpected Y=%f \"%s\"\n", y,
+			 path);
+		return 0;
+	    }
+	  if (z != 135.0)
+	    {
+		fprintf (stderr, "XB_MLineFromGPX: unexpected Z=%f \"%s\"\n", z,
+			 path);
+		return 0;
+	    }
+	  if (m < 2454970.667060 || m > 2454970.667061)
+	    {
+		fprintf (stderr, "XB_MLineFromGPX: unexpected M=%f \"%s\"\n", m,
+			 path);
+		return 0;
+	    }
+      }
+    else
+      {
+	  if (x != -25.1959200)
+	    {
+		fprintf (stderr, "XB_MLineFromGPX: unexpected X=%f \"%s\"\n", x,
+			 path);
+		return 0;
+	    }
+	  if (y != 37.7710900)
+	    {
+		fprintf (stderr, "XB_MLineFromGPX: unexpected Y=%f \"%s\"\n", y,
+			 path);
+		return 0;
+	    }
+	  if (z != 0.0)
+	    {
+		fprintf (stderr, "XB_MLineFromGPX: unexpected Z=%f \"%s\"\n", z,
+			 path);
+		return 0;
+	    }
+	  if (m != 1721059.50)
+	    {
+		fprintf (stderr, "XB_MLineFromGPX: unexpected M=%f \"%s\"\n", m,
+			 path);
+		return 0;
+	    }
+      }
+
+    gaiaFreeGeomColl (geom);
+    free (p_result);
+    free (xml);
+    return 1;
+}
+
+#endif
 #endif
 
 int
@@ -666,6 +800,7 @@ main (int argc, char *argv[])
     spatialite_init_ex (handle, cache, 0);
 
 #ifdef ENABLE_LIBXML2		/* only if LIBXML2 is supported */
+#ifndef OMIT_ICONV		/* only if ICONV is supported */
 
     if (!check_parse (cache, "books.xml"))
       {
@@ -725,6 +860,18 @@ main (int argc, char *argv[])
 	  return -12;
       }
 
+    if (!check_mline_gpx (handle, cache, "000323485.gpx"))
+      {
+	  fprintf (stderr, "unable to test \"000323485.gpx\"\n");
+	  return -13;
+      }
+    if (!check_mline_gpx (handle, cache, "Gpx-sample.gpx"))
+      {
+	  fprintf (stderr, "unable to test \"Gpx-sample.gpx\"\n");
+	  return -14;
+      }
+
+#endif
 #endif
 
     ret = sqlite3_close (handle);

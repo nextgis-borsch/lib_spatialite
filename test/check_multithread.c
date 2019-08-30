@@ -73,7 +73,6 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #ifdef _WIN32
 #include "fnmatch4win.h"
 #include "scandir4win.h"
-#include "asprintf4win.h"
 #include "fnmatch_impl4win.h"
 #endif
 
@@ -116,7 +115,7 @@ struct thread_params
     pthread_t thread_id;
     pthread_attr_t attr;
 #endif
-} mt_params[64];
+} mt_params[128];
 
 static struct db_conn *
 alloc_connection (void)
@@ -578,9 +577,9 @@ load_testcases (struct test_list *list)
     free (namelist);
 #endif /* end GEOS_ADVANCED conditional */
 
-#ifdef ENABLE_LWGEOM		/* only if LWGEOM is supported */
-/* LWGEOM SQL testcases */
-    current_dir = "sql_stmt_lwgeom_tests";
+#ifdef ENABLE_RTTOPO		/* only if RTTOPO is supported */
+/* RTTOPO SQL testcases */
+    current_dir = "sql_stmt_rtgeom_tests";
     path = sqlite3_mprintf ("%s", current_dir);
     n = scandir (path, &namelist, test_case_filter, alphasort);
     if (n < 0)
@@ -603,7 +602,7 @@ load_testcases (struct test_list *list)
 	  free (namelist[i]);
       }
     free (namelist);
-#endif /* end LWGEOM conditional */
+#endif /* end RTTOPO conditional */
 
 #ifdef ENABLE_LIBXML2		/* only if LIBXML2 is supported */
 /* LIBXML2 SQL testcases */
@@ -898,8 +897,8 @@ main (int argc, char *argv[])
 	  num_threads = atoi (env_var);
 	  if (num_threads < 1)
 	      num_threads = 1;
-	  if (num_threads > 64)
-	      num_threads = 64;
+	  if (num_threads > 128)
+	      num_threads = 128;
       }
     printf ("Testing %d concurrent threads\n", num_threads);
 

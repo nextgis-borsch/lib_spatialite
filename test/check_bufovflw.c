@@ -81,14 +81,16 @@ main (int argc, char *argv[])
     char *err_msg = NULL;
     int suffix_len = 16 * 1024;	/* 16 KB suffix */
     char *suffix;
+#ifndef OMIT_ICONV
     char *xtable;
+    char *dbf;
+    int row_count;
+#endif
     char *shape;
     char *shape2;
     char *shape2geom;
-    char *dbf;
     char *table_a;
     char *table_b;
-    char *topology;
     char *auth;
 #ifndef OMIT_PROJ		/* including PROJ.4 */
     char *kml1;
@@ -106,7 +108,6 @@ main (int argc, char *argv[])
     char *string;
     int len;
     char frmt[2048];
-    int row_count;
     char *dumpname = __FILE__ "dump";
     void *cache = spatialite_alloc_connection ();
 
@@ -147,11 +148,12 @@ main (int argc, char *argv[])
     shape2 = sqlite3_mprintf ("shape_table_2_%s", suffix);
     shape2geom = sqlite3_mprintf ("shape_table_2_geom_%s", suffix);
     shape = sqlite3_mprintf ("shape_table_%s", suffix);
-    dbf = sqlite3_mprintf ("dbf_tbale_%s", suffix);
+#ifndef OMIT_ICONV
+    dbf = sqlite3_mprintf ("dbf_table_%s", suffix);
+#endif
     pk = sqlite3_mprintf ("id_%s", suffix);
     name = sqlite3_mprintf ("name_%s", suffix);
     geom = sqlite3_mprintf ("geom_%s", suffix);
-    topology = sqlite3_mprintf ("topology_%s_", suffix);
 
 /* creating table "A" */
     sql = sqlite3_mprintf ("CREATE TABLE %s (\n"
@@ -836,41 +838,11 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-/* creating a topology */
-    sql =
-	sqlite3_mprintf ("SELECT CreateTopologyTables(%Q, 4326, 'XY')",
-			 topology);
-    ret = sqlite3_get_table (handle, sql, &results, &rows, &columns, &err_msg);
-    sqlite3_free (sql);
-    if (ret != SQLITE_OK)
-      {
-	  fprintf (stderr, "CreateTopologyTables error: %s\n", err_msg);
-	  sqlite3_free (err_msg);
-	  sqlite3_close (handle);
-	  return -61;
-      }
-    if (rows != 1 || columns != 1)
-      {
-	  fprintf (stderr,
-		   "Unexpected rows/columns (CreateTopologyTables): r=%d c=%d\n",
-		   rows, columns);
-	  return -62;
-      }
-    value = results[1];
-    if (strcmp ("1", value) != 0)
-      {
-	  fprintf (stderr, "Unexpected result (CreateTopologyTables): %s\n",
-		   results[1]);
-	  return -63;
-      }
-    sqlite3_free_table (results);
-
     sqlite3_free (table_a);
     sqlite3_free (table_b);
     sqlite3_free (pk);
     sqlite3_free (name);
     sqlite3_free (geom);
-    sqlite3_free (topology);
 
 /* inserting a CRS (very long auth) */
     auth = sqlite3_mprintf ("authority_%s", suffix);
@@ -889,7 +861,7 @@ main (int argc, char *argv[])
 	  return -64;
       }
 
-#ifndef OMIT_EPSG /* only if full EPSG support is enabled */
+#ifndef OMIT_EPSG		/* only if full EPSG support is enabled */
 /* checking for validity (SRID from Auth) */
     sql = sqlite3_mprintf ("SELECT SridFromAuthCrs(%Q, %d)", auth, 1122);
     ret = sqlite3_get_table (handle, sql, &results, &rows, &columns, &err_msg);
@@ -909,7 +881,7 @@ main (int argc, char *argv[])
 	  return -66;
       }
     value = results[1];
-    if (strcmp ("325834", value) != 0)
+    if (strcmp ("900914", value) != 0)
       {
 	  fprintf (stderr, "Unexpected result (SRID from Auth): %s\n",
 		   results[1]);
@@ -1776,6 +1748,7 @@ main (int argc, char *argv[])
 	  return -117;
       }
 
+#ifndef OMIT_ICONV		/* only if ICONV is enabled */
 /* checking load_shapefile */
     ret = load_shapefile (handle, "./shp/gaza/route", shape, "UTF-8", 4326,
 			  NULL, 1, 0, 1, 1, &row_count, err_msg);
@@ -1825,13 +1798,15 @@ main (int argc, char *argv[])
 #endif /* end including PROJ.4 */
 
 /* checking dump_geojson */
-    ret = dump_geojson (handle, shape, "col1", dumpname, 10, 5);
+    ret = dump_geojson (handle, shape, "geometry", dumpname, 10, 5);
     if (!ret)
       {
 	  fprintf (stderr, "dump_geojson() error: %s\n", err_msg);
 	  sqlite3_close (handle);
 	  return -123;
       }
+#endif /* end ICONV */
+
     unlink (dumpname);
 /* dropping virtual geometry */
     sql = sqlite3_mprintf ("SELECT DropVirtualGeometry(%Q)", shape);
@@ -1848,6 +1823,7 @@ main (int argc, char *argv[])
       }
     sqlite3_free (shape);
 
+#ifndef OMIT_ICONV		/* only if ICONV is enabled */
 /* checking load_dbf */
     ret =
 	load_dbf (handle, "./shapetest1.dbf", dbf, "UTF-8", 1, &row_count,
@@ -1893,6 +1869,7 @@ main (int argc, char *argv[])
 	  sqlite3_close (handle);
 	  return -129;
       }
+
     xtable = gaiaDoubleQuotedSql (shape2);
     sql = sqlite3_mprintf ("INSERT INTO \"%s\" (FEATURE_ID, DATUM, HAUSNR) "
 			   "VALUES (1250000, 0.1, 'alpha')", xtable);
@@ -1928,6 +1905,7 @@ main (int argc, char *argv[])
 	  sqlite3_close (handle);
 	  return -132;
       }
+#endif /* end ICONV */
 
     remove_duplicated_rows (handle, shape2);
     elementary_geometries (handle, shape2, shape2geom, "elem_poly", "pk_elem",

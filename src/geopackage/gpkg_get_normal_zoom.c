@@ -89,7 +89,7 @@ fnct_gpkgGetNormalZoom (sqlite3_context * context, int argc UNUSED,
 
     sql_stmt =
 	sqlite3_mprintf
-	("SELECT MAX(zoom_level) FROM gpkg_tile_matrix WHERE table_name=\"%q\"",
+	("SELECT MAX(zoom_level) FROM gpkg_tile_matrix WHERE table_name = %Q",
 	 table);
 
     sqlite = sqlite3_context_db_handle (context);

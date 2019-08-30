@@ -101,7 +101,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
     /* add in a test entry */
     ret =
 	sqlite3_exec (db_handle,
-		      "INSERT INTO raster_format_metadata VALUES (\"mytable_tiles\", \"tile_data\", \"image/png\", 24)",
+		      "INSERT INTO raster_format_metadata VALUES ('mytable_tiles', 'tile_data', 'image/png', 24)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -134,7 +134,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
     /* add in a test entry */
     ret =
 	sqlite3_exec (db_handle,
-		      "INSERT INTO tile_matrix_metadata VALUES (\"mytable_tiles\", 0, 1, 1)",
+		      "INSERT INTO tile_matrix_metadata VALUES ('mytable_tiles', 0, 1, 1)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -167,7 +167,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
     /* test trigger setup */
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgAddTileTriggers(\"no_such_table\")", NULL,
+		      "SELECT gpkgAddTileTriggers('no_such_table')", NULL,
 		      NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {

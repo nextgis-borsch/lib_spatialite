@@ -52,10 +52,6 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include "sqlite3.h"
 #include "spatialite.h"
 
-#ifdef _WIN32
-#include "asprintf4win.h"
-#endif
-
 int
 main (int argc, char *argv[])
 {
@@ -68,9 +64,6 @@ main (int argc, char *argv[])
     int rows;
     int columns;
     void *cache = spatialite_alloc_connection ();
-
-    if (argc > 1 || argv[0] == NULL)
-	argc = 1;		/* silencing stupid compiler warnings */
 
     ret =
 	sqlite3_open_v2 (":memory:", &db_handle,
@@ -97,12 +90,13 @@ main (int argc, char *argv[])
 	  return -2;
       }
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2 from dbftest where testcase2 < 20;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2 from dbftest where testcase2 < 20;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -136,12 +130,13 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2 from dbftest where testcase2 <= 19;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2 from dbftest where testcase2 <= 19;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -175,12 +170,13 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2 from dbftest where testcase2 = 20;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2 from dbftest where testcase2 = 20;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -214,12 +210,13 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2 from dbftest where testcase2 > 2;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2 from dbftest where testcase2 > 2;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -253,12 +250,13 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2 from dbftest where testcase2 >= 20;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2 from dbftest where testcase2 >= 20;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -292,12 +290,13 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2 from dbftest where testcase1 < \"p\";");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2 from dbftest where testcase1 < 'p';");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -331,12 +330,13 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2 from dbftest where testcase1 <= \"p\";");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2 from dbftest where testcase1 <= 'p';");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -378,12 +378,13 @@ main (int argc, char *argv[])
 	  return -46;
       }
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2 from dbftest where testcase1 > \"p\";");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2 from dbftest where testcase1 > 'p';");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -436,12 +437,13 @@ main (int argc, char *argv[])
 	  return -47;
       }
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2 from dbftest where testcase1 >= \"p\";");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2 from dbftest where testcase1 >= 'p';");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -475,12 +477,13 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2 from dbftest where testcase1 = \"windward\";");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2 from dbftest where testcase1 = 'windward';");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -514,12 +517,13 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2 from dbftest where PKUID = 1;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2 from dbftest where PKUID = 1;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -553,12 +557,13 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2 from dbftest where PKUID < 2;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2 from dbftest where PKUID < 2;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -592,12 +597,13 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2 from dbftest where PKUID <= 1;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2 from dbftest where PKUID <= 1;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -631,12 +637,13 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2 from dbftest where PKUID > 1;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2 from dbftest where PKUID > 1;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -670,12 +677,13 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select testcase1, testcase2 from dbftest where PKUID >= 2;");
+    sql_statement =
+	sqlite3_mprintf
+	("select testcase1, testcase2 from dbftest where PKUID >= 2;");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -709,12 +717,13 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select PKUID, testcase1, testcase2 from dbftest where testcase1 LIKE \"wind%%\";");
+    sql_statement =
+	sqlite3_mprintf
+	("select PKUID, testcase1, testcase2 from dbftest where testcase1 LIKE 'wind%%';");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -728,7 +737,7 @@ main (int argc, char *argv[])
 		   rows, columns);
 	  return -91;
       }
-    if (strcmp (results[0], "PKUID") != 0)
+    if (strcmp (results[0], "pkuid") != 0)
       {
 	  fprintf (stderr, "Unexpected error: header uid bad result: %s.\n",
 		   results[0]);
@@ -765,7 +774,7 @@ main (int argc, char *argv[])
     /* error cases */
     ret =
 	sqlite3_exec (db_handle,
-		      "create VIRTUAL TABLE toofewargs USING VirtualDBF(\"shapetest1.dbf\");",
+		      "create VIRTUAL TABLE toofewargs USING VirtualDBF('shapetest1.dbf');",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -776,18 +785,18 @@ main (int argc, char *argv[])
 
     ret =
 	sqlite3_exec (db_handle,
-		      "create VIRTUAL TABLE toomanyargs USING VirtualDBF(\"shapetest1.dbf\", UTF-8, 1, 1);",
+		      "create VIRTUAL TABLE toomanyargs USING VirtualDBF('shapetest1.dbf', UTF-8, 1, UPPER, 1);",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
-	  fprintf (stderr, "VirtualDBF unexpected result: %i\n", ret);
+	  fprintf (stderr, "2 VirtualDBF unexpected result: %i\n", ret);
 	  return -96;
       }
     sqlite3_free (err_msg);
 
     ret =
 	sqlite3_exec (db_handle,
-		      "create VIRTUAL TABLE nosuchfile USING VirtualDBF(\"not_a_file.dbf\", UTF-8);",
+		      "create VIRTUAL TABLE nosuchfile USING VirtualDBF('not_a_file.dbf', UTF-8);",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -828,7 +837,7 @@ main (int argc, char *argv[])
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
-	  fprintf (stderr, "VirtualDBF unexpected result: %i\n", ret);
+	  fprintf (stderr, "3 VirtualDBF unexpected result: %i\n", ret);
 	  return -101;
       }
     sqlite3_free (err_msg);
@@ -836,6 +845,9 @@ main (int argc, char *argv[])
     sqlite3_close (db_handle);
     spatialite_cleanup_ex (cache);
 #endif /* end ICONV conditional */
+
+    if (argc > 1 || argv[0] == NULL)
+	argc = 1;		/* silencing stupid compiler warnings */
 
     spatialite_shutdown ();
     return 0;

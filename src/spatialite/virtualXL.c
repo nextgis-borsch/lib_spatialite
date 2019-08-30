@@ -244,7 +244,7 @@ vXL_create (sqlite3 * db, void *pAux, int argc, const char *const *argv,
 	  return SQLITE_OK;
       }
 /* selecting the currently active XL Worksheet */
-    freexl_select_active_worksheet (handle, worksheet);
+    freexl_select_active_worksheet (handle, (unsigned short) worksheet);
     freexl_worksheet_dimensions (handle, &rows, &columns);
     p_vt->XL_handle = handle;
     p_vt->rows = rows;
@@ -506,6 +506,7 @@ vXL_eval_constraints (VirtualXLCursorPtr cursor)
     VirtualXLConstraintPtr pC = cursor->firstConstraint;
     if (pC == NULL)
 	return 1;
+    cell.value.int_value = 0;
     while (pC)
       {
 	  int ok = 0;
@@ -547,8 +548,8 @@ vXL_eval_constraints (VirtualXLCursorPtr cursor)
 	      && cursor->current_row <= cursor->pVtab->rows
 	      && pC->iColumn <= cursor->pVtab->columns)
 	      freexl_get_cell_value (cursor->pVtab->XL_handle,
-				     cursor->current_row - 1, pC->iColumn - 1,
-				     &cell);
+				     (int) cursor->current_row - 1,
+				     (unsigned short) pC->iColumn - 1, &cell);
 	  else
 	      cell.type = FREEXL_CELL_NULL;
 	  if (cell.type == FREEXL_CELL_INT)
@@ -690,6 +691,15 @@ vXL_eval_constraints (VirtualXLCursorPtr cursor)
 		      if (ret >= 0)
 			  ok = 1;
 		      break;
+#ifdef HAVE_DECL_SQLITE_INDEX_CONSTRAINT_LIKE
+		  case SQLITE_INDEX_CONSTRAINT_LIKE:
+		      ret =
+			  sqlite3_strlike (pC->txtValue, cell.value.text_value,
+					   0);
+		      if (ret == 0)
+			  ok = 1;
+		      break;
+#endif
 		  };
 	    }
 	done:
@@ -802,6 +812,7 @@ vXL_column (sqlite3_vtab_cursor * pCursor, sqlite3_context * pContext,
 {
 /* fetching value for the Nth column */
     FreeXL_CellValue cell;
+    cell.value.int_value = 0;
     VirtualXLCursorPtr cursor = (VirtualXLCursorPtr) pCursor;
     if (column == 0)
       {
@@ -816,7 +827,8 @@ vXL_column (sqlite3_vtab_cursor * pCursor, sqlite3_context * pContext,
 	&& cursor->current_row <= cursor->pVtab->rows
 	&& column <= cursor->pVtab->columns)
 	freexl_get_cell_value (cursor->pVtab->XL_handle,
-			       cursor->current_row - 1, column - 1, &cell);
+			       cursor->current_row - 1,
+			       (unsigned short) column - 1, &cell);
     else
 	cell.type = FREEXL_CELL_NULL;
     switch (cell.type)

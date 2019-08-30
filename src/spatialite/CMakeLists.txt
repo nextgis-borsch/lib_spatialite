@@ -3,7 +3,7 @@
 # Purpose:  CMake build scripts
 # Author:   Dmitry Baryshnikov, <dmitry.baryshnikov@nextgis.com>
 ################################################################################
-# Copyright (C) 2017, NextGIS <info@nextgis.com>
+# Copyright (C) 2017-2019, NextGIS <info@nextgis.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -26,25 +26,31 @@
 
 set(TARGET_NAME splite)
 
-set(CSOURCES mbrcache.c
-	spatialite.c
-	spatialite_init.c
-	metatables.c
-	statistics.c
-	extra_tables.c
-	se_helpers.c
-	srid_aux.c
-	table_cloner.c
-	virtualdbf.c
-	virtualXL.c
-	virtualfdo.c
-	virtualgpkg.c
-	virtualbbox.c
-	virtualspatialindex.c
-	virtualnetwork.c
-	virtualshape.c
-	virtualxpath.c
-	virtualelementary.c
+set(CSOURCES mbrcache.c 
+	spatialite.c 
+	spatialite_init.c 
+	pause.c 
+	metatables.c 
+	statistics.c 
+	extra_tables.c 
+	se_helpers.c 
+	srid_aux.c 
+	table_cloner.c 
+	dbobj_scopes.c 
+	virtualdbf.c 
+	virtualXL.c 
+	virtualfdo.c 
+	virtualgpkg.c 
+	virtualbbox.c 
+	virtualspatialindex.c 
+	virtualnetwork.c 
+	virtualrouting.c 
+	virtualshape.c 
+	virtualxpath.c 
+	virtualelementary.c 
+	virtualknn.c 
+	create_routing.c 
+	virtualgeojson.c
 )
 
 add_library(${TARGET_NAME} OBJECT ${CSOURCES})

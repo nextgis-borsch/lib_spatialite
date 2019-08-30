@@ -122,7 +122,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesTable(\"test1_matrix_tiles\", 4326, -180.0, -90.0, 180.0, 90.0)",
+		      "SELECT gpkgCreateTilesTable('test1_matrix_tiles', 4326, -180.0, -90.0, 180.0, 90.0)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -136,7 +136,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
     /* create matrix level 0 */
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesZoomLevel(\"test1_matrix_tiles\", 0, 360, 180)",
+		      "SELECT gpkgCreateTilesZoomLevel('test1_matrix_tiles', 0, 360, 180)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -150,7 +150,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
     /* try duplicate entry */
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesZoomLevel(\"test1_matrix_tiles\", 0, 360, 180)",
+		      "SELECT gpkgCreateTilesZoomLevel('test1_matrix_tiles', 0, 360, 180)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -190,7 +190,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesZoomLevel(\"test1_matrix_tiles\", 4.2, 360, 180)",
+		      "SELECT gpkgCreateTilesZoomLevel('test1_matrix_tiles', 4.2, 360, 180)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -215,7 +215,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesZoomLevel(\"test1_matrix_tiles\", 4, \"x\", 180)",
+		      "SELECT gpkgCreateTilesZoomLevel('test1_matrix_tiles', 4, 'x', 180)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -240,7 +240,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesZoomLevel(\"test1_matrix_tiles\", 4, 360, \"y\")",
+		      "SELECT gpkgCreateTilesZoomLevel('test1_matrix_tiles', 4, 360, 'y')",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -265,7 +265,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesZoomLevel(\"test1_matrix_tiles\", -1, 360, 180)",
+		      "SELECT gpkgCreateTilesZoomLevel('test1_matrix_tiles', -1, 360, 180)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_ERROR)
       {
@@ -291,7 +291,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
     /* Try float extent */
     ret =
 	sqlite3_exec (db_handle,
-		      "SELECT gpkgCreateTilesZoomLevel(\"test1_matrix_tiles\", 1, 360.0, 180.0)",
+		      "SELECT gpkgCreateTilesZoomLevel('test1_matrix_tiles', 1, 360.0, 180.0)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {

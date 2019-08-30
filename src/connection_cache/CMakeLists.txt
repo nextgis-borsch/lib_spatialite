@@ -28,7 +28,7 @@ set(TARGET_NAME connection_cache)
 
 set(CSOURCES
     alloc_cache.c
-    generator/code_generator.c
+    gg_sequence.c
 )
 
 add_library(${TARGET_NAME} OBJECT ${CSOURCES})

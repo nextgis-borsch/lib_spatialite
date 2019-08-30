@@ -51,10 +51,6 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include "sqlite3.h"
 #include "spatialite.h"
 
-#ifdef _WIN32
-#include "asprintf4win.h"
-#endif
-
 struct test_step
 {
     const char *sql;
@@ -64,10 +60,10 @@ struct test_step
 #define NUMSTEPS 36
 
 struct test_step steps[NUMSTEPS] = {
-    {"select col_2, col_4, col_5, col_7 from xltest WHERE col_2 > \"Canary Creek\";", 9},
-    {"select col_2, col_4, col_5, col_7 from xltest WHERE col_2 < \"Canary Creek\";", 7},
-    {"select col_2, col_4, col_5, col_7 from xltest WHERE col_2 >= \"Canary Creek\";", 10},
-    {"select col_2, col_4, col_5, col_7 from xltest WHERE col_2 <= \"Canary Creek\";", 8},
+    {"select col_2, col_4, col_5, col_7 from xltest WHERE col_2 > 'Canary Creek';", 9},
+    {"select col_2, col_4, col_5, col_7 from xltest WHERE col_2 < 'Canary Creek';", 7},
+    {"select col_2, col_4, col_5, col_7 from xltest WHERE col_2 >= 'Canary Creek';", 10},
+    {"select col_2, col_4, col_5, col_7 from xltest WHERE col_2 <= 'Canary Creek';", 8},
     {"select col_2, col_4, col_5, col_7 from xltest WHERE col_2 = 3;", 0},
     {"SELECT col_2, col_14 FROM xltest WHERE col_14 > 100000;", 1},
     {"SELECT col_2, col_14 FROM xltest WHERE col_14 < 100000;", 16},
@@ -107,6 +103,7 @@ int
 main (int argc, char *argv[])
 {
 #ifndef OMIT_FREEXL		/* only if FreeXL is supported */
+#ifndef OMIT_ICONV		/* only if ICONV is supported */
     sqlite3 *db_handle = NULL;
     char *sql_statement;
     int ret;
@@ -116,9 +113,6 @@ main (int argc, char *argv[])
     int rows;
     int columns;
     void *cache = spatialite_alloc_connection ();
-
-    if (argc > 1 || argv[0] == NULL)
-	argc = 1;		/* silencing stupid compiler warnings */
 
     ret =
 	sqlite3_open_v2 (":memory:", &db_handle,
@@ -136,7 +130,7 @@ main (int argc, char *argv[])
 
     ret =
 	sqlite3_exec (db_handle,
-		      "create VIRTUAL TABLE xltest USING VirtualXL(\"testcase1.xls\");",
+		      "create VIRTUAL TABLE xltest USING VirtualXL('testcase1.xls');",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -145,12 +139,13 @@ main (int argc, char *argv[])
 	  return -2;
       }
 
-    asprintf (&sql_statement,
-	      "select col_2, col_4, col_5, col_7, rowid from xltest WHERE col_2 = \"Canal Creek\";");
+    sql_statement =
+	sqlite3_mprintf
+	("select col_2, col_4, col_5, col_7, rowid from xltest WHERE col_2 = 'Canal Creek';");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -253,7 +248,7 @@ main (int argc, char *argv[])
 
     ret =
 	sqlite3_exec (db_handle,
-		      "create VIRTUAL TABLE nosuchworksheet USING VirtualXL(\"testcase1.xls\", 3);",
+		      "create VIRTUAL TABLE nosuchworksheet USING VirtualXL('testcase1.xls', 3);",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -273,7 +268,7 @@ main (int argc, char *argv[])
 
     ret =
 	sqlite3_exec (db_handle,
-		      "create VIRTUAL TABLE nosuchfile USING VirtualXL(\"not_a_file.xls\", 3);",
+		      "create VIRTUAL TABLE nosuchfile USING VirtualXL('not_a_file.xls', 3);",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -293,7 +288,7 @@ main (int argc, char *argv[])
 
     ret =
 	sqlite3_exec (db_handle,
-		      "create VIRTUAL TABLE sheet2 USING VirtualXL(\"testcase1.xls\", 1, 1);",
+		      "create VIRTUAL TABLE sheet2 USING VirtualXL('testcase1.xls', 1, 1);",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -301,12 +296,13 @@ main (int argc, char *argv[])
 	  sqlite3_free (err_msg);
 	  return -30;
       }
-    asprintf (&sql_statement,
-	      "select row_no, place, lat, lon, rowid from sheet2 WHERE place = \"Canal Creek\";");
+    sql_statement =
+	sqlite3_mprintf
+	("select row_no, place, lat, lon, rowid from sheet2 WHERE place = 'Canal Creek';");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -353,12 +349,13 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement,
-	      "select row_no, place, lat, lon, rowid from sheet2 WHERE row_no = 16");
+    sql_statement =
+	sqlite3_mprintf
+	("select row_no, place, lat, lon, rowid from sheet2 WHERE row_no = 16");
     ret =
 	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
 			   &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -425,7 +422,7 @@ main (int argc, char *argv[])
       }
     ret =
 	sqlite3_exec (db_handle,
-		      "create VIRTUAL TABLE noheader USING VirtualXL(\"testcase1.xls\", 0, 0);",
+		      "create VIRTUAL TABLE noheader USING VirtualXL('testcase1.xls', 0, 0);",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -454,7 +451,11 @@ main (int argc, char *argv[])
 
     sqlite3_close (db_handle);
     spatialite_cleanup_ex (cache);
+#endif /* end ICONV conditional */
 #endif /* end FreeXL conditional */
+
+    if (argc > 1 || argv[0] == NULL)
+	argc = 1;		/* silencing stupid compiler warnings */
 
     spatialite_shutdown ();
     return 0;

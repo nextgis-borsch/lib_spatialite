@@ -51,10 +51,6 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include "sqlite3.h"
 #include "spatialite.h"
 
-#ifdef _WIN32
-#include "asprintf4win.h"
-#endif
-
 int
 main (int argc, char *argv[])
 {
@@ -83,10 +79,10 @@ main (int argc, char *argv[])
 
     sqlite3_enable_load_extension (db_handle, 1);
 
-    asprintf (&sql_statement, "SELECT load_extension('mod_spatialite')");
+    sql_statement = sqlite3_mprintf ("SELECT load_extension('mod_spatialite')");
 
     ret = sqlite3_exec (db_handle, sql_statement, NULL, NULL, &err_msg);
-    free (sql_statement);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "load_extension() error: %s\n", err_msg);
@@ -94,11 +90,11 @@ main (int argc, char *argv[])
 	  return -2;
       }
 
-    asprintf (&sql_statement, "SELECT spatialite_version()");
+    sql_statement = sqlite3_mprintf ("SELECT spatialite_version()");
     ret =
-	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
-			   &err_msg);
-    free (sql_statement);
+	sqlite3_get_table (db_handle, sql_statement, &results, &rows,
+			   &columns, &err_msg);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error: %s\n", err_msg);
@@ -121,11 +117,11 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement, "SELECT geos_version()");
+    sql_statement = sqlite3_mprintf ("SELECT geos_version()");
     ret =
-	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
-			   &err_msg);
-    free (sql_statement);
+	sqlite3_get_table (db_handle, sql_statement, &results, &rows,
+			   &columns, &err_msg);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error2: %s\n", err_msg);
@@ -157,11 +153,11 @@ main (int argc, char *argv[])
 #endif /* end GEOS conditional */
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement, "SELECT proj4_version()");
+    sql_statement = sqlite3_mprintf ("SELECT proj4_version()");
     ret =
-	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
-			   &err_msg);
-    free (sql_statement);
+	sqlite3_get_table (db_handle, sql_statement, &results, &rows,
+			   &columns, &err_msg);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error3: %s\n", err_msg);
@@ -193,11 +189,11 @@ main (int argc, char *argv[])
 #endif /* end PROJ conditional */
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement, "SELECT spatialite_target_cpu()");
+    sql_statement = sqlite3_mprintf ("SELECT spatialite_target_cpu()");
     ret =
-	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
-			   &err_msg);
-    free (sql_statement);
+	sqlite3_get_table (db_handle, sql_statement, &results, &rows,
+			   &columns, &err_msg);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error4: %s\n", err_msg);
@@ -213,11 +209,11 @@ main (int argc, char *argv[])
       }
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement, "SELECT lwgeom_version()");
+    sql_statement = sqlite3_mprintf ("SELECT rttopo_version()");
     ret =
-	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
-			   &err_msg);
-    free (sql_statement);
+	sqlite3_get_table (db_handle, sql_statement, &results, &rows,
+			   &columns, &err_msg);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error5: %s\n", err_msg);
@@ -227,33 +223,33 @@ main (int argc, char *argv[])
     if ((rows != 1) || (columns != 1))
       {
 	  fprintf (stderr,
-		   "Unexpected error: lwgeom_version() bad result: %i/%i.\n",
+		   "Unexpected error: rttopo_version() bad result: %i/%i.\n",
 		   rows, columns);
 	  return -23;
       }
 
-#ifdef ENABLE_LWGEOM		/* only if LWGEOM is supported */
+#ifdef ENABLE_RTTOPO		/* only if RTTOPO is supported */
     /* we tolerate any string here, because versions always change */
     if (strlen (results[1]) == 0)
       {
-	  fprintf (stderr, "Unexpected error: lwgeom_version() bad result.\n");
+	  fprintf (stderr, "Unexpected error: rttopo_version() bad result.\n");
 	  return -24;
       }
-#else /* LWGEOM is not supported */
+#else /* RTTOPO is not supported */
     /* in this case we expect a NULL */
     if (results[1] != NULL)
       {
-	  fprintf (stderr, "Unexpected error: lwgeom_version() bad result.\n");
+	  fprintf (stderr, "Unexpected error: rttopo_version() bad result.\n");
 	  return -25;
       }
-#endif /* end LWGEOM conditional */
+#endif /* end RTTOPO conditional */
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement, "SELECT libxml2_version()");
+    sql_statement = sqlite3_mprintf ("SELECT libxml2_version()");
     ret =
-	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
-			   &err_msg);
-    free (sql_statement);
+	sqlite3_get_table (db_handle, sql_statement, &results, &rows,
+			   &columns, &err_msg);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error6: %s\n", err_msg);
@@ -285,11 +281,11 @@ main (int argc, char *argv[])
 #endif /* end LIBXML2 conditional */
     sqlite3_free_table (results);
 
-    asprintf (&sql_statement, "SELECT freexl_version()");
+    sql_statement = sqlite3_mprintf ("SELECT freexl_version()");
     ret =
-	sqlite3_get_table (db_handle, sql_statement, &results, &rows, &columns,
-			   &err_msg);
-    free (sql_statement);
+	sqlite3_get_table (db_handle, sql_statement, &results, &rows,
+			   &columns, &err_msg);
+    sqlite3_free (sql_statement);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "Error2: %s\n", err_msg);

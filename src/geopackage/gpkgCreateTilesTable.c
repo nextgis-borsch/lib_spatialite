@@ -78,7 +78,7 @@ fnct_gpkgCreateTilesTable (sqlite3_context * context, int argc
     };
 
     const char *tableSchemas[] = {
-	"CREATE TABLE %q (\n"
+	"CREATE TABLE \"%w\" (\n"
 	    "id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
 	    "zoom_level INTEGER NOT NULL DEFAULT 0,\n"
 	    "tile_column INTEGER NOT NULL DEFAULT 0,\n"

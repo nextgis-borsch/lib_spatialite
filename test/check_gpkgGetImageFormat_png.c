@@ -108,7 +108,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 	  return -1;
       }
 
-    sql_statement = "SELECT gpkgGetImageType(BlobFromFile(\"empty.png\"))";
+    sql_statement = "SELECT gpkgGetImageType(BlobFromFile('empty.png'))";
     ret =
 	sqlite3_prepare_v2 (db_handle, sql_statement, strlen (sql_statement),
 			    &stmt, NULL);

@@ -74,8 +74,15 @@ Regione Toscana - Settore Sistema Informativo Territoriale ed Ambientale
 #define strcasecmp	_stricmp
 #endif /* not WIN32 */
 
-
 #ifdef ENABLE_LIBXML2		/* including LIBXML2 */
+
+/* Constant definitions: Vector Coverage Types */
+#define VECTOR_UNKNOWN		0
+#define VECTOR_GEOTABLE		1
+#define VECTOR_SPATIALVIEW	2
+#define VECTOR_VIRTUALSHP	3
+#define VECTOR_TOPOGEO		4
+#define VECTOR_TOPONET		5
 
 static int
 check_external_graphic (sqlite3 * sqlite, const char *xlink_href)
@@ -402,7 +409,7 @@ check_vector_style_by_name (sqlite3 * sqlite, const char *style_name,
     const char *sql;
     sqlite3_stmt *stmt;
     int count = 0;
-    sqlite3_int64 xid;
+    sqlite3_int64 xid = 0;
 
     sql = "SELECT style_id FROM SE_vector_styles "
 	"WHERE Lower(style_name) = Lower(?)";
@@ -497,7 +504,7 @@ check_vector_style_refs_by_name (sqlite3 * sqlite, const char *style_name,
     sqlite3_stmt *stmt;
     int count = 0;
     int ref_count = 0;
-    sqlite3_int64 xid;
+    sqlite3_int64 xid = 0;
 
     sql = "SELECT style_id FROM SE_vector_styles "
 	"WHERE Lower(style_name) = Lower(?)";
@@ -556,7 +563,6 @@ check_vector_style_refs_by_name (sqlite3 * sqlite, const char *style_name,
     if (ref_count > 0)
 	*has_refs = 1;
     return 1;
-    return 0;
   stop:
     return 0;
 }
@@ -882,7 +888,7 @@ check_vector_styled_layer_by_name (sqlite3 * sqlite, const char *coverage_name,
     const char *sql;
     sqlite3_stmt *stmt;
     int count = 0;
-    sqlite3_int64 xid;
+    sqlite3_int64 xid = 0;
 
     sql = "SELECT l.style_id FROM SE_vector_styled_layers AS l "
 	"JOIN SE_vector_styles AS s ON (l.style_id = s.style_id) "
@@ -1162,7 +1168,7 @@ check_raster_style_refs_by_name (sqlite3 * sqlite, const char *style_name,
     sqlite3_stmt *stmt;
     int count = 0;
     int ref_count = 0;
-    sqlite3_int64 xid;
+    sqlite3_int64 xid = 0;
 
     sql = "SELECT style_id FROM SE_raster_styles "
 	"WHERE Lower(style_name) = Lower(?)";
@@ -1221,7 +1227,6 @@ check_raster_style_refs_by_name (sqlite3 * sqlite, const char *style_name,
     if (ref_count > 0)
 	*has_refs = 1;
     return 1;
-    return 0;
   stop:
     return 0;
 }
@@ -1351,7 +1356,7 @@ check_raster_style_by_name (sqlite3 * sqlite, const char *style_name,
     const char *sql;
     sqlite3_stmt *stmt;
     int count = 0;
-    sqlite3_int64 xid;
+    sqlite3_int64 xid = 0;
 
     sql = "SELECT style_id FROM SE_raster_styles "
 	"WHERE Lower(style_name) = Lower(?)";
@@ -1598,7 +1603,7 @@ check_raster_styled_layer_by_name (sqlite3 * sqlite, const char *coverage_name,
     const char *sql;
     sqlite3_stmt *stmt;
     int count = 0;
-    sqlite3_int64 xid;
+    sqlite3_int64 xid = 0;
 
     sql = "SELECT l.style_id FROM SE_raster_styled_layers AS l "
 	"JOIN SE_raster_styles AS s ON (l.style_id = s.style_id) "
@@ -2152,7 +2157,7 @@ check_styled_group_raster (sqlite3 * sqlite, const char *group_name,
     const char *sql;
     sqlite3_stmt *stmt;
     int count = 0;
-    sqlite3_int64 xid;
+    sqlite3_int64 xid = 0;
 
     sql = "SELECT id FROM SE_styled_group_refs WHERE "
 	"Lower(group_name) = Lower(?) AND Lower(raster_coverage_name) = Lower(?)";
@@ -2200,7 +2205,7 @@ check_styled_group_vector (sqlite3 * sqlite, const char *group_name,
     const char *sql;
     sqlite3_stmt *stmt;
     int count = 0;
-    sqlite3_int64 xid;
+    sqlite3_int64 xid = 0;
 
     sql = "SELECT id FROM SE_styled_group_refs WHERE "
 	"Lower(group_name) = Lower(?) AND Lower(vector_coverage_name) = Lower(?) ";
@@ -2581,7 +2586,7 @@ check_group_style_refs_by_name (sqlite3 * sqlite, const char *style_name,
     sqlite3_stmt *stmt;
     int count = 0;
     int ref_count = 0;
-    sqlite3_int64 xid;
+    sqlite3_int64 xid = 0;
 
     sql = "SELECT style_id FROM SE_group_styles "
 	"WHERE Lower(style_name) = Lower(?)";
@@ -2640,7 +2645,6 @@ check_group_style_refs_by_name (sqlite3 * sqlite, const char *style_name,
     if (ref_count > 0)
 	*has_refs = 1;
     return 1;
-    return 0;
   stop:
     return 0;
 }
@@ -2770,7 +2774,7 @@ check_group_style_by_name (sqlite3 * sqlite, const char *style_name,
     const char *sql;
     sqlite3_stmt *stmt;
     int count = 0;
-    sqlite3_int64 xid;
+    sqlite3_int64 xid = 0;
 
     sql = "SELECT style_id FROM SE_group_styles "
 	"WHERE Lower(style_name) = Lower(?)";
@@ -2999,7 +3003,7 @@ check_styled_group_style_by_name (sqlite3 * sqlite, const char *group_name,
     const char *sql;
     sqlite3_stmt *stmt;
     int count = 0;
-    sqlite3_int64 xid;
+    sqlite3_int64 xid = 0;
 
     sql = "SELECT l.style_id FROM SE_styled_group_styles AS l "
 	"JOIN SE_group_styles AS s ON (l.style_id = s.style_id) "
@@ -3111,7 +3115,8 @@ SPATIALITE_PRIVATE int
 register_vector_coverage (void *p_sqlite, const char *coverage_name,
 			  const char *f_table_name,
 			  const char *f_geometry_column, const char *title,
-			  const char *abstract)
+			  const char *abstract, int is_queryable,
+			  int is_editable)
 {
 /* auxiliary function: inserts a Vector Coverage definition */
     sqlite3 *sqlite = (sqlite3 *) p_sqlite;
@@ -3124,8 +3129,9 @@ register_vector_coverage (void *p_sqlite, const char *coverage_name,
       {
 	  /* attempting to insert the Vector Coverage */
 	  sql = "INSERT INTO vector_coverages "
-	      "(coverage_name, f_table_name, f_geometry_column, title, abstract) "
-	      "VALUES (Lower(?), Lower(?), Lower(?), ?, ?)";
+	      "(coverage_name, f_table_name, f_geometry_column, title, "
+	      "abstract, is_queryable, is_editable) VALUES "
+	      "(Lower(?), Lower(?), Lower(?), ?, ?, ?, ?)";
 	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
 	  if (ret != SQLITE_OK)
 	    {
@@ -3144,6 +3150,12 @@ register_vector_coverage (void *p_sqlite, const char *coverage_name,
 	  sqlite3_bind_text (stmt, 4, title, strlen (title), SQLITE_STATIC);
 	  sqlite3_bind_text (stmt, 5, abstract, strlen (abstract),
 			     SQLITE_STATIC);
+	  if (is_queryable)
+	      is_queryable = 1;
+	  if (is_editable)
+	      is_editable = 1;
+	  sqlite3_bind_int (stmt, 6, is_queryable);
+	  sqlite3_bind_int (stmt, 7, is_editable);
 	  ret = sqlite3_step (stmt);
 	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
 	      ;
@@ -3162,8 +3174,9 @@ register_vector_coverage (void *p_sqlite, const char *coverage_name,
       {
 	  /* attempting to insert the Vector Coverage */
 	  sql = "INSERT INTO vector_coverages "
-	      "(coverage_name, f_table_name, f_geometry_column) "
-	      "VALUES (Lower(?), Lower(?), Lower(?))";
+	      "(coverage_name, f_table_name, f_geometry_column, "
+	      "is_queryable, is_editable) VALUES "
+	      "(Lower(?), Lower(?), Lower(?), ?, ?)";
 	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
 	  if (ret != SQLITE_OK)
 	    {
@@ -3179,6 +3192,12 @@ register_vector_coverage (void *p_sqlite, const char *coverage_name,
 			     SQLITE_STATIC);
 	  sqlite3_bind_text (stmt, 3, f_geometry_column,
 			     strlen (f_geometry_column), SQLITE_STATIC);
+	  if (is_queryable)
+	      is_queryable = 1;
+	  if (is_editable)
+	      is_editable = 1;
+	  sqlite3_bind_int (stmt, 4, is_queryable);
+	  sqlite3_bind_int (stmt, 5, is_editable);
 	  ret = sqlite3_step (stmt);
 	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
 	      ;
@@ -3194,6 +3213,497 @@ register_vector_coverage (void *p_sqlite, const char *coverage_name,
       }
     else
 	return 0;
+}
+
+SPATIALITE_PRIVATE int
+register_spatial_view_coverage (void *p_sqlite, const char *coverage_name,
+				const char *view_name,
+				const char *view_geometry, const char *title,
+				const char *abstract, int is_queryable,
+				int is_editable)
+{
+/* auxiliary function: inserts a Spatial View Coverage definition */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    if (coverage_name != NULL && view_name != NULL
+	&& view_geometry != NULL && title != NULL && abstract != NULL)
+      {
+	  /* attempting to insert the Vector Coverage */
+	  sql = "INSERT INTO vector_coverages "
+	      "(coverage_name, view_name, view_geometry, title, "
+	      "abstract, is_queryable, is_editable) VALUES "
+	      "(Lower(?), Lower(?), Lower(?), ?, ?, ?, ?)";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("registerVectorCoverage: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, coverage_name, strlen (coverage_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, view_name, strlen (view_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, view_geometry,
+			     strlen (view_geometry), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 4, title, strlen (title), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 5, abstract, strlen (abstract),
+			     SQLITE_STATIC);
+	  if (is_queryable)
+	      is_queryable = 1;
+	  if (is_editable)
+	      is_editable = 1;
+	  sqlite3_bind_int (stmt, 6, is_queryable);
+	  sqlite3_bind_int (stmt, 7, is_editable);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("registerVectorCoverage() error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+	  return 1;
+      }
+    else if (coverage_name != NULL && view_name != NULL
+	     && view_geometry != NULL)
+      {
+	  /* attempting to insert the Spatial View Coverage */
+	  sql = "INSERT INTO vector_coverages "
+	      "(coverage_name, view_name, view_geometry, "
+	      "is_queryable, is_editable) VALUES "
+	      "(Lower(?), Lower(?), Lower(?), ?, ?)";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("registerVectorCoverage: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, coverage_name, strlen (coverage_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, view_name, strlen (view_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, view_geometry,
+			     strlen (view_geometry), SQLITE_STATIC);
+	  if (is_queryable)
+	      is_queryable = 1;
+	  if (is_editable)
+	      is_editable = 1;
+	  sqlite3_bind_int (stmt, 4, is_queryable);
+	  sqlite3_bind_int (stmt, 5, is_editable);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("registerVectorCoverage() error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+	  return 1;
+      }
+    else
+	return 0;
+}
+
+SPATIALITE_PRIVATE int
+register_virtual_table_coverage (void *p_sqlite, const char *coverage_name,
+				 const char *virt_name,
+				 const char *virt_geometry, const char *title,
+				 const char *abstract, int is_queryable)
+{
+/* auxiliary function: inserts a VirtualTable Coverage definition */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    if (coverage_name != NULL && virt_name != NULL
+	&& virt_geometry != NULL && title != NULL && abstract != NULL)
+      {
+	  /* attempting to insert the Vector Coverage */
+	  sql = "INSERT INTO vector_coverages "
+	      "(coverage_name, virt_name, virt_geometry, title, "
+	      "abstract, is_queryable, is_editable) VALUES "
+	      "(Lower(?), Lower(?), Lower(?), ?, ?, ?, ?)";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("registerVectorCoverage: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, coverage_name, strlen (coverage_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, virt_name, strlen (virt_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, virt_geometry,
+			     strlen (virt_geometry), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 4, title, strlen (title), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 5, abstract, strlen (abstract),
+			     SQLITE_STATIC);
+	  if (is_queryable)
+	      is_queryable = 1;
+	  sqlite3_bind_int (stmt, 6, is_queryable);
+	  sqlite3_bind_int (stmt, 7, 0);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("registerVectorCoverage() error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+	  return 1;
+      }
+    else if (coverage_name != NULL && virt_name != NULL
+	     && virt_geometry != NULL)
+      {
+	  /* attempting to insert the VirtualTable Coverage */
+	  sql = "INSERT INTO vector_coverages "
+	      "(coverage_name, virt_name, virt_geometry, "
+	      "is_queryable, is_editable) VALUES "
+	      "(Lower(?), Lower(?), Lower(?), ?, ?)";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("registerVectorCoverage: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, coverage_name, strlen (coverage_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, virt_name, strlen (virt_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, virt_geometry,
+			     strlen (virt_geometry), SQLITE_STATIC);
+	  if (is_queryable)
+	      is_queryable = 1;
+	  sqlite3_bind_int (stmt, 4, is_queryable);
+	  sqlite3_bind_int (stmt, 5, 0);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("registerVectorCoverage() error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+	  return 1;
+      }
+    else
+	return 0;
+}
+
+SPATIALITE_PRIVATE int
+register_topogeo_coverage (void *p_sqlite, const char *coverage_name,
+			   const char *topogeo_name, const char *title,
+			   const char *abstract, int is_queryable,
+			   int is_editable)
+{
+/* auxiliary function: inserts a Vector Coverage definition 
+ * based on some Topology-Geometry */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    char *xsql;
+    int i;
+    char **results;
+    int rows;
+    int columns;
+    char *errMsg = NULL;
+    char *f_table_name = NULL;
+    char *f_geometry_column = NULL;
+    sqlite3_stmt *stmt;
+
+    if (topogeo_name == NULL)
+	return 0;
+
+/* testing if the Topology-Geometry do really exist */
+    xsql = sqlite3_mprintf ("SELECT topology_name "
+			    "FROM topologies WHERE Lower(topology_name) = %Q",
+			    topogeo_name);
+    ret = sqlite3_get_table (sqlite, xsql, &results, &rows, &columns, &errMsg);
+    sqlite3_free (xsql);
+    if (ret != SQLITE_OK)
+      {
+	  sqlite3_free (errMsg);
+	  return 0;
+      }
+    for (i = 1; i <= rows; i++)
+      {
+	  const char *value = results[(i * columns) + 0];
+	  if (f_table_name != NULL)
+	      sqlite3_free (f_table_name);
+	  if (f_geometry_column != NULL)
+	      sqlite3_free (f_geometry_column);
+	  f_table_name = sqlite3_mprintf ("%s_edge", value);
+	  f_geometry_column = sqlite3_mprintf ("geom");
+      }
+    sqlite3_free_table (results);
+
+    if (coverage_name != NULL && f_table_name != NULL
+	&& f_geometry_column != NULL && title != NULL && abstract != NULL)
+      {
+	  /* attempting to insert the Vector Coverage */
+	  sql = "INSERT INTO vector_coverages "
+	      "(coverage_name, f_table_name, f_geometry_column, "
+	      "topology_name, title, abstract, is_queryable, is_editable) VALUES "
+	      "(Lower(?), Lower(?), Lower(?), Lower(?), ?, ?, ?, ?)";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("registerTopoGeoCoverage: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, coverage_name, strlen (coverage_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, f_table_name, strlen (f_table_name),
+			     sqlite3_free);
+	  sqlite3_bind_text (stmt, 3, f_geometry_column,
+			     strlen (f_geometry_column), sqlite3_free);
+	  sqlite3_bind_text (stmt, 4, topogeo_name, strlen (topogeo_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 5, title, strlen (title), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 6, abstract, strlen (abstract),
+			     SQLITE_STATIC);
+	  if (is_queryable)
+	      is_queryable = 1;
+	  if (is_editable)
+	      is_editable = 1;
+	  sqlite3_bind_int (stmt, 7, is_queryable);
+	  sqlite3_bind_int (stmt, 8, is_editable);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("registerTopoGeoCoverage() error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+	  return 1;
+      }
+    else if (coverage_name != NULL && f_table_name != NULL
+	     && f_geometry_column != NULL)
+      {
+	  /* attempting to insert the Vector Coverage */
+	  sql = "INSERT INTO vector_coverages "
+	      "(coverage_name, f_table_name, f_geometry_column, "
+	      "topology_name, is_queryable, is_editable) VALUES "
+	      "(Lower(?), Lower(?), Lower(?), Lower(?), ?, ?)";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("registerTopoGeoCoverage: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, coverage_name, strlen (coverage_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, f_table_name, strlen (f_table_name),
+			     sqlite3_free);
+	  sqlite3_bind_text (stmt, 3, f_geometry_column,
+			     strlen (f_geometry_column), sqlite3_free);
+	  sqlite3_bind_text (stmt, 4, topogeo_name, strlen (topogeo_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_int (stmt, 5, is_queryable);
+	  sqlite3_bind_int (stmt, 6, is_editable);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("registerTopoGeoCoverage() error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+	  return 1;
+      }
+    else
+      {
+	  if (f_table_name != NULL)
+	      sqlite3_free (f_table_name);
+	  if (f_geometry_column != NULL)
+	      sqlite3_free (f_geometry_column);
+	  return 0;
+      }
+}
+
+SPATIALITE_PRIVATE int
+register_toponet_coverage (void *p_sqlite, const char *coverage_name,
+			   const char *toponet_name, const char *title,
+			   const char *abstract, int is_queryable,
+			   int is_editable)
+{
+/* auxiliary function: inserts a Vector Coverage definition  
+ * based on some Topology-Network */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    char *xsql;
+    int i;
+    char **results;
+    int rows;
+    int columns;
+    char *errMsg = NULL;
+    char *f_table_name = NULL;
+    char *f_geometry_column = NULL;
+    sqlite3_stmt *stmt;
+
+    if (toponet_name == NULL)
+	return 0;
+
+/* testing if the Topology-Network do really exist */
+    xsql = sqlite3_mprintf ("SELECT network_name "
+			    "FROM networks WHERE Lower(network_name) = %Q",
+			    toponet_name);
+    ret = sqlite3_get_table (sqlite, xsql, &results, &rows, &columns, &errMsg);
+    sqlite3_free (xsql);
+    if (ret != SQLITE_OK)
+      {
+	  sqlite3_free (errMsg);
+	  return 0;
+      }
+    for (i = 1; i <= rows; i++)
+      {
+	  const char *value = results[(i * columns) + 0];
+	  if (f_table_name != NULL)
+	      sqlite3_free (f_table_name);
+	  if (f_geometry_column != NULL)
+	      sqlite3_free (f_geometry_column);
+	  f_table_name = sqlite3_mprintf ("%s_link", value);
+	  f_geometry_column = sqlite3_mprintf ("geometry");
+      }
+    sqlite3_free_table (results);
+
+    if (coverage_name != NULL && f_table_name != NULL
+	&& f_geometry_column != NULL && title != NULL && abstract != NULL)
+      {
+	  /* attempting to insert the Vector Coverage */
+	  sql = "INSERT INTO vector_coverages "
+	      "(coverage_name, f_table_name, f_geometry_column, "
+	      "network_name, title, abstract, is_queryable, is_editable) VALUES "
+	      "(Lower(?), Lower(?), Lower(?), Lower(?), ?, ?, ?, ?)";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("registerTopoNetCoverage: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, coverage_name, strlen (coverage_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, f_table_name, strlen (f_table_name),
+			     sqlite3_free);
+	  sqlite3_bind_text (stmt, 3, f_geometry_column,
+			     strlen (f_geometry_column), sqlite3_free);
+	  sqlite3_bind_text (stmt, 4, toponet_name, strlen (toponet_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 5, title, strlen (title), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 6, abstract, strlen (abstract),
+			     SQLITE_STATIC);
+	  if (is_queryable)
+	      is_queryable = 1;
+	  if (is_editable)
+	      is_editable = 1;
+	  sqlite3_bind_int (stmt, 7, is_queryable);
+	  sqlite3_bind_int (stmt, 8, is_editable);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("registerTopoNetCoverage() error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+	  return 1;
+      }
+    else if (coverage_name != NULL && f_table_name != NULL
+	     && f_geometry_column != NULL)
+      {
+	  /* attempting to insert the Vector Coverage */
+	  sql = "INSERT INTO vector_coverages "
+	      "(coverage_name, f_table_name, f_geometry_column, "
+	      "network_name, is_queryable, is_editable) VALUES "
+	      "(Lower(?), Lower(?), Lower(?), Lower(?), ?, ?)";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("registerTopoNetCoverage: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, coverage_name, strlen (coverage_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, f_table_name, strlen (f_table_name),
+			     sqlite3_free);
+	  sqlite3_bind_text (stmt, 3, f_geometry_column,
+			     strlen (f_geometry_column), sqlite3_free);
+	  sqlite3_bind_text (stmt, 4, toponet_name, strlen (toponet_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_int (stmt, 5, is_queryable);
+	  sqlite3_bind_int (stmt, 6, is_editable);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("registerTopoNetCoverage() error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+	  return 1;
+      }
+    else
+      {
+	  if (f_table_name != NULL)
+	      sqlite3_free (f_table_name);
+	  if (f_geometry_column != NULL)
+	      sqlite3_free (f_geometry_column);
+	  return 0;
+      }
 }
 
 static int
@@ -3426,33 +3936,70 @@ unregister_vector_coverage (void *p_sqlite, const char *coverage_name)
 
 SPATIALITE_PRIVATE int
 set_vector_coverage_infos (void *p_sqlite, const char *coverage_name,
-			   const char *title, const char *abstract)
+			   const char *title, const char *abstract,
+			   int is_queryable, int is_editable)
 {
 /* auxiliary function: updates the descriptive infos supporting a Vector Coverage */
     sqlite3 *sqlite = (sqlite3 *) p_sqlite;
     int ret;
     const char *sql;
     sqlite3_stmt *stmt;
+    int prev_changes;
+    int curr_changes;
 
     if (coverage_name != NULL && title != NULL && abstract != NULL)
       {
+	  prev_changes = sqlite3_total_changes (sqlite);
+
 	  /* attempting to update the Vector Coverage */
-	  sql = "UPDATE vector_coverages SET title = ?, abstract = ? "
-	      "WHERE Lower(coverage_name) = Lower(?)";
-	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
-	  if (ret != SQLITE_OK)
+	  if (is_queryable < 0 || is_editable < 0)
 	    {
-		spatialite_e ("registerVectorCoverage: \"%s\"\n",
-			      sqlite3_errmsg (sqlite));
-		return 0;
+		sql = "UPDATE vector_coverages SET title = ?, abstract = ? "
+		    "WHERE Lower(coverage_name) = Lower(?)";
+		ret =
+		    sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+		if (ret != SQLITE_OK)
+		  {
+		      spatialite_e ("setVectorCoverageInfos: \"%s\"\n",
+				    sqlite3_errmsg (sqlite));
+		      return 0;
+		  }
+		sqlite3_reset (stmt);
+		sqlite3_clear_bindings (stmt);
+		sqlite3_bind_text (stmt, 1, title, strlen (title),
+				   SQLITE_STATIC);
+		sqlite3_bind_text (stmt, 2, abstract, strlen (abstract),
+				   SQLITE_STATIC);
+		sqlite3_bind_text (stmt, 3, coverage_name,
+				   strlen (coverage_name), SQLITE_STATIC);
 	    }
-	  sqlite3_reset (stmt);
-	  sqlite3_clear_bindings (stmt);
-	  sqlite3_bind_text (stmt, 1, title, strlen (title), SQLITE_STATIC);
-	  sqlite3_bind_text (stmt, 2, abstract, strlen (abstract),
-			     SQLITE_STATIC);
-	  sqlite3_bind_text (stmt, 3, coverage_name, strlen (coverage_name),
-			     SQLITE_STATIC);
+	  else
+	    {
+		sql = "UPDATE vector_coverages SET title = ?, abstract = ?, "
+		    "is_queryable = ?, is_editable = ? WHERE Lower(coverage_name) = Lower(?)";
+		ret =
+		    sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+		if (ret != SQLITE_OK)
+		  {
+		      spatialite_e ("setVectorCoverageInfos: \"%s\"\n",
+				    sqlite3_errmsg (sqlite));
+		      return 0;
+		  }
+		sqlite3_reset (stmt);
+		sqlite3_clear_bindings (stmt);
+		sqlite3_bind_text (stmt, 1, title, strlen (title),
+				   SQLITE_STATIC);
+		sqlite3_bind_text (stmt, 2, abstract, strlen (abstract),
+				   SQLITE_STATIC);
+		if (is_queryable)
+		    is_queryable = 1;
+		if (is_editable)
+		    is_editable = 1;
+		sqlite3_bind_int (stmt, 3, is_queryable);
+		sqlite3_bind_int (stmt, 4, is_editable);
+		sqlite3_bind_text (stmt, 5, coverage_name,
+				   strlen (coverage_name), SQLITE_STATIC);
+	    }
 	  ret = sqlite3_step (stmt);
 	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
 	      ;
@@ -3464,10 +4011,102 @@ set_vector_coverage_infos (void *p_sqlite, const char *coverage_name,
 		return 0;
 	    }
 	  sqlite3_finalize (stmt);
+
+	  curr_changes = sqlite3_total_changes (sqlite);
+	  if (prev_changes == curr_changes)
+	      return 0;
 	  return 1;
       }
     else
 	return 0;
+}
+
+SPATIALITE_PRIVATE int
+set_vector_coverage_copyright (void *p_sqlite, const char *coverage_name,
+			       const char *copyright, const char *license)
+{
+/* auxiliary function: updates the copyright infos supporting a Vector Coverage */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    if (coverage_name == NULL)
+	return 0;
+    if (copyright == NULL && license == NULL)
+	return 1;
+
+    if (copyright == NULL)
+      {
+	  /* just updating the License */
+	  sql = "UPDATE vector_coverages SET license = ("
+	      "SELECT id FROM data_licenses WHERE name = ?) "
+	      "WHERE Lower(coverage_name) = Lower(?)";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("setVectorCoverageCopyright: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, license, strlen (license), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, coverage_name,
+			     strlen (coverage_name), SQLITE_STATIC);
+      }
+    else if (license == NULL)
+      {
+	  /* just updating the Copyright */
+	  sql = "UPDATE vector_coverages SET copyright = ? "
+	      "WHERE Lower(coverage_name) = Lower(?)";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("setVectorCoverageCopyright: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, copyright, strlen (copyright),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, coverage_name, strlen (coverage_name),
+			     SQLITE_STATIC);
+      }
+    else
+      {
+	  /* updating both Copyright and License */
+	  sql = "UPDATE vector_coverages SET copyright = ?, license = ("
+	      "SELECT id FROM data_licenses WHERE name = ?) "
+	      "WHERE Lower(coverage_name) = Lower(?)";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("setVectorCoverageCopyright: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, copyright, strlen (copyright),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, license, strlen (license), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, coverage_name,
+			     strlen (coverage_name), SQLITE_STATIC);
+      }
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	;
+    else
+      {
+	  spatialite_e ("setVectorCoverageCopyright() error: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  sqlite3_finalize (stmt);
+	  return 0;
+      }
+    sqlite3_finalize (stmt);
+    return 1;
 }
 
 static int
@@ -3512,31 +4151,121 @@ check_vector_coverage_srid2 (sqlite3 * sqlite, const char *coverage_name,
 }
 
 static int
+find_vector_coverage_type (sqlite3 * sqlite, const char *coverage_name)
+{
+/* determining the Vector Coverage Type */
+    int ret;
+    int i;
+    char **results;
+    int rows;
+    int columns;
+    char *value1;
+    char *value2;
+    int type = VECTOR_UNKNOWN;
+    char *sql;
+
+    sql =
+	sqlite3_mprintf
+	("SELECT f_table_name, f_geometry_column, view_name, view_geometry, "
+	 "virt_name, virt_geometry, topology_name, network_name "
+	 "FROM vector_coverages WHERE coverage_name = %Q", coverage_name);
+    ret = sqlite3_get_table (sqlite, sql, &results, &rows, &columns, NULL);
+    sqlite3_free (sql);
+    if (ret != SQLITE_OK)
+	return VECTOR_UNKNOWN;
+    if (rows < 1)
+	;
+    else
+      {
+	  for (i = 1; i <= rows; i++)
+	    {
+		value1 = results[(i * columns) + 0];
+		value2 = results[(i * columns) + 1];
+		if (value1 != NULL && value2 != NULL)
+		    type = VECTOR_GEOTABLE;
+		value1 = results[(i * columns) + 2];
+		value2 = results[(i * columns) + 3];
+		if (value1 != NULL && value2 != NULL)
+		    type = VECTOR_SPATIALVIEW;
+		value1 = results[(i * columns) + 4];
+		value2 = results[(i * columns) + 5];
+		if (value1 != NULL && value2 != NULL)
+		    type = VECTOR_VIRTUALSHP;
+		value1 = results[(i * columns) + 6];
+		if (value1 != NULL)
+		    type = VECTOR_TOPOGEO;
+		value1 = results[(i * columns) + 7];
+		if (value1 != NULL)
+		    type = VECTOR_TOPONET;
+	    }
+      }
+    sqlite3_free_table (results);
+    return type;
+}
+
+static int
 check_vector_coverage_srid1 (sqlite3 * sqlite, const char *coverage_name,
 			     int srid)
 {
 /* checks if a Vector Coverage do actually exists and check its SRID */
     int ret;
-    const char *sql;
+    char *sql;
     sqlite3_stmt *stmt;
     int count = 0;
     int same_srid = 0;
+    int type = find_vector_coverage_type (sqlite, coverage_name);
 
-    sql = "SELECT c.srid FROM vector_coverages AS v "
-	"JOIN geometry_columns AS c ON (Lower(v.f_table_name) = Lower(c.f_table_name) "
-	"AND Lower(v.f_geometry_column) = Lower(c.f_geometry_column)) "
-	"WHERE Lower(v.coverage_name) = Lower(?)";
-    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
-    if (ret != SQLITE_OK)
+    switch (type)
       {
-	  spatialite_e ("check Vector Coverage SRID: \"%s\"\n",
-			sqlite3_errmsg (sqlite));
+      case VECTOR_GEOTABLE:
+	  sql = sqlite3_mprintf ("SELECT c.srid FROM vector_coverages AS v "
+				 "JOIN geometry_columns AS c ON (v.f_table_name IS NOT NULL AND v.f_geometry_column IS NOT NULL "
+				 "AND v.topology_name IS NULL AND v.network_name IS NULL AND "
+				 "Lower(v.f_table_name) = Lower(c.f_table_name) "
+				 "AND Lower(v.f_geometry_column) = Lower(c.f_geometry_column)) "
+				 "WHERE Lower(v.coverage_name) = Lower(%Q)",
+				 coverage_name);
+	  break;
+      case VECTOR_SPATIALVIEW:
+	  sql = sqlite3_mprintf ("SELECT c.srid FROM vector_coverages AS v "
+				 "JOIN views_geometry_columns AS x ON (v.view_name IS NOT NULL AND v.view_geometry IS NOT NULL "
+				 "AND Lower(v.view_name) = Lower(x.view_name) AND Lower(v.view_geometry) = Lower(x.view_geometry)) "
+				 "JOIN geometry_columns AS c ON (Lower(x.f_table_name) = Lower(c.f_table_name) "
+				 "AND Lower(x.f_geometry_column) = Lower(c.f_geometry_column)) "
+				 "WHERE Lower(v.coverage_name) = Lower(%Q)",
+				 coverage_name);
+	  break;
+      case VECTOR_VIRTUALSHP:
+	  sql = sqlite3_mprintf ("SELECT c.srid FROM vector_coverages AS v "
+				 "JOIN virts_geometry_columns AS c ON (v.virt_name IS NOT NULL AND v.virt_geometry IS NOT NULL "
+				 "AND Lower(v.virt_name) = Lower(c.virt_name) AND Lower(v.virt_geometry) = Lower(c.virt_geometry)) "
+				 "WHERE Lower(v.coverage_name) = Lower(%Q)",
+				 coverage_name);
+	  break;
+      case VECTOR_TOPOGEO:
+	  sql = sqlite3_mprintf ("SELECT c.srid FROM vector_coverages AS v "
+				 "JOIN topologies AS c ON (v.topology_name IS NOT NULL "
+				 "AND Lower(v.topology_name) = Lower(c.topology_name)) "
+				 "WHERE Lower(v.coverage_name) = Lower(%Q)",
+				 coverage_name);
+	  break;
+      case VECTOR_TOPONET:
+	  sql = sqlite3_mprintf ("SELECT c.srid FROM vector_coverages AS v "
+				 "JOIN networks AS c ON (v.network_name IS NOT NULL "
+				 "AND Lower(v.network_name) = Lower(c.network_name)) "
+				 "WHERE Lower(v.coverage_name) = Lower(%Q)",
+				 coverage_name);
+	  break;
+      case VECTOR_UNKNOWN:
+      default:
 	  goto stop;
-      }
-    sqlite3_reset (stmt);
-    sqlite3_clear_bindings (stmt);
-    sqlite3_bind_text (stmt, 1, coverage_name, strlen (coverage_name),
-		       SQLITE_STATIC);
+	  break;
+      };
+
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    sqlite3_free (sql);
+    if (ret != SQLITE_OK)
+	goto stop;
     while (1)
       {
 	  /* scrolling the result set rows */
@@ -4105,6 +4834,7 @@ update_vector_coverage_extent (void *p_sqlite, const void *cache,
     sqlite3_stmt *stmt_upd_srid = NULL;
     sqlite3_stmt *stmt_null_srid = NULL;
     sqlite3_stmt *stmt_srid = NULL;
+    sqlite3_stmt *stmt_virt = NULL;
 
 /* preparing the ancillary SQL statements */
     sql = "SELECT srid FROM vector_coverages_srid "
@@ -4158,17 +4888,39 @@ update_vector_coverage_extent (void *p_sqlite, const void *cache,
 	      "c.srid FROM vector_coverages AS v "
 	      "JOIN geometry_columns AS c ON (Lower(v.f_table_name) = "
 	      "Lower(c.f_table_name) AND Lower(v.f_geometry_column) = "
-	      "Lower(c.f_geometry_column))";
+	      "Lower(c.f_geometry_column)) "
+	      "WHERE v.f_table_name IS NOT NULL AND v.f_geometry_column IS NOT NULL "
+	      "UNION "
+	      "SELECT v.coverage_name, v.view_name, w.view_geometry, c.srid "
+	      "FROM vector_coverages AS v "
+	      "JOIN views_geometry_columns AS w ON "
+	      "(Lower(v.view_name) = Lower(w.view_name) AND "
+	      "Lower(v.view_geometry) = Lower(w.view_geometry)) "
+	      "JOIN geometry_columns AS c ON "
+	      "(Lower(w.f_table_name) = Lower(c.f_table_name) AND "
+	      "Lower(w.f_geometry_column) = Lower(c.f_geometry_column)) "
+	      "WHERE v.view_name IS NOT NULL AND v.view_geometry IS NOT NULL";
       }
     else
       {
-
 	  sql = "SELECT v.coverage_name, v.f_table_name, v.f_geometry_column, "
 	      "c.srid FROM vector_coverages AS v "
 	      "JOIN geometry_columns AS c ON (Lower(v.f_table_name) = "
 	      "Lower(c.f_table_name) AND Lower(v.f_geometry_column) = "
 	      "Lower(c.f_geometry_column)) "
-	      "WHERE Lower(v.coverage_name) = Lower(?)";
+	      "WHERE Lower(v.coverage_name) = Lower(?) AND "
+	      "v.f_table_name IS NOT NULL AND v.f_geometry_column IS NOT NULL "
+	      "UNION "
+	      "SELECT v.coverage_name, v.view_name, v.view_geometry, c.srid "
+	      "FROM vector_coverages AS v "
+	      "JOIN views_geometry_columns AS w ON "
+	      "(Lower(v.view_name) = Lower(w.view_name) AND "
+	      "Lower(v.view_geometry) = Lower(w.view_geometry)) "
+	      "JOIN geometry_columns AS c ON "
+	      "(Lower(w.f_table_name) = Lower(c.f_table_name) AND "
+	      "Lower(w.f_geometry_column) = Lower(c.f_geometry_column)) "
+	      "WHERE Lower(v.coverage_name) = Lower(?) AND "
+	      "v.view_name IS NOT NULL AND v.view_geometry IS NOT NULL";
       }
     ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
     if (ret != SQLITE_OK)
@@ -4189,8 +4941,12 @@ update_vector_coverage_extent (void *p_sqlite, const void *cache,
     sqlite3_reset (stmt);
     sqlite3_clear_bindings (stmt);
     if (coverage_name != NULL)
-	sqlite3_bind_text (stmt, 1, coverage_name, strlen (coverage_name),
-			   SQLITE_STATIC);
+      {
+	  sqlite3_bind_text (stmt, 1, coverage_name, strlen (coverage_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, coverage_name, strlen (coverage_name),
+			     SQLITE_STATIC);
+      }
     while (1)
       {
 	  /* scrolling the result set rows */
@@ -4239,10 +4995,10 @@ update_vector_coverage_extent (void *p_sqlite, const void *cache,
 			    int null_miny = 1;
 			    int null_maxx = 1;
 			    int null_maxy = 1;
-			    double minx;
-			    double miny;
-			    double maxx;
-			    double maxy;
+			    double minx = 0.0;
+			    double miny = 0.0;
+			    double maxx = 0.0;
+			    double maxy = 0.0;
 			    if (sqlite3_column_type (stmt_ext, 0) ==
 				SQLITE_FLOAT)
 			      {
@@ -4309,6 +5065,74 @@ update_vector_coverage_extent (void *p_sqlite, const void *cache,
 	    }
       }
 
+/* updating VirtualShapes Extents */
+    sql = "UPDATE vector_coverages SET "
+	"geo_minx = MbrMinX(ST_Transform(GetVirtualTableExtent(virt_name), 4326)), "
+	"geo_miny = MbrMinY(ST_Transform(GetVirtualTableExtent(virt_name), 4326)), "
+	"geo_maxx = MbrMaxX(ST_Transform(GetVirtualTableExtent(virt_name), 4326)), "
+	"geo_maxy = MbrMaxY(ST_Transform(GetVirtualTableExtent(virt_name), 4326)), "
+	"extent_minx = MbrMinX(GetVirtualTableExtent(virt_name)), "
+	"extent_miny = MbrMinY(GetVirtualTableExtent(virt_name)), "
+	"extent_maxx = MbrMaxX(GetVirtualTableExtent(virt_name)), "
+	"extent_maxy = MbrMaxY(GetVirtualTableExtent(virt_name)) "
+	"WHERE virt_name IS NOT NULL";
+    ret = sqlite3_exec (sqlite, sql, NULL, NULL, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("updateVectorCoverageExtent: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  goto error;
+      }
+
+    sql =
+	"SELECT coverage_name, virt_name FROM vector_coverages WHERE virt_name IS NOT NULL";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt_virt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("updateVectorCoverageExtent: ERROR #1 !!! \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  goto error;
+      }
+    while (1)
+      {
+	  /* scrolling the result set rows */
+	  ret = sqlite3_step (stmt_virt);
+	  if (ret == SQLITE_DONE)
+	      break;		/* end of result set */
+	  if (ret == SQLITE_ROW)
+	    {
+		const char *coverage_name =
+		    (const char *) sqlite3_column_text (stmt_virt, 0);
+		const char *virt_name =
+		    (const char *) sqlite3_column_text (stmt_virt, 1);
+		sql =
+		    sqlite3_mprintf ("UPDATE vector_coverages_srid SET "
+				     "extent_minx = MbrMinX(ST_Transform(GetVirtualTableExtent(%Q), srid)), "
+				     "extent_miny = MbrMinY(ST_Transform(GetVirtualTableExtent(%Q), srid)), "
+				     "extent_maxx = MbrMaxX(ST_Transform(GetVirtualTableExtent(%Q), srid)), "
+				     "extent_maxy = MbrMaxY(ST_Transform(GetVirtualTableExtent(%Q), srid)) "
+				     "WHERE coverage_name = %Q", virt_name,
+				     virt_name, virt_name, virt_name,
+				     coverage_name);
+		ret = sqlite3_exec (sqlite, sql, NULL, NULL, NULL);
+		sqlite3_free (sql);
+		if (ret != SQLITE_OK)
+		  {
+		      spatialite_e
+			  ("updateVectorCoverageExtent:  ERROR #2 !!! %d \"%s\"\n",
+			   ret, sqlite3_errmsg (sqlite));
+		      goto error;
+		  }
+	    }
+	  else
+	    {
+		spatialite_e
+		    ("updateVectorCoverageExtent() error: \"%s\"\n",
+		     sqlite3_errmsg (sqlite));
+		goto error;
+	    }
+      }
+
     if (transaction)
       {
 	  /* committing the still pending Transaction */
@@ -4322,6 +5146,7 @@ update_vector_coverage_extent (void *p_sqlite, const void *cache,
     sqlite3_finalize (stmt_upd_srid);
     sqlite3_finalize (stmt_null_srid);
     sqlite3_finalize (stmt_srid);
+    sqlite3_finalize (stmt_virt);
     return 1;
 
   error:
@@ -4337,6 +5162,9 @@ update_vector_coverage_extent (void *p_sqlite, const void *cache,
 	sqlite3_finalize (stmt_null_srid);
     if (stmt_srid != NULL)
 	sqlite3_finalize (stmt_srid);
+    if (stmt_virt != NULL)
+	sqlite3_finalize (stmt_virt);
+
     return 0;
 }
 
@@ -5159,10 +5987,10 @@ update_raster_coverage_extent (void *p_sqlite, const void *cache,
 			    int null_miny = 1;
 			    int null_maxx = 1;
 			    int null_maxy = 1;
-			    double minx;
-			    double miny;
-			    double maxx;
-			    double maxy;
+			    double minx = 0.0;
+			    double miny = 0.0;
+			    double maxx = 0.0;
+			    double maxy = 0.0;
 			    if (sqlite3_column_type (stmt_ext, 0) ==
 				SQLITE_FLOAT)
 			      {
@@ -5266,7 +6094,7 @@ get_iso_metadata_id (void *p_sqlite, const char *fileIdentifier, void *p_id)
 /* auxiliary function: return the ID of the row corresponding to "fileIdentifier" */
     sqlite3 *sqlite = (sqlite3 *) p_sqlite;
     sqlite3_int64 *p64 = (sqlite3_int64 *) p_id;
-    sqlite3_int64 id;
+    sqlite3_int64 id = 0;
     int ret;
     const char *sql;
     sqlite3_stmt *stmt;
@@ -5427,3 +6255,1915 @@ register_iso_metadata (void *p_sqlite, const char *scope,
 }
 
 #endif /* end including LIBXML2 */
+
+SPATIALITE_PRIVATE int
+register_wms_getcapabilities (void *p_sqlite, const char *url,
+			      const char *title, const char *abstract)
+{
+/* auxiliary function: inserts a WMS GetCapabilities */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    if (url != NULL && title != NULL && abstract != NULL)
+      {
+	  /* attempting to insert the WMS GetCapabilities */
+	  sql = "INSERT INTO wms_getcapabilities (url, title, abstract) "
+	      "VALUES (?, ?, ?)";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("WMS_RegisterGetCapabilities: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, title, strlen (title), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, abstract, strlen (abstract),
+			     SQLITE_STATIC);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("WMS_RegisterGetCapabilities() error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+	  return 1;
+      }
+    else if (url != NULL)
+      {
+	  /* attempting to insert the WMS GetCapabilities */
+	  sql = "INSERT INTO wms_getcapabilities (url) VALUES (?)";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("WMS_RegisterGetCapabilities: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("WMS_RegisterGetCapabilities() error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+	  return 1;
+      }
+    else
+	return 0;
+}
+
+static int
+check_wms_getcapabilities (sqlite3 * sqlite, const char *url)
+{
+/* checks if a WMS GetCapabilities do actually exists */
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+    int count = 0;
+
+    sql = "SELECT url FROM wms_getcapabilities WHERE url = ?";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("check WMS GetCapabilities: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  goto stop;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    while (1)
+      {
+	  /* scrolling the result set rows */
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE)
+	      break;		/* end of result set */
+	  if (ret == SQLITE_ROW)
+	      count++;
+      }
+    sqlite3_finalize (stmt);
+    if (count == 1)
+	return 1;
+    return 0;
+  stop:
+    return 0;
+}
+
+static int
+do_delete_wms_getcapabilities (sqlite3 * sqlite, const char *url)
+{
+/* auxiliary function: deleting a WMS GetCapabilities */
+    int ret;
+    int result = 0;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    sql = "DELETE FROM wms_getcapabilities WHERE url = ?";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("WMS_UnRegisterGetCapabilities: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  return 0;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	result = 1;
+    else
+	spatialite_e ("WMS_UnRegisterGetCapabilities() error: \"%s\"\n",
+		      sqlite3_errmsg (sqlite));
+    sqlite3_finalize (stmt);
+    return result;
+}
+
+static void
+do_delete_wms_settings_0 (sqlite3 * sqlite, const char *url)
+{
+/* auxiliary function: deleting WMS settings (from GetCapabilities) */
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    sql = "DELETE FROM wms_settings WHERE id IN ("
+	"SELECT s.id FROM wms_getcapabilities AS c "
+	"JOIN wms_getmap AS m ON (c.id = m.parent_id) "
+	"JOIN wms_settings AS s ON (m.id = s.parent_id) " "WHERE c.url = ?)";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("WMS_UnRegisterGetCapabilities: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  return;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	;
+    else
+	spatialite_e ("WMS_UnRegisterGetCapabilities() error: \"%s\"\n",
+		      sqlite3_errmsg (sqlite));
+    sqlite3_finalize (stmt);
+}
+
+static void
+do_delete_wms_getmap_0 (sqlite3 * sqlite, const char *url)
+{
+/* auxiliary function: deleting WMS GetMap (from GetCapabilities) */
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    sql = "DELETE FROM wms_getmap WHERE id IN ("
+	"SELECT m.id FROM wms_getcapabilities AS c "
+	"JOIN wms_getmap AS m ON (c.id = m.parent_id) " "WHERE c.url = ?)";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("WMS_UnRegisterGetCapabilities: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  return;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	;
+    else
+	spatialite_e ("WMS_UnRegisterGetCapabilities() error: \"%s\"\n",
+		      sqlite3_errmsg (sqlite));
+    sqlite3_finalize (stmt);
+}
+
+SPATIALITE_PRIVATE int
+unregister_wms_getcapabilities (void *p_sqlite, const char *url)
+{
+/* auxiliary function: deletes a WMS GetCapabilities definition (and any related) */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+
+    if (url == NULL)
+	return 0;
+
+    /* checking if the WMS GetCapabilities do actually exists */
+    if (!check_wms_getcapabilities (sqlite, url))
+	return 0;
+    /* deleting all WMS settings */
+    do_delete_wms_settings_0 (sqlite, url);
+    /* deleting all WMS GetMap */
+    do_delete_wms_getmap_0 (sqlite, url);
+    /* deleting the WMS GetCapability itself */
+    return do_delete_wms_getcapabilities (sqlite, url);
+}
+
+SPATIALITE_PRIVATE int
+set_wms_getcapabilities_infos (void *p_sqlite, const char *url,
+			       const char *title, const char *abstract)
+{
+/* auxiliary function: updates the descriptive infos supporting a WMS GetCapabilities */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    if (url != NULL && title != NULL && abstract != NULL)
+      {
+	  /* checking if the WMS GetCapabilities do actually exists */
+	  if (!check_wms_getcapabilities (sqlite, url))
+	      return 0;
+
+	  /* attempting to update the WMS GetCapabilities */
+	  sql =
+	      "UPDATE wms_getcapabilities SET title = ?, abstract = ? WHERE url = ?";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("WMS_SetGetCapabilitiesInfos: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, title, strlen (title), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, abstract, strlen (abstract),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, url, strlen (url), SQLITE_STATIC);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("WMS_SetGetCapabilitiesInfos() error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+	  return 1;
+      }
+    else
+	return 0;
+}
+
+static int
+wms_getmap_parentid (sqlite3 * sqlite, const char *url, sqlite3_int64 * id)
+{
+/* retieving the WMS GetCapabilities ID value */
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+    int count = 0;
+
+    sql = "SELECT id FROM wms_getcapabilities WHERE url = ?";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("GetMap parent_id: \"%s\"\n", sqlite3_errmsg (sqlite));
+	  goto stop;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    while (1)
+      {
+	  /* scrolling the result set rows */
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE)
+	      break;		/* end of result set */
+	  if (ret == SQLITE_ROW)
+	    {
+		*id = sqlite3_column_int64 (stmt, 0);
+		count++;
+	    }
+      }
+    sqlite3_finalize (stmt);
+    if (count == 1)
+	return 1;
+    return 0;
+  stop:
+    return 0;
+}
+
+SPATIALITE_PRIVATE int
+register_wms_getmap (void *p_sqlite, const char *getcapabilities_url,
+		     const char *getmap_url, const char *layer_name,
+		     const char *title, const char *abstract,
+		     const char *version, const char *ref_sys,
+		     const char *image_format, const char *style,
+		     int transparent, int flip_axes, int tiled, int cached,
+		     int tile_width, int tile_height, const char *bgcolor,
+		     int is_queryable, const char *getfeatureinfo_url)
+{
+/* auxiliary function: inserts a WMS GetMap */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    sqlite3_int64 parent_id;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    if (getcapabilities_url == NULL)
+	return 0;
+
+    if (!wms_getmap_parentid (sqlite, getcapabilities_url, &parent_id))
+      {
+	  spatialite_e ("WMS_RegisterGetMap: missing parent GetCapabilities\n");
+	  return 0;
+      }
+
+    if (getmap_url != NULL && layer_name != NULL && title != NULL
+	&& abstract != NULL)
+      {
+	  /* attempting to insert the WMS GetMap */
+	  sql =
+	      "INSERT INTO wms_getmap (parent_id, url, layer_name, title, abstract, "
+	      "version, srs, format, style, transparent, flip_axes, tiled, "
+	      "is_cached, tile_width, tile_height, bgcolor, is_queryable, "
+	      "getfeatureinfo_url) VALUES "
+	      "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("WMS_RegisterGetMap: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_int64 (stmt, 1, parent_id);
+	  sqlite3_bind_text (stmt, 2, getmap_url, strlen (getmap_url),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, layer_name, strlen (layer_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 4, title, strlen (title), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 5, abstract, strlen (abstract),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 6, version, strlen (version), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 7, ref_sys, strlen (ref_sys), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 8, image_format, strlen (image_format),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 9, style, strlen (style), SQLITE_STATIC);
+	  if (transparent != 0)
+	      transparent = 1;
+	  sqlite3_bind_int (stmt, 10, transparent);
+	  if (flip_axes != 0)
+	      flip_axes = 1;
+	  sqlite3_bind_int (stmt, 11, flip_axes);
+	  if (tiled != 0)
+	      tiled = 1;
+	  sqlite3_bind_int (stmt, 12, tiled);
+	  if (cached != 0)
+	      cached = 1;
+	  sqlite3_bind_int (stmt, 13, cached);
+	  if (tile_width < 256)
+	      tile_width = 256;
+	  if (tile_height > 5000)
+	      tile_width = 5000;
+	  sqlite3_bind_int (stmt, 14, tile_width);
+	  if (tile_height < 256)
+	      tile_height = 256;
+	  if (tile_height > 5000)
+	      tile_height = 5000;
+	  sqlite3_bind_int (stmt, 15, tile_height);
+	  if (bgcolor == NULL)
+	      sqlite3_bind_null (stmt, 16);
+	  else
+	      sqlite3_bind_text (stmt, 16, bgcolor, strlen (bgcolor),
+				 SQLITE_STATIC);
+	  if (is_queryable != 0)
+	      is_queryable = 1;
+	  sqlite3_bind_int (stmt, 17, is_queryable);
+	  if (getfeatureinfo_url == NULL)
+	      sqlite3_bind_null (stmt, 18);
+	  else
+	      sqlite3_bind_text (stmt, 18, getfeatureinfo_url,
+				 strlen (getfeatureinfo_url), SQLITE_STATIC);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("WMS_RegisterGetMap() error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+      }
+    else if (getmap_url != NULL && layer_name != NULL)
+      {
+	  /* attempting to insert the WMS GetMap */
+	  sql =
+	      "INSERT INTO wms_getmap (parent_id, url, layer_name, version, srs, "
+	      "format, style, transparent, flip_axes, tiled, is_cached, "
+	      "tile_width, tile_height, is_queryable) VALUES "
+	      "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("WMS_RegisterGetMap: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_int64 (stmt, 1, parent_id);
+	  sqlite3_bind_text (stmt, 2, getmap_url, strlen (getmap_url),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, layer_name, strlen (layer_name),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 4, version, strlen (version), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 5, ref_sys, strlen (ref_sys), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 6, image_format, strlen (image_format),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 7, style, strlen (style), SQLITE_STATIC);
+	  if (transparent != 0)
+	      transparent = 1;
+	  sqlite3_bind_int (stmt, 8, transparent);
+	  if (flip_axes != 0)
+	      flip_axes = 1;
+	  sqlite3_bind_int (stmt, 9, flip_axes);
+	  if (tiled != 0)
+	      tiled = 1;
+	  sqlite3_bind_int (stmt, 10, tiled);
+	  if (cached != 0)
+	      cached = 1;
+	  sqlite3_bind_int (stmt, 11, cached);
+	  if (tile_width < 256)
+	      tile_width = 256;
+	  if (tile_height > 5000)
+	      tile_width = 5000;
+	  sqlite3_bind_int (stmt, 12, tile_width);
+	  if (tile_height < 256)
+	      tile_height = 256;
+	  if (tile_height > 5000)
+	      tile_height = 5000;
+	  sqlite3_bind_int (stmt, 13, tile_height);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("WMS_RegisterGetMap() error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+      }
+    return 1;
+}
+
+static int
+check_wms_getmap (sqlite3 * sqlite, const char *url, const char *layer_name)
+{
+/* checks if a WMS GetMap do actually exists */
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+    int count = 0;
+
+    sql = "SELECT url FROM wms_getmap WHERE url = ? AND layer_name = ?";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("check WMS GetMap: \"%s\"\n", sqlite3_errmsg (sqlite));
+	  goto stop;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 2, layer_name, strlen (layer_name), SQLITE_STATIC);
+    while (1)
+      {
+	  /* scrolling the result set rows */
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE)
+	      break;		/* end of result set */
+	  if (ret == SQLITE_ROW)
+	      count++;
+      }
+    sqlite3_finalize (stmt);
+    if (count == 1)
+	return 1;
+    return 0;
+  stop:
+    return 0;
+}
+
+static int
+do_delete_wms_getmap (sqlite3 * sqlite, const char *url, const char *layer_name)
+{
+/* auxiliary function: deleting a WMS GetMap */
+    int ret;
+    int result = 0;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    sql = "DELETE FROM wms_getmap WHERE url = ? AND layer_name = ?";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("WMS_UnRegisterGetMap: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  return 0;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 2, layer_name, strlen (layer_name), SQLITE_STATIC);
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	result = 1;
+    else
+	spatialite_e ("WMS_UnRegisterGetMap() error: \"%s\"\n",
+		      sqlite3_errmsg (sqlite));
+    sqlite3_finalize (stmt);
+    return result;
+}
+
+static void
+do_delete_wms_settings_1 (sqlite3 * sqlite, const char *url,
+			  const char *layer_name)
+{
+/* auxiliary function: deleting WMS settings (from GetMap) */
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    sql = "DELETE FROM wms_settings WHERE id IN ("
+	"SELECT s.id FROM wms_getmap AS m "
+	"JOIN wms_settings AS s ON (m.id = s.parent_id) "
+	"WHERE m.url = ? AND m.layer_name = ?)";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("WMS_UnRegisterGetMap: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  return;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 2, layer_name, strlen (layer_name), SQLITE_STATIC);
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	;
+    else
+	spatialite_e ("WMS_UnRegisterGetMap() error: \"%s\"\n",
+		      sqlite3_errmsg (sqlite));
+    sqlite3_finalize (stmt);
+}
+
+SPATIALITE_PRIVATE int
+unregister_wms_getmap (void *p_sqlite, const char *url, const char *layer_name)
+{
+/* auxiliary function: deletes a WMS GetMap definition (and related settings) */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+
+    if (url == NULL || layer_name == NULL)
+	return 0;
+
+    /* checking if the WMS GetMap do actually exists */
+    if (!check_wms_getmap (sqlite, url, layer_name))
+	return 0;
+    /* deleting all WMS settings */
+    do_delete_wms_settings_1 (sqlite, url, layer_name);
+    /* deleting the WMS GetMap itself */
+    return do_delete_wms_getmap (sqlite, url, layer_name);
+}
+
+SPATIALITE_PRIVATE int
+set_wms_getmap_infos (void *p_sqlite, const char *url, const char *layer_name,
+		      const char *title, const char *abstract)
+{
+/* auxiliary function: updates the descriptive infos supporting a WMS GetMap */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    if (url != NULL && title != NULL && abstract != NULL)
+      {
+	  /* checking if the WMS GetMap do actually exists */
+	  if (!check_wms_getmap (sqlite, url, layer_name))
+	      return 0;
+
+	  /* attempting to update the WMS GetGetMap */
+	  sql = "UPDATE wms_getmap SET title = ?, abstract = ? "
+	      "WHERE url = ? AND layer_name = ?";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("WMS_SetGetMapInfos: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, title, strlen (title), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, abstract, strlen (abstract),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, url, strlen (url), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 4, layer_name, strlen (layer_name),
+			     SQLITE_STATIC);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("WMS_SetGetMapInfos() error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+	  return 1;
+      }
+    else
+	return 0;
+}
+
+SPATIALITE_PRIVATE int
+set_wms_getmap_copyright (void *p_sqlite, const char *url,
+			  const char *layer_name, const char *copyright,
+			  const char *license)
+{
+/* auxiliary function: updates the copyright infos supporting a WMS layer */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    if (url == NULL || layer_name == NULL)
+	return 0;
+    if (copyright == NULL && license == NULL)
+	return 1;
+
+    if (copyright == NULL)
+      {
+	  /* just updating the License */
+	  sql = "UPDATE wms_getmap SET license = ("
+	      "SELECT id FROM data_licenses WHERE name = ?) "
+	      "WHERE url = ? AND layer_name = ?";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("setWMSLayerCopyright: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, license, strlen (license), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, url, strlen (url), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, layer_name,
+			     strlen (layer_name), SQLITE_STATIC);
+      }
+    else if (license == NULL)
+      {
+	  /* just updating the Copyright */
+	  sql = "UPDATE wms_getmap SET copyright = ? "
+	      "WHERE url = ? AND layer_name = ?";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("setWMSLayerCopyright: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, copyright, strlen (copyright),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, url, strlen (url), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, layer_name,
+			     strlen (layer_name), SQLITE_STATIC);
+      }
+    else
+      {
+	  /* updating both Copyright and License */
+	  sql = "UPDATE wms_getmap SET copyright = ?, license = ("
+	      "SELECT id FROM data_licenses WHERE name = ?) "
+	      "WHERE url = ? AND layer_name = ?";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("setWMSLayerCopyright: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, copyright, strlen (copyright),
+			     SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, license, strlen (license), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, url, strlen (url), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 4, layer_name,
+			     strlen (layer_name), SQLITE_STATIC);
+      }
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	;
+    else
+      {
+	  spatialite_e ("setWMSLayerCopyright() error: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  sqlite3_finalize (stmt);
+	  return 0;
+      }
+    sqlite3_finalize (stmt);
+    return 1;
+}
+
+SPATIALITE_PRIVATE int
+set_wms_getmap_bgcolor (void *p_sqlite,
+			const char *url, const char *layer_name,
+			const char *bgcolor)
+{
+/* updating WMS GetMap Options - BgColor */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    if (url != NULL)
+      {
+	  /* checking if the WMS GetMap do actually exists */
+	  if (!check_wms_getmap (sqlite, url, layer_name))
+	      return 0;
+
+	  /* attempting to update the WMS GetMap */
+	  sql =
+	      "UPDATE wms_getmap SET bgcolor = ? WHERE url = ? AND layer_name = ?";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("WMS_SetGetMapOptions (BGCOLOR): \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  if (bgcolor == NULL)
+	      sqlite3_bind_null (stmt, 1);
+	  else
+	      sqlite3_bind_text (stmt, 1, bgcolor, strlen (bgcolor),
+				 SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, url, strlen (url), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, layer_name, strlen (layer_name),
+			     SQLITE_STATIC);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("WMS_SetGetMapOptions (BGCOLOR) error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+	  return 1;
+      }
+    else
+	return 0;
+}
+
+SPATIALITE_PRIVATE int
+set_wms_getmap_queryable (void *p_sqlite,
+			  const char *url, const char *layer_name,
+			  int is_queryable, const char *getfeatureinfo_url)
+{
+/* updating WMS GetMap Options - IsQueryable */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    if (url != NULL)
+      {
+	  /* checking if the WMS GetMap do actually exists */
+	  if (!check_wms_getmap (sqlite, url, layer_name))
+	      return 0;
+
+	  /* attempting to update the WMS GetMap */
+	  sql =
+	      "UPDATE wms_getmap SET is_queryable = ?, getfeatureinfo_url = ? WHERE url = ? AND layer_name = ?";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("WMS_SetGetMapOptions (IsQueryable): \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  if (is_queryable != 0)
+	      is_queryable = 1;
+	  sqlite3_bind_int (stmt, 1, is_queryable);
+	  if (getfeatureinfo_url == NULL)
+	      sqlite3_bind_null (stmt, 2);
+	  else
+	      sqlite3_bind_text (stmt, 2, getfeatureinfo_url,
+				 strlen (getfeatureinfo_url), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, url, strlen (url), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 4, layer_name, strlen (layer_name),
+			     SQLITE_STATIC);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e
+		    ("WMS_SetGetMapOptions (IsQueryable) error: \"%s\"\n",
+		     sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+	  return 1;
+      }
+    else
+	return 0;
+}
+
+SPATIALITE_PRIVATE int
+set_wms_getmap_options (void *p_sqlite,
+			const char *url, const char *layer_name,
+			int transparent, int flip_axes)
+{
+/* updating WMS GetMap Options - Flags */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    if (url != NULL)
+      {
+	  /* checking if the WMS GetMap do actually exists */
+	  if (!check_wms_getmap (sqlite, url, layer_name))
+	      return 0;
+
+	  /* attempting to update the WMS GetMap */
+	  sql =
+	      "UPDATE wms_getmap SET transparent = ?, flip_axes = ? WHERE url = ? AND layer_name = ?";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("WMS_SetGetMapOptions (Flags): \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  if (transparent != 0)
+	      transparent = 1;
+	  sqlite3_bind_int (stmt, 1, transparent);
+	  if (flip_axes != 0)
+	      flip_axes = 1;
+	  sqlite3_bind_int (stmt, 2, flip_axes);
+	  sqlite3_bind_text (stmt, 3, url, strlen (url), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 4, layer_name, strlen (layer_name),
+			     SQLITE_STATIC);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("WMS_SetGetMapOptions (Flags) error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+	  return 1;
+      }
+    else
+	return 0;
+}
+
+SPATIALITE_PRIVATE int
+set_wms_getmap_tiled (void *p_sqlite,
+		      const char *url, const char *layer_name,
+		      int tiled, int cached, int tile_width, int tile_height)
+{
+/* updating WMS GetMap Options - Tiled */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    if (url != NULL)
+      {
+	  /* checking if the WMS GetMap do actually exists */
+	  if (!check_wms_getmap (sqlite, url, layer_name))
+	      return 0;
+
+	  /* attempting to update the WMS GetMap */
+	  sql =
+	      "UPDATE wms_getmap SET tiled = ?, is_cached = ?, tile_width = ?, tile_height = ? "
+	      "WHERE url = ? AND layer_name = ?";
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("WMS_SetGetMapOptions (Tiled): \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  if (tiled != 0)
+	      tiled = 1;
+	  sqlite3_bind_int (stmt, 1, tiled);
+	  if (cached != 0)
+	      cached = 1;
+	  sqlite3_bind_int (stmt, 2, cached);
+	  if (tile_width < 256)
+	      tile_width = 256;
+	  if (tile_height > 5000)
+	      tile_width = 5000;
+	  sqlite3_bind_int (stmt, 3, tile_width);
+	  if (tile_height < 256)
+	      tile_height = 256;
+	  if (tile_height > 5000)
+	      tile_height = 5000;
+	  sqlite3_bind_int (stmt, 4, tile_height);
+	  sqlite3_bind_text (stmt, 5, url, strlen (url), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 6, layer_name, strlen (layer_name),
+			     SQLITE_STATIC);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      ;
+	  else
+	    {
+		spatialite_e ("WMS_SetGetMapOptions (Tiled) error: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		sqlite3_finalize (stmt);
+		return 0;
+	    }
+	  sqlite3_finalize (stmt);
+	  return 1;
+      }
+    else
+	return 0;
+}
+
+static int
+wms_setting_parentid (sqlite3 * sqlite, const char *url, const char *layer_name,
+		      sqlite3_int64 * id)
+{
+/* retieving the WMS GetMap ID value */
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+    int count = 0;
+
+    sql = "SELECT id FROM wms_getmap WHERE url = ? AND layer_name = ?";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("WMS Setting parent_id: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  goto stop;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 2, layer_name, strlen (layer_name), SQLITE_STATIC);
+    while (1)
+      {
+	  /* scrolling the result set rows */
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE)
+	      break;		/* end of result set */
+	  if (ret == SQLITE_ROW)
+	    {
+		*id = sqlite3_column_int64 (stmt, 0);
+		count++;
+	    }
+      }
+    sqlite3_finalize (stmt);
+    if (count == 1)
+	return 1;
+    return 0;
+  stop:
+    return 0;
+}
+
+static int
+do_wms_set_default (sqlite3 * sqlite, const char *url, const char *layer_name,
+		    const char *key, const char *value)
+{
+/* auxiliary function: updating a WMS GetMap default setting */
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+    int result = 0;
+
+/* resetting an eventual previous default */
+    sql = "UPDATE wms_settings SET is_default = 0 WHERE id IN ("
+	"SELECT s.id FROM wms_getmap AS m "
+	"JOIN wms_settings AS s ON (m.id = s.parent_id) "
+	"WHERE m.url = ? AND m.layer_name = ? AND s.key = Lower(?) AND s.value <> ?)";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("WMS_DefaultSetting: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  return 0;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 2, layer_name, strlen (layer_name), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 3, key, strlen (key), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 4, value, strlen (value), SQLITE_STATIC);
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	result = 1;
+    else
+	spatialite_e ("WMS_DefaultSetting() error: \"%s\"\n",
+		      sqlite3_errmsg (sqlite));
+    sqlite3_finalize (stmt);
+    if (!result)
+	return 0;
+
+/* setting the current default */
+    sql = "UPDATE wms_settings SET is_default = 1 WHERE id IN ("
+	"SELECT s.id FROM wms_getmap AS m "
+	"JOIN wms_settings AS s ON (m.id = s.parent_id) "
+	"WHERE m.url = ? AND m.layer_name = ? AND s.key = Lower(?) AND s.value = ?)";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("WMS_DefaultSetting: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  return 0;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 2, layer_name, strlen (layer_name), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 3, key, strlen (key), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 4, value, strlen (value), SQLITE_STATIC);
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	result = 1;
+    else
+	spatialite_e ("WMS_DefaultSetting() error: \"%s\"\n",
+		      sqlite3_errmsg (sqlite));
+    sqlite3_finalize (stmt);
+
+    if (result)
+      {
+	  /* updating the WMS GetMap */
+	  sql = NULL;
+	  if (strcasecmp (key, "version") == 0)
+	      sql =
+		  "UPDATE wms_getmap SET version = ? WHERE url = ? AND layer_name = ?";
+	  if (strcasecmp (key, "format") == 0)
+	      sql =
+		  "UPDATE wms_getmap SET format = ? WHERE url = ? AND layer_name = ?";
+	  if (strcasecmp (key, "style") == 0)
+	      sql =
+		  "UPDATE wms_getmap SET style = ? WHERE url = ? AND layer_name = ?";
+	  if (sql == NULL)
+	      return 0;
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("WMS_DefaultSetting: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  result = 0;
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, value, strlen (value), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, url, strlen (url), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, layer_name, strlen (layer_name),
+			     SQLITE_STATIC);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      result = 1;
+	  else
+	      spatialite_e ("WMS_DefaultSetting() error: \"%s\"\n",
+			    sqlite3_errmsg (sqlite));
+	  sqlite3_finalize (stmt);
+      }
+    return result;
+}
+
+static int
+do_wms_srs_default (sqlite3 * sqlite, const char *url, const char *layer_name,
+		    const char *ref_sys)
+{
+/* auxiliary function: updating a WMS GetMap default SRS */
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+    int result = 0;
+
+/* resetting an eventual previous default */
+    sql = "UPDATE wms_ref_sys SET is_default = 0 WHERE id IN ("
+	"SELECT s.id FROM wms_getmap AS m "
+	"JOIN wms_ref_sys AS s ON (m.id = s.parent_id) "
+	"WHERE m.url = ? AND m.layer_name = ? AND s.srs <> Upper(?))";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("WMS_DefaultSetting: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  return 0;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 2, layer_name, strlen (layer_name), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 3, ref_sys, strlen (ref_sys), SQLITE_STATIC);
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	result = 1;
+    else
+	spatialite_e ("WMS_DefaultSRS() error: \"%s\"\n",
+		      sqlite3_errmsg (sqlite));
+    sqlite3_finalize (stmt);
+    if (!result)
+	return 0;
+
+/* setting the current default */
+    sql = "UPDATE wms_ref_sys SET is_default = 1 WHERE id IN ("
+	"SELECT s.id FROM wms_getmap AS m "
+	"JOIN wms_ref_sys AS s ON (m.id = s.parent_id) "
+	"WHERE m.url = ? AND m.layer_name = ? AND s.srs = Lower(?))";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("WMS_DefaultSetting: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  return 0;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 2, layer_name, strlen (layer_name), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 3, ref_sys, strlen (ref_sys), SQLITE_STATIC);
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	result = 1;
+    else
+	spatialite_e ("WMS_DefaultSRS() error: \"%s\"\n",
+		      sqlite3_errmsg (sqlite));
+    sqlite3_finalize (stmt);
+
+    if (result)
+      {
+	  /* updating the WMS GetMap */
+	  sql = NULL;
+	  sql =
+	      "UPDATE wms_getmap SET srs = ? WHERE url = ? AND layer_name = ?";
+	  if (sql == NULL)
+	      return 0;
+	  ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+	  if (ret != SQLITE_OK)
+	    {
+		spatialite_e ("WMS_DefaultSRS: \"%s\"\n",
+			      sqlite3_errmsg (sqlite));
+		return 0;
+	    }
+	  result = 0;
+	  sqlite3_reset (stmt);
+	  sqlite3_clear_bindings (stmt);
+	  sqlite3_bind_text (stmt, 1, ref_sys, strlen (ref_sys), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 2, url, strlen (url), SQLITE_STATIC);
+	  sqlite3_bind_text (stmt, 3, layer_name, strlen (layer_name),
+			     SQLITE_STATIC);
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	      result = 1;
+	  else
+	      spatialite_e ("WMS_DefaultSRS() error: \"%s\"\n",
+			    sqlite3_errmsg (sqlite));
+	  sqlite3_finalize (stmt);
+      }
+    return result;
+}
+
+SPATIALITE_PRIVATE int
+register_wms_setting (void *p_sqlite, const char *url, const char *layer_name,
+		      const char *key, const char *value, int is_default)
+{
+/* auxiliary function: inserts a WMS GetMap Setting */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    sqlite3_int64 parent_id;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    if (!wms_setting_parentid (sqlite, url, layer_name, &parent_id))
+      {
+	  spatialite_e ("WMS_RegisterSetting: missing parent GetMap\n");
+	  return 0;
+      }
+
+    /* attempting to insert the WMS Setting */
+    sql = "INSERT INTO wms_settings (parent_id, key, value, is_default) "
+	"VALUES (?, Lower(?), ?, ?)";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("WMS_RegisterSetting: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  return 0;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_int64 (stmt, 1, parent_id);
+    sqlite3_bind_text (stmt, 2, key, strlen (key), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 3, value, strlen (value), SQLITE_STATIC);
+    if (is_default != 0)
+	is_default = 1;
+    sqlite3_bind_int (stmt, 4, 0);
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	;
+    else
+      {
+	  spatialite_e ("WMS_RegisterSetting() error: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  sqlite3_finalize (stmt);
+	  return 0;
+      }
+    sqlite3_finalize (stmt);
+
+    if (is_default)
+	return do_wms_set_default (sqlite, url, layer_name, key, value);
+    return 1;
+}
+
+static int
+check_wms_setting (sqlite3 * sqlite, const char *url, const char *layer_name,
+		   const char *key, const char *value, int mode_delete)
+{
+/* checks if a WMS GetMap Setting do actually exists */
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+    int count = 0;
+
+    sql = "SELECT s.is_default FROM wms_getmap AS m "
+	"LEFT JOIN wms_settings AS s ON (m.id = s.parent_id) "
+	"WHERE m.url = ? AND m.layer_name = ? AND s.key = Lower(?) AND s.value = ?";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("check WMS GetMap: \"%s\"\n", sqlite3_errmsg (sqlite));
+	  goto stop;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 2, layer_name, strlen (layer_name), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 3, key, strlen (key), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 4, value, strlen (value), SQLITE_STATIC);
+    while (1)
+      {
+	  /* scrolling the result set rows */
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE)
+	      break;		/* end of result set */
+	  if (ret == SQLITE_ROW)
+	    {
+		int is_default = sqlite3_column_int (stmt, 0);
+		if (mode_delete && is_default)
+		    ;
+		else
+		    count++;
+	    }
+      }
+    sqlite3_finalize (stmt);
+    if (count == 1)
+	return 1;
+  stop:
+    return 0;
+}
+
+static int
+do_delete_wms_setting (sqlite3 * sqlite, const char *url,
+		       const char *layer_name, const char *key,
+		       const char *value)
+{
+/* auxiliary function: deleting a WMS GetMap setting */
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+    int result = 0;
+
+    sql = "DELETE FROM wms_settings WHERE id IN ("
+	"SELECT s.id FROM wms_getmap AS m "
+	"JOIN wms_settings AS s ON (m.id = s.parent_id) "
+	"WHERE m.url = ? AND m.layer_name = ? AND s.key = Lower(?) AND s.value = ?)";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("WMS_UnRegisterSetting: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  return 0;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 2, layer_name, strlen (layer_name), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 3, key, strlen (key), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 4, value, strlen (value), SQLITE_STATIC);
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	result = 1;
+    else
+	spatialite_e ("WMS_UnRegisterSetting() error: \"%s\"\n",
+		      sqlite3_errmsg (sqlite));
+    sqlite3_finalize (stmt);
+    return result;
+}
+
+SPATIALITE_PRIVATE int
+unregister_wms_setting (void *p_sqlite, const char *url, const char *layer_name,
+			const char *key, const char *value)
+{
+/* auxiliary function: deletes a WMS GetMap Setting */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+
+    if (url == NULL)
+	return 0;
+
+    /* checking if the WMS GetMap do actually exists */
+    if (!check_wms_setting (sqlite, url, layer_name, key, value, 1))
+	return 0;
+    /* deleting the WMS GetMap Setting itself */
+    return do_delete_wms_setting (sqlite, url, layer_name, key, value);
+}
+
+SPATIALITE_PRIVATE int
+set_wms_default_setting (void *p_sqlite, const char *url,
+			 const char *layer_name, const char *key,
+			 const char *value)
+{
+/* auxiliary function: updating a WMS GetMap Default Setting */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+
+    if (url == NULL)
+	return 0;
+
+    /* checking if the WMS GetMap do actually exists */
+    if (!check_wms_setting (sqlite, url, layer_name, key, value, 0))
+	return 0;
+    /* updating the WMS GetMap Default Setting */
+    return do_wms_set_default (sqlite, url, layer_name, key, value);
+}
+
+SPATIALITE_PRIVATE int
+register_wms_srs (void *p_sqlite, const char *url, const char *layer_name,
+		  const char *ref_sys, double minx, double miny, double maxx,
+		  double maxy, int is_default)
+{
+/* auxiliary function: inserts a WMS GetMap SRS */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    sqlite3_int64 parent_id;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    if (!wms_setting_parentid (sqlite, url, layer_name, &parent_id))
+      {
+	  spatialite_e ("WMS_RegisterSRS: missing parent GetMap\n");
+	  return 0;
+      }
+
+    /* attempting to insert the WMS Setting */
+    sql =
+	"INSERT INTO wms_ref_sys (parent_id, srs, minx, miny, maxx, maxy, is_default) "
+	"VALUES (?, Upper(?), ?, ?, ?, ?, ?)";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("WMS_RegisterSRS: \"%s\"\n", sqlite3_errmsg (sqlite));
+	  return 0;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_int64 (stmt, 1, parent_id);
+    sqlite3_bind_text (stmt, 2, ref_sys, strlen (ref_sys), SQLITE_STATIC);
+    sqlite3_bind_double (stmt, 3, minx);
+    sqlite3_bind_double (stmt, 4, miny);
+    sqlite3_bind_double (stmt, 5, maxx);
+    sqlite3_bind_double (stmt, 6, maxy);
+    if (is_default != 0)
+	is_default = 1;
+    sqlite3_bind_int (stmt, 7, is_default);
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	;
+    else
+      {
+	  spatialite_e ("WMS_RegisterSRS() error: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  sqlite3_finalize (stmt);
+	  return 0;
+      }
+    sqlite3_finalize (stmt);
+
+    if (is_default)
+	return do_wms_srs_default (sqlite, url, layer_name, ref_sys);
+    return 1;
+}
+
+static int
+check_wms_srs (sqlite3 * sqlite, const char *url, const char *layer_name,
+	       const char *ref_sys, int mode_delete)
+{
+/* checks if a WMS GetMap SRS do actually exists */
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+    int count = 0;
+
+    sql = "SELECT s.is_default FROM wms_getmap AS m "
+	"LEFT JOIN wms_ref_sys AS s ON (m.id = s.parent_id) "
+	"WHERE m.url = ? AND m.layer_name = ? AND s.srs = Upper(?)";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("check WMS GetMap: \"%s\"\n", sqlite3_errmsg (sqlite));
+	  goto stop;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 2, layer_name, strlen (layer_name), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 3, ref_sys, strlen (ref_sys), SQLITE_STATIC);
+    while (1)
+      {
+	  /* scrolling the result set rows */
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE)
+	      break;		/* end of result set */
+	  if (ret == SQLITE_ROW)
+	    {
+		int is_default = sqlite3_column_int (stmt, 0);
+		if (mode_delete && is_default)
+		    ;
+		else
+		    count++;
+	    }
+      }
+    sqlite3_finalize (stmt);
+    if (count == 1)
+	return 1;
+  stop:
+    return 0;
+}
+
+static int
+do_delete_wms_srs (sqlite3 * sqlite, const char *url,
+		   const char *layer_name, const char *ref_sys)
+{
+/* auxiliary function: deleting a WMS GetMap SRS */
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+    int result = 0;
+
+    sql = "DELETE FROM wms_ref_sys WHERE id IN ("
+	"SELECT s.id FROM wms_getmap AS m "
+	"JOIN wms_ref_sys AS s ON (m.id = s.parent_id) "
+	"WHERE m.url = ? AND m.layer_name = ? AND s.srs = Upper(?))";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("WMS_UnRegisterSRS: \"%s\"\n", sqlite3_errmsg (sqlite));
+	  return 0;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 2, layer_name, strlen (layer_name), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 3, ref_sys, strlen (ref_sys), SQLITE_STATIC);
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	result = 1;
+    else
+	spatialite_e ("WMS_UnRegisterSRSg() error: \"%s\"\n",
+		      sqlite3_errmsg (sqlite));
+    sqlite3_finalize (stmt);
+    return result;
+}
+
+SPATIALITE_PRIVATE int
+unregister_wms_srs (void *p_sqlite, const char *url, const char *layer_name,
+		    const char *ref_sys)
+{
+/* auxiliary function: deletes a WMS GetMap SRS */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+
+    if (url == NULL)
+	return 0;
+
+    /* checking if the WMS GetMap do actually exists */
+    if (!check_wms_srs (sqlite, url, layer_name, ref_sys, 1))
+	return 0;
+    /* deleting the WMS GetMap SRS itself */
+    return do_delete_wms_srs (sqlite, url, layer_name, ref_sys);
+}
+
+SPATIALITE_PRIVATE int
+set_wms_default_srs (void *p_sqlite, const char *url,
+		     const char *layer_name, const char *ref_sys)
+{
+/* auxiliary function: updating a WMS GetMap Default SRS */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+
+    if (url == NULL)
+	return 0;
+
+    /* checking if the WMS GetMap do actually exists */
+    if (!check_wms_srs (sqlite, url, layer_name, ref_sys, 0))
+	return 0;
+    /* updating the WMS GetMap Default SRS */
+    return do_wms_srs_default (sqlite, url, layer_name, ref_sys);
+}
+
+SPATIALITE_PRIVATE char *
+wms_getmap_request_url (void *p_sqlite, const char *getmap_url,
+			const char *layer_name, int width, int height,
+			double minx, double miny, double maxx, double maxy)
+{
+/* return a WMS GetMap request URL */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+    char *request_url = NULL;
+
+    if (getmap_url == NULL)
+	return NULL;
+
+    sql = "SELECT version, srs, format, style, transparent, flip_axes, "
+	"bgcolor FROM wms_getmap WHERE url = ? AND layer_name = ?";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("WMS_GetMapRequestURL: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  return NULL;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, getmap_url, strlen (getmap_url), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 2, layer_name, strlen (layer_name), SQLITE_STATIC);
+    while (1)
+      {
+	  /* scrolling the result set rows */
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE)
+	      break;		/* end of result set */
+	  if (ret == SQLITE_ROW)
+	    {
+		const char *ref_sys_prefix = "CRS";
+		const char *bgcolor = NULL;
+		const char *version =
+		    (const char *) sqlite3_column_text (stmt, 0);
+		const char *ref_sys =
+		    (const char *) sqlite3_column_text (stmt, 1);
+		const char *format =
+		    (const char *) sqlite3_column_text (stmt, 2);
+		const char *style =
+		    (const char *) sqlite3_column_text (stmt, 3);
+		int transparent = sqlite3_column_int (stmt, 4);
+		int flip_axes = sqlite3_column_int (stmt, 5);
+		if (sqlite3_column_type (stmt, 6) == SQLITE_TEXT)
+		    bgcolor = (const char *) sqlite3_column_text (stmt, 6);
+		/* preparing the request URL */
+		if (strcmp (version, "1.3.0") < 0)
+		  {
+		      /* earlier versions of the protocol require SRS instead of CRS */
+		      ref_sys_prefix = "SRS";
+		  }
+		if (flip_axes)
+		  {
+		      request_url =
+			  sqlite3_mprintf
+			  ("%s?SERVICE=WMS&REQUEST=GetMap&VERSION=%s"
+			   "&LAYERS=%s&%s=%s&BBOX=%1.6f,%1.6f,%1.6f,%1.6f"
+			   "&WIDTH=%d&HEIGHT=%d&STYLES=%s&FORMAT=%s"
+			   "&TRANSPARENT=%s", getmap_url, version, layer_name,
+			   ref_sys_prefix, ref_sys, miny, minx, maxy, maxx,
+			   width, height, style, format,
+			   (transparent == 0) ? "FALSE" : "TRUE");
+		  }
+		else
+		  {
+		      request_url =
+			  sqlite3_mprintf
+			  ("%s?SERVICE=WMS&REQUEST=GetMap&VERSION=%s"
+			   "&LAYERS=%s&%s=%s&BBOX=%1.6f,%1.6f,%1.6f,%1.6f"
+			   "&WIDTH=%d&HEIGHT=%d&STYLES=%s&FORMAT=%s"
+			   "&TRANSPARENT=%s", getmap_url, version, layer_name,
+			   ref_sys_prefix, ref_sys, minx, miny, maxx, maxy,
+			   width, height, style, format,
+			   (transparent == 0) ? "FALSE" : "TRUE");
+		  }
+		if (bgcolor != NULL)
+		  {
+		      char *prev = request_url;
+		      request_url =
+			  sqlite3_mprintf ("%s&BGCOLOR=0x%s", prev, bgcolor);
+		      sqlite3_free (prev);
+		  }
+	    }
+      }
+    sqlite3_finalize (stmt);
+    return request_url;
+}
+
+SPATIALITE_PRIVATE char *
+wms_getfeatureinfo_request_url (void *p_sqlite, const char *getmap_url,
+				const char *layer_name, int width, int height,
+				int x, int y, double minx, double miny,
+				double maxx, double maxy, int feature_count)
+{
+/* return a WMS GetFeatureInfo request URL */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+    char *request_url = NULL;
+
+    if (getmap_url == NULL)
+	return NULL;
+
+    sql = "SELECT version, srs, flip_axes, is_queryable, getfeatureinfo_url "
+	"FROM wms_getmap WHERE url = ? AND layer_name = ?";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("WMS_GetFeatureInfoRequestURL: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  return NULL;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, getmap_url, strlen (getmap_url), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 2, layer_name, strlen (layer_name), SQLITE_STATIC);
+    while (1)
+      {
+	  /* scrolling the result set rows */
+	  ret = sqlite3_step (stmt);
+	  if (ret == SQLITE_DONE)
+	      break;		/* end of result set */
+	  if (ret == SQLITE_ROW)
+	    {
+		const char *ref_sys_prefix = "CRS";
+		const char *getfeatureinfo_url = NULL;
+		const char *version =
+		    (const char *) sqlite3_column_text (stmt, 0);
+		const char *ref_sys =
+		    (const char *) sqlite3_column_text (stmt, 1);
+		int flip_axes = sqlite3_column_int (stmt, 2);
+		int is_queryable = sqlite3_column_int (stmt, 3);
+		if (sqlite3_column_type (stmt, 4) == SQLITE_TEXT)
+		    getfeatureinfo_url =
+			(const char *) sqlite3_column_text (stmt, 4);
+		if (!is_queryable || getfeatureinfo_url == NULL)
+		    return NULL;
+
+		/* preparing the request URL */
+		if (feature_count < 1)
+		    feature_count = 1;
+		if (strcmp (version, "1.3.0") < 0)
+		  {
+		      /* earlier versions of the protocol require SRS instead of CRS */
+		      ref_sys_prefix = "SRS";
+		  }
+		if (flip_axes)
+		  {
+		      request_url =
+			  sqlite3_mprintf
+			  ("%s?SERVICE=WMS&REQUEST=GetFeatureInfo&VERSION=%s"
+			   "&QUERY_LAYERS=%s&%s=%s&BBOX=%1.6f,%1.6f,%1.6f,%1.6f"
+			   "&WIDTH=%d&HEIGHT=%d&X=%d&Y=%d&FEATURE_COUNT=%d",
+			   getfeatureinfo_url, version, layer_name,
+			   ref_sys_prefix, ref_sys, miny, minx, maxy, maxx,
+			   width, height, x, y, feature_count);
+		  }
+		else
+		  {
+		      request_url =
+			  sqlite3_mprintf
+			  ("%s?SERVICE=WMS&REQUEST=GetFeatureInfo&VERSION=%s"
+			   "&QUERY_LAYERS=%s&%s=%s&BBOX=%1.6f,%1.6f,%1.6f,%1.6f"
+			   "&WIDTH=%d&HEIGHT=%d&X=%d&Y=%d&FEATURE_COUNT=%d",
+			   getfeatureinfo_url, version, layer_name,
+			   ref_sys_prefix, ref_sys, minx, miny, maxx, maxy,
+			   width, height, x, y, feature_count);
+		  }
+	    }
+      }
+    sqlite3_finalize (stmt);
+    return request_url;
+}
+
+SPATIALITE_PRIVATE int
+register_data_license (void *p_sqlite, const char *license_name,
+		       const char *url)
+{
+/* auxiliary function: inserts a Data License */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    if (license_name == NULL)
+	return 0;
+
+    sql = "INSERT INTO data_licenses (name, url) VALUES (?, ?)";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("registerDataLicense: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  return 0;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, license_name,
+		       strlen (license_name), SQLITE_STATIC);
+    if (url == NULL)
+	sqlite3_bind_null (stmt, 2);
+    else
+	sqlite3_bind_text (stmt, 2, url, strlen (url), SQLITE_STATIC);
+
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	;
+    else
+      {
+	  spatialite_e ("registerDataLicense() error: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  sqlite3_finalize (stmt);
+	  return 0;
+      }
+    sqlite3_finalize (stmt);
+    return 1;
+}
+
+SPATIALITE_PRIVATE int
+unregister_data_license (void *p_sqlite, const char *license_name)
+{
+/* auxiliary function: deletes a Data License */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+
+    if (license_name == NULL)
+	return 0;
+
+    sql = "DELETE FROM data_licenses WHERE name = ?";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("unregisterDataLicense: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  return 0;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, license_name,
+		       strlen (license_name), SQLITE_STATIC);
+
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	;
+    else
+      {
+	  spatialite_e ("unregisterDataLicense() error: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  sqlite3_finalize (stmt);
+	  return 0;
+      }
+    sqlite3_finalize (stmt);
+    return 1;
+}
+
+SPATIALITE_PRIVATE int
+rename_data_license (void *p_sqlite, const char *old_name, const char *new_name)
+{
+/* auxiliary function: renames a Data License */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+    int prev_changes;
+    int curr_changes;
+
+    if (old_name == NULL || new_name == NULL)
+	return 0;
+
+    prev_changes = sqlite3_total_changes (sqlite);
+
+    sql = "UPDATE data_licenses SET name = ? WHERE name = ?";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("renameDataLicense: \"%s\"\n", sqlite3_errmsg (sqlite));
+	  return 0;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, new_name, strlen (new_name), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 2, old_name, strlen (old_name), SQLITE_STATIC);
+
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	;
+    else
+      {
+	  spatialite_e ("renameDataLicense() error: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  sqlite3_finalize (stmt);
+	  return 0;
+      }
+    sqlite3_finalize (stmt);
+
+    curr_changes = sqlite3_total_changes (sqlite);
+    if (prev_changes == curr_changes)
+	return 0;
+    return 1;
+}
+
+SPATIALITE_PRIVATE int
+set_data_license_url (void *p_sqlite, const char *license_name, const char *url)
+{
+/* auxiliary function: updates a Data License URL */
+    sqlite3 *sqlite = (sqlite3 *) p_sqlite;
+    int ret;
+    const char *sql;
+    sqlite3_stmt *stmt;
+    int prev_changes;
+    int curr_changes;
+
+    if (license_name == NULL || url == NULL)
+	return 0;
+
+    prev_changes = sqlite3_total_changes (sqlite);
+
+    sql = "UPDATE data_licenses SET url = ? WHERE name = ?";
+    ret = sqlite3_prepare_v2 (sqlite, sql, strlen (sql), &stmt, NULL);
+    if (ret != SQLITE_OK)
+      {
+	  spatialite_e ("setDataLicenseUrl: \"%s\"\n", sqlite3_errmsg (sqlite));
+	  return 0;
+      }
+    sqlite3_reset (stmt);
+    sqlite3_clear_bindings (stmt);
+    sqlite3_bind_text (stmt, 1, url, strlen (url), SQLITE_STATIC);
+    sqlite3_bind_text (stmt, 2, license_name,
+		       strlen (license_name), SQLITE_STATIC);
+
+    ret = sqlite3_step (stmt);
+    if (ret == SQLITE_DONE || ret == SQLITE_ROW)
+	;
+    else
+      {
+	  spatialite_e ("setDataLicenseUrl() error: \"%s\"\n",
+			sqlite3_errmsg (sqlite));
+	  sqlite3_finalize (stmt);
+	  return 0;
+      }
+    sqlite3_finalize (stmt);
+
+    curr_changes = sqlite3_total_changes (sqlite);
+    if (prev_changes == curr_changes)
+	return 0;
+    return 1;
+}

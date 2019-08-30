@@ -4,7 +4,7 @@
 # Author:   Alexander Lisovenko, alexander.lisovenko@nexgis.com
 # Author:   Dmitry Baryshnikov, <dmitry.baryshnikov@nextgis.com>
 ################################################################################
-# Copyright (C) 2016-2018, NextGIS <info@nextgis.com>
+# Copyright (C) 2016-2019, NextGIS <info@nextgis.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -94,24 +94,30 @@ endif()
 option(OMIT_GEOS "Should be defined in order to disable GEOS support" OFF)
 if(NOT OMIT_GEOS)
     option(GEOS_ADVANCED "Should be defined in order to enable GEOS_ADVANCED support" ON)
-    option(GEOS_TRUNK "Should be defined in order to enable GEOS_TRUNK experimental support" OFF)
     if(GEOS_ADVANCED)
         find_anyproject(GEOS VERSION 3.4.0 REQUIRED)
     else()
         find_anyproject(GEOS VERSION 3.3.0 REQUIRED)
     endif()
+    option(GEOS_REENTRANT "Should be defined in order to enable GEOS_REENTRANT (fully thread-safe)" ON)
 endif()
 
 if(GEOS_FOUND)
     set(HAVE_GEOS_C_H ON)
+    if(GEOS_VERSION VERSION_GREATER_EQUAL "3.7.0")
+        set(GEOS_370 ON)
+    endif()
 endif()
 
-option(OMIT_PROJ "Should be defined in order to disable PROJ.4 support" OFF)
+option(OMIT_PROJ "Should be defined in order to disable PROJ support" OFF)
 if(NOT OMIT_PROJ)
-    find_anyproject(PROJ4 REQUIRED)
+    find_anyproject(PROJ REQUIRED)
 endif()
-if(PROJ4_FOUND)
-    set(HAVE_PROJ_API_H 1)
+if(PROJ_FOUND)
+    set(HAVE_PROJ_H 1)
+    if(PROJ_VERSION VERSION_GREATER_EQUAL "6.0.0")
+        set(PROJ_NEW ON)
+    endif()
 endif()
 option(OMIT_ICONV "Should be defined in order to disable ICONV support" OFF)
 if(NOT OMIT_ICONV)
@@ -139,7 +145,7 @@ if(NOT MSVC)
     option(ENABLE_GEOPACKAGE "Should be defined in order to enable GeoPackage support" ON)
 endif()
 
-option(ENABLE_LWGEOM "Should be defined in order to enable LWGEOM support" ON)
+option(ENABLE_LWGEOM "Should be defined in order to enable LWGEOM support" OFF)
 if(ENABLE_LWGEOM)
     set(POSTGIS_2_1 ON)
     # TODO find_anyproject(LWGEOM DEFAULT ON)
@@ -147,6 +153,8 @@ if(ENABLE_LWGEOM)
         set(HAVE_LIBLWGEOM_H ON)
     endif()
 endif()
+
+option(ENABLE_RTTOPO "Should be defined in order to enable RTTOPO support." OFF)
 
 include(configure)
 

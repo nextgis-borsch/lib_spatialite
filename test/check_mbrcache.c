@@ -64,9 +64,6 @@ main (int argc, char *argv[])
     int pt;
     void *cache = spatialite_alloc_connection ();
 
-    if (argc > 1 || argv[0] == NULL)
-	argc = 1;		/* silencing stupid compiler warnings */
-
     ret =
 	sqlite3_open_v2 (":memory:", &handle,
 			 SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
@@ -346,7 +343,7 @@ main (int argc, char *argv[])
 
     ret =
 	sqlite3_exec (handle,
-		      "UPDATE Councils SET geom = GeomFromText('MULTIPOLYGON(((987226.750031 4627372.000018, 997301.750031 4627331.000018, 997402.500032 4627344.000018, 997541.500031 4627326.500018, 987226.750031 4627372.000018)))', 23032) WHERE lc_name = \"Quairading\";",
+		      "UPDATE Councils SET geom = GeomFromText('MULTIPOLYGON(((987226.750031 4627372.000018, 997301.750031 4627331.000018, 997402.500032 4627344.000018, 997541.500031 4627326.500018, 987226.750031 4627372.000018)))', 23032) WHERE lc_name = 'Quairading';",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -619,6 +616,9 @@ main (int argc, char *argv[])
 
     spatialite_cleanup_ex (cache);
 #endif /* end ICONV conditional */
+
+    if (argc > 1 || argv[0] == NULL)
+	argc = 1;		/* silencing stupid compiler warnings */
 
     return 0;
 }

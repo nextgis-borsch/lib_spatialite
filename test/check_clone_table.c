@@ -48,9 +48,13 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include <stdio.h>
 #include <string.h>
 
+#include "config.h"
+
 #include "sqlite3.h"
 #include "spatialite.h"
 #include "spatialite/gaiageo.h"
+
+#ifndef OMIT_GEOS		/* only if GEOS is enabled */
 
 int
 execute_check (sqlite3 * sqlite, const char *sql, char **error)
@@ -1382,15 +1386,14 @@ test_clone_table (int base, int with_extra, int ignore, int resequence,
     return 0;
 }
 
+#endif
 
 int
 main (int argc, char *argv[])
 {
-    int ret;
     int retcode = 0;
-
-    if (argc > 1 || argv[0] == NULL)
-	argc = 1;		/* silencing stupid compiler warnings */
+#ifndef OMIT_GEOS		/* only if GEOS is enabled */
+    int ret;
 
     if (create_origin () < 0)
       {
@@ -1437,6 +1440,11 @@ main (int argc, char *argv[])
   end:
 /* removing the origin DB */
     unlink ("clone_origin.sqlite");
+#endif
+
+    if (argc > 1 || argv[0] == NULL)
+	argc = 1;		/* silencing stupid compiler warnings */
+
     spatialite_shutdown ();
     return retcode;
 }

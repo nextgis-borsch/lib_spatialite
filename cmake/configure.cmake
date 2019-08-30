@@ -32,7 +32,7 @@ include(CheckCSourceCompiles)
 if(WIN32)
     set(TARGET_CPU "Win32")
     if (MSVC)
-        add_definitions(-D_CRT_SECURE_NO_WARNINGS -DDLL_EXPORT -DYY_NO_UNISTD_H)
+        add_definitions(-D_CRT_SECURE_NO_WARNINGS -DYY_NO_UNISTD_H)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /fp:precise /Ox")
         if(CMAKE_C_FLAGS MATCHES "/W[0-4]")
             string(REGEX REPLACE "/W[0-4]" "/W3"

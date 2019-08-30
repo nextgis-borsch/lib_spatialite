@@ -54,6 +54,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
 int
 main (int argc, char *argv[])
 {
+#ifndef OMIT_ICONV		/* only if ICONV is enabled */
     sqlite3 *db_handle = NULL;
     int ret;
     char *err_msg = NULL;
@@ -65,9 +66,6 @@ main (int argc, char *argv[])
     char *table;
     char *sql;
     void *cache = spatialite_alloc_connection ();
-
-    if (argc > 1 || argv[0] == NULL)
-	argc = 1;		/* silencing stupid compiler warnings */
 
     ret =
 	sqlite3_open_v2 (":memory:", &db_handle,
@@ -104,7 +102,7 @@ main (int argc, char *argv[])
 
     sql =
 	sqlite3_mprintf
-	("create VIRTUAL TABLE %s USING VirtualXL(\"testcase1.xls\");", table);
+	("create VIRTUAL TABLE %s USING VirtualXL('testcase1.xls');", table);
     ret = sqlite3_exec (db_handle, sql, NULL, NULL, &err_msg);
     sqlite3_free (sql);
     if (ret != SQLITE_OK)
@@ -115,7 +113,7 @@ main (int argc, char *argv[])
       }
 
     sql = sqlite3_mprintf ("select col_2, col_4, col_5, col_7, rowid "
-			   "from %s WHERE col_2 = \"Canal Creek\";", table);
+			   "from %s WHERE col_2 = 'Canal Creek';", table);
     ret =
 	sqlite3_get_table (db_handle, sql, &results, &rows, &columns, &err_msg);
     sqlite3_free (sql);
@@ -167,12 +165,11 @@ main (int argc, char *argv[])
     sqlite3_free (table);
 #endif /* end FreeXL conditional */
 
-#ifndef OMIT_ICONV		/* only if ICONV is supported */
     table = sqlite3_mprintf ("shapetest_%s", suffix);
 
     sql =
 	sqlite3_mprintf
-	("create VIRTUAL TABLE %s USING VirtualShape(\"shapetest1\", UTF-8, 4326);",
+	("create VIRTUAL TABLE %s USING VirtualShape('shapetest1', UTF-8, 4326);",
 	 table);
     ret = sqlite3_exec (db_handle, sql, NULL, NULL, &err_msg);
     sqlite3_free (sql);
@@ -343,7 +340,6 @@ main (int argc, char *argv[])
       }
 
     sqlite3_free (table);
-#endif /* end ICONV conditional */
 
     sqlite3_close (db_handle);
     spatialite_cleanup_ex (cache);
@@ -373,7 +369,7 @@ main (int argc, char *argv[])
 
     sql =
 	sqlite3_mprintf
-	("create VIRTUAL TABLE %s USING VirtualNetwork(\"roads_net_data\");",
+	("create VIRTUAL TABLE %s USING VirtualNetwork('roads_net_data');",
 	 table);
     ret = sqlite3_exec (db_handle, sql, NULL, NULL, &err_msg);
     sqlite3_free (sql);
@@ -446,6 +442,11 @@ main (int argc, char *argv[])
       }
 
     free (suffix);
+
+#endif /* end ICONV */
+
+    if (argc > 1 || argv[0] == NULL)
+	argc = 1;		/* silencing stupid compiler warnings */
 
     spatialite_shutdown ();
     return 0;

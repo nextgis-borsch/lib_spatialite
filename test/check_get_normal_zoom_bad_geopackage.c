@@ -101,7 +101,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
       }
     ret =
 	sqlite3_exec (db_handle,
-		      "INSERT INTO gpkg_tile_matrix VALUES (\"test1_matrix_tiles\", \"foo\", 1, 1)",
+		      "INSERT INTO gpkg_tile_matrix VALUES ('test1_matrix_tiles', 'foo', 1, 1)",
 		      NULL, NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
@@ -113,7 +113,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
 
     ret =
 	sqlite3_get_table (db_handle,
-			   "SELECT gpkgGetNormalZoom(\"test1_matrix_tiles\", 0)",
+			   "SELECT gpkgGetNormalZoom('test1_matrix_tiles', 0)",
 			   &results, &rows, &columns, &err_msg);
     if (ret != SQLITE_ERROR)
       {

@@ -3,7 +3,7 @@
 # Purpose:  CMake build scripts
 # Author:   Dmitry Baryshnikov, <dmitry.baryshnikov@nextgis.com>
 ################################################################################
-# Copyright (C) 2017, NextGIS <info@nextgis.com>
+# Copyright (C) 2017-2019, NextGIS <info@nextgis.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -76,6 +76,17 @@ set(CSOURCES srs_init.c
 	epsg_inlined_44.c
 	epsg_inlined_45.c
 	epsg_inlined_46.c
+	epsg_inlined_47.c
+	epsg_inlined_48.c
+	epsg_inlined_49.c
+	epsg_inlined_50.c
+	epsg_inlined_51.c
+	epsg_inlined_52.c
+	epsg_inlined_53.c
+	epsg_inlined_54.c
+	epsg_inlined_55.c
+	epsg_inlined_56.c
+	epsg_inlined_57.c
 	epsg_inlined_wgs84_00.c
 	epsg_inlined_wgs84_01.c
 	epsg_inlined_prussian.c

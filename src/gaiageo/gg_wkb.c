@@ -1071,6 +1071,83 @@ ParseWkbGeometry (gaiaGeomCollPtr geo, int isWKB)
       }
 }
 
+static gaiaGeomCollPtr
+doParseTinyPointBlob (const unsigned char *blob, unsigned int size)
+{
+/* decoding from SpatiaLite TinyPoint BLOB to GEOMETRY */
+    unsigned char pointType;
+    int type;
+    int little_endian;
+    int endian_arch = gaiaEndianArch ();
+    gaiaGeomCollPtr geo = NULL;
+
+    if (size < 24)
+	return NULL;		/* cannot be an internal BLOB TinyPoint geometry */
+    if (*(blob + 0) != GAIA_MARK_START)
+	return NULL;		/* failed to recognize START signature */
+    if (*(blob + (size - 1)) != GAIA_MARK_END)
+	return NULL;		/* failed to recognize END signature */
+    if (*(blob + 1) == GAIA_TINYPOINT_LITTLE_ENDIAN)
+	little_endian = 1;
+    else if (*(blob + 1) == GAIA_TINYPOINT_BIG_ENDIAN)
+	little_endian = 0;
+    else
+	return NULL;		/* unknown encoding; nor little-endian neither big-endian */
+
+    pointType = *(blob + 6);
+    geo = gaiaAllocGeomColl ();
+    geo->Srid = gaiaImport32 (blob + 2, little_endian, endian_arch);
+    geo->endian_arch = (char) endian_arch;
+    geo->endian = (char) little_endian;
+    geo->blob = blob;
+    geo->size = size;
+    geo->offset = 7;
+    switch (pointType)
+      {
+	  /* setting up DimensionModel */
+      case GAIA_TINYPOINT_XYZ:
+	  type = GAIA_POINTZ;
+	  geo->DimensionModel = GAIA_XY_Z;
+	  break;
+      case GAIA_TINYPOINT_XYM:
+	  type = GAIA_POINTM;
+	  geo->DimensionModel = GAIA_XY_M;
+	  break;
+      case GAIA_TINYPOINT_XYZM:
+	  type = GAIA_POINTZM;
+	  geo->DimensionModel = GAIA_XY_Z_M;
+	  break;
+      default:
+	  type = GAIA_POINT;
+	  geo->DimensionModel = GAIA_XY;
+	  break;
+      };
+    switch (type)
+      {
+	  /* parsing elementary geometries */
+      case GAIA_POINT:
+	  ParseWkbPoint (geo);
+	  break;
+      case GAIA_POINTZ:
+	  ParseWkbPointZ (geo);
+	  break;
+      case GAIA_POINTM:
+	  ParseWkbPointM (geo);
+	  break;
+      case GAIA_POINTZM:
+	  ParseWkbPointZM (geo);
+	  break;
+      default:
+	  break;
+      };
+    geo->MinX = geo->FirstPoint->X;
+    geo->MinY = geo->FirstPoint->Y;
+    geo->MaxX = geo->FirstPoint->X;
+    geo->MaxY = geo->FirstPoint->Y;
+    geo->DeclaredType = GAIA_POINT;
+    return geo;
+}
+
 GAIAGEO_DECLARE gaiaGeomCollPtr
 gaiaFromSpatiaLiteBlobWkbEx (const unsigned char *blob, unsigned int size,
 			     int gpkg_mode, int gpkg_amphibious)
@@ -1095,6 +1172,16 @@ gaiaFromSpatiaLiteBlobWkbEx (const unsigned char *blob, unsigned int size,
 #else
 	  ;
 #endif /* end GEOPACKAGE: supporting GPKG geometries */
+      }
+
+    if (size == 24 || size == 32 || size == 40)
+      {
+	  /* testing for a possible TinyPoint BLOB */
+	  if (*(blob + 0) == GAIA_MARK_START &&
+	      (*(blob + 1) == GAIA_TINYPOINT_LITTLE_ENDIAN
+	       || *(blob + 1) == GAIA_TINYPOINT_BIG_ENDIAN)
+	      && *(blob + (size - 1)) == GAIA_MARK_END)
+	      return doParseTinyPointBlob (blob, size);
       }
 
     if (size < 45)
@@ -1317,6 +1404,45 @@ gaiaFromSpatiaLiteBlobWkb (const unsigned char *blob, unsigned int size)
     return gaiaFromSpatiaLiteBlobWkbEx (blob, size, 0, 0);
 }
 
+static gaiaGeomCollPtr
+doParseTinyPointBlobMbr (const unsigned char *blob, unsigned int size)
+{
+/* decoding from SpatiaLite TinyPoint BLOB (MBR only) */
+    int little_endian;
+    int endian_arch = gaiaEndianArch ();
+    double x;
+    double y;
+    gaiaGeomCollPtr geo = NULL;
+    gaiaPolygonPtr polyg;
+    gaiaRingPtr ring;
+
+    if (size < 24)
+	return NULL;		/* cannot be an internal BLOB TinyPoint geometry */
+    if (*(blob + 0) != GAIA_MARK_START)
+	return NULL;		/* failed to recognize START signature */
+    if (*(blob + (size - 1)) != GAIA_MARK_END)
+	return NULL;		/* failed to recognize END signature */
+    if (*(blob + 1) == GAIA_TINYPOINT_LITTLE_ENDIAN)
+	little_endian = 1;
+    else if (*(blob + 1) == GAIA_TINYPOINT_BIG_ENDIAN)
+	little_endian = 0;
+    else
+	return NULL;		/* unknown encoding; nor little-endian neither big-endian */
+
+    x = gaiaImport64 (blob + 7, little_endian, endian_arch);
+    y = gaiaImport64 (blob + 15, little_endian, endian_arch);
+
+    geo = gaiaAllocGeomColl ();
+    polyg = gaiaAddPolygonToGeomColl (geo, 5, 0);
+    ring = polyg->Exterior;
+    gaiaSetPoint (ring->Coords, 0, x, y);	/* vertex # 1 */
+    gaiaSetPoint (ring->Coords, 1, x, y);	/* vertex # 2 */
+    gaiaSetPoint (ring->Coords, 2, x, y);	/* vertex # 3 */
+    gaiaSetPoint (ring->Coords, 3, x, y);	/* vertex # 4 */
+    gaiaSetPoint (ring->Coords, 4, x, y);	/* vertex # 5 [same as vertex # 1 to close the polygon] */
+    return geo;
+}
+
 GAIAGEO_DECLARE gaiaGeomCollPtr
 gaiaFromSpatiaLiteBlobMbr (const unsigned char *blob, unsigned int size)
 {
@@ -1330,6 +1456,16 @@ gaiaFromSpatiaLiteBlobMbr (const unsigned char *blob, unsigned int size)
     gaiaGeomCollPtr geo = NULL;
     gaiaPolygonPtr polyg;
     gaiaRingPtr ring;
+
+    if (size == 24 || size == 32 || size == 40)
+      {
+	  /* testing for a possible TinyPoint BLOB */
+	  if (*(blob + 0) == GAIA_MARK_START &&
+	      (*(blob + 1) == GAIA_TINYPOINT_LITTLE_ENDIAN
+	       || *(blob + 1) == GAIA_TINYPOINT_BIG_ENDIAN)
+	      && *(blob + (size - 1)) == GAIA_MARK_END)
+	      return doParseTinyPointBlobMbr (blob, size);
+      }
     if (size < 45)
 	return NULL;		/* cannot be an internal BLOB WKB geometry */
     if (*(blob + 0) != GAIA_MARK_START)
@@ -1362,6 +1498,79 @@ gaiaFromSpatiaLiteBlobMbr (const unsigned char *blob, unsigned int size)
 GAIAGEO_DECLARE void
 gaiaToSpatiaLiteBlobWkbEx (gaiaGeomCollPtr geom, unsigned char **result,
 			   int *size, int gpkg_mode)
+{
+/* simply defaults to gaiaToSpatiaLiteBlobWkbEx2 tiny_point=FALSE */
+    gaiaToSpatiaLiteBlobWkbEx2 (geom, result, size, gpkg_mode, 0);
+}
+
+static void
+doEncodeTinyPointBlob (gaiaGeomCollPtr geom, unsigned char **result, int *size)
+{
+/* encoding a TinyPoint BLOB */
+    int sz;
+    unsigned char *blob;
+    unsigned char *ptr;
+    int endian_arch = gaiaEndianArch ();
+    gaiaPointPtr point = geom->FirstPoint;
+
+/* compunting the BLOB size */
+    if (geom->DimensionModel == GAIA_XY_Z)
+	sz = 32;
+    else if (geom->DimensionModel == GAIA_XY_M)
+	sz = 32;
+    else if (geom->DimensionModel == GAIA_XY_Z_M)
+	sz = 40;
+    else
+	sz = 24;
+/* allocating the BLOB */
+    blob = malloc (sz);
+    ptr = blob;
+/* and finally we build the BLOB */
+    *ptr = GAIA_MARK_START;	/* START signature */
+    ptr++;
+    *(ptr) = GAIA_TINYPOINT_LITTLE_ENDIAN;	/* byte ordering */
+    ptr++;
+    gaiaExport32 (ptr, geom->Srid, 1, endian_arch);	/* the SRID */
+    ptr += 4;
+    if (geom->DimensionModel == GAIA_XY_Z)
+	*ptr = GAIA_TINYPOINT_XYZ;
+    else if (geom->DimensionModel == GAIA_XY_M)
+	*ptr = GAIA_TINYPOINT_XYM;
+    else if (geom->DimensionModel == GAIA_XY_Z_M)
+	*ptr = GAIA_TINYPOINT_XYZM;
+    else
+	*ptr = GAIA_TINYPOINT_XY;
+    ptr++;
+    gaiaExport64 (ptr, point->X, 1, endian_arch);	/* X */
+    ptr += 8;
+    gaiaExport64 (ptr, point->Y, 1, endian_arch);	/* Y */
+    ptr += 8;
+    if (geom->DimensionModel == GAIA_XY_Z)
+      {
+	  gaiaExport64 (ptr, point->Z, 1, endian_arch);	/* Z */
+	  ptr += 8;
+      }
+    else if (geom->DimensionModel == GAIA_XY_M)
+      {
+	  gaiaExport64 (ptr, point->M, 1, endian_arch);	/* M */
+	  ptr += 8;
+      }
+    else if (geom->DimensionModel == GAIA_XY_Z_M)
+      {
+	  gaiaExport64 (ptr, point->Z, 1, endian_arch);	/* Z */
+	  ptr += 8;
+	  gaiaExport64 (ptr, point->M, 1, endian_arch);	/* M */
+	  ptr += 8;
+      }
+    *ptr = GAIA_MARK_END;	/* END signature */
+
+    *result = blob;
+    *size = sz;
+}
+
+GAIAGEO_DECLARE void
+gaiaToSpatiaLiteBlobWkbEx2 (gaiaGeomCollPtr geom, unsigned char **result,
+			    int *size, int gpkg_mode, int tiny_point)
 {
 /* builds the SpatiaLite BLOB representation for this GEOMETRY */
     int ib;
@@ -1420,10 +1629,20 @@ gaiaToSpatiaLiteBlobWkbEx (gaiaGeomCollPtr geom, unsigned char **result,
 	  n_polygons++;
 	  pg = pg->Next;
       }
+
     *size = 0;
     *result = NULL;
     if (n_points == 0 && n_polygons == 0 && n_linestrings == 0)
 	return;
+    if (n_points == 1 && n_linestrings == 0 && n_polygons == 0 && entities == 1
+	&& geom->DeclaredType != GAIA_MULTIPOINT
+	&& geom->DeclaredType != GAIA_GEOMETRYCOLLECTION && tiny_point)
+      {
+	  /* using the TinyPoint BLOB encoding */
+	  doEncodeTinyPointBlob (geom, result, size);
+	  return;
+      }
+
 /* ok, we can determine the geometry class */
     if (n_points == 1 && n_linestrings == 0 && n_polygons == 0)
       {

@@ -92,7 +92,7 @@ main (int argc UNUSED, char *argv[]UNUSED)
     /* now do the query */
     ret =
 	sqlite3_get_table (db_handle,
-			   "SELECT gpkgGetNormalRow(\"test1_matrix_tiles\", 0, 0)",
+			   "SELECT gpkgGetNormalRow('test1_matrix_tiles', 0, 0)",
 			   &results, &rows, &columns, &err_msg);
     if (ret != SQLITE_ERROR)
       {
