@@ -4,7 +4,7 @@
 # Author:   Alexander Lisovenko, alexander.lisovenko@nexgis.com
 # Author:   Dmitry Baryshnikov, <dmitry.baryshnikov@nextgis.com>
 ################################################################################
-# Copyright (C) 2016-2019, NextGIS <info@nextgis.com>
+# Copyright (C) 2016-2020, NextGIS <info@nextgis.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
