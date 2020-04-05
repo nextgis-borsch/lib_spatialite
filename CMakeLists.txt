@@ -75,7 +75,7 @@ if(OSX_FRAMEWORK)
 endif()
 report_version(${PROJECT_NAME} ${VERSION})
 
-if(CMAKE_GENERATOR_TOOLSET MATCHES "v([0-9]+)_xp")
+if(MSVC AND CMAKE_GENERATOR_TOOLSET MATCHES "v([0-9]+)_xp")
     add_definitions(-D_WIN32_WINNT=0x0501)
 endif()
 #------------------------------------------------------------------------------
