@@ -26,7 +26,6 @@
 ################################################################################
 remove_definitions(-D_ANSI_SOURCE)
 
-include(FindAnyProject)
 find_anyproject(Qt4 REQUIRED COMPONENTS QtCore QtSql)
 
 add_definitions(-DQT_BUILD_SQL_LIB -DQT_PLUGIN -DQT_NO_DEBUG -DQT_SHARED)
