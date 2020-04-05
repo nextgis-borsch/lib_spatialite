@@ -162,6 +162,8 @@ endif()
 
 option(ENABLE_RTTOPO "Should be defined in order to enable RTTOPO support." OFF)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 include(configure)
 
 include(CheckCXXCompilerFlag)
