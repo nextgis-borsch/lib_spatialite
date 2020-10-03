@@ -3,8 +3,8 @@
 # Purpose:  CMake build scripts
 # Author:   Dmitry Baryshnikov, polimax@mail.ru
 ################################################################################
-# Copyright (C) 2015-2019, NextGIS <info@nextgis.com>
-# Copyright (C) 2015-2019 Dmitry Baryshnikov
+# Copyright (C) 2015-2020, NextGIS <info@nextgis.com>
+# Copyright (C) 2015-2020 Dmitry Baryshnikov
 #
 # This script is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -68,6 +68,20 @@ function(get_binary_package url repo repo_type repo_id exact_version is_static d
                         continue()
                     endif()
                 endif()
+
+                if(NOT ANDROID)
+                    string(FIND ${api_request.files_${asset_id}.name} "android-" IS_FOUND_OS)
+                    if(IS_FOUND_OS GREATER 0)
+                        continue()
+                    endif()
+                endif()
+            
+                if(IOS)
+                    string(FIND ${api_request.files_${asset_id}.name} "ios-" IS_FOUND_OS)
+                    if(IS_FOUND_OS GREATER 0)
+                        continue()
+                    endif()
+                endif()
             endif()
             if(IS_FOUND GREATER 0)
                 color_message("Found binary package ${api_request.assets_${asset_id}.browser_download_url}")
@@ -103,12 +117,27 @@ function(get_binary_package url repo repo_type repo_id exact_version is_static d
         foreach(asset_id ${api_request.files})
             string(FIND ${api_request.files_${asset_id}.name} "${STATIC_PREFIX}${COMPILER}.zip" IS_FOUND)
             # In this case we get static and shared. Add one more check.
+            if(NOT ANDROID)
+                string(FIND ${api_request.files_${asset_id}.name} "android-" IS_FOUND_OS)
+                if(IS_FOUND_OS GREATER 0)
+                    continue()
+                endif()
+            endif()
+                
+            if(IOS)
+                string(FIND ${api_request.files_${asset_id}.name} "ios-" IS_FOUND_OS)
+                if(IS_FOUND_OS GREATER 0)
+                    continue()
+                endif()
+            endif()
+
             if(NOT is_static)
                 string(FIND ${api_request.files_${asset_id}.name} "static-${COMPILER}.zip" IS_FOUND_STATIC)
                 if(IS_FOUND_STATIC GREATER 0)
                     continue()
                 endif()
             endif()
+
             if(IS_FOUND GREATER 0)
                 color_message("Found binary package ${api_request.files_${asset_id}.name}")
                 set(${download_url} ${url}/api/asset/${api_request.files_${asset_id}.id}/download PARENT_SCOPE)
@@ -219,13 +248,17 @@ function(find_extproject name)
             set(FIND_PROJECT_ARG ${FIND_PROJECT_ARG} NAMES ${find_extproject_NAMES})
         endif()
 
-        find_package(${name} NO_MODULE ${FIND_PROJECT_ARG})
-        
+        find_package(${name} NO_MODULE ${FIND_PROJECT_ARG})       
+
         set(${UPPER_NAME}_FOUND ${${UPPER_NAME}_FOUND} PARENT_SCOPE)
         set(${UPPER_NAME}_VERSION ${${UPPER_NAME}_VERSION} PARENT_SCOPE)
         set(${UPPER_NAME}_VERSION_STR ${${UPPER_NAME}_VERSION_STR} PARENT_SCOPE)
         set(${UPPER_NAME}_LIBRARIES ${${UPPER_NAME}_LIBRARIES} PARENT_SCOPE)
         set(${UPPER_NAME}_INCLUDE_DIRS ${${UPPER_NAME}_INCLUDE_DIRS} PARENT_SCOPE)
+
+        if (${UPPER_NAME} STREQUAL "QT5")
+            set(Qt5Sql_PRIVATE_INCLUDE_DIRS ${Qt5Sql_PRIVATE_INCLUDE_DIRS} PARENT_SCOPE)
+        endif() 
 
         foreach(TARGETG ${${UPPER_NAME}_LIBRARIES})
             if(TARGET ${TARGETG})
@@ -517,6 +550,7 @@ function(find_extproject name)
             endif()
         endforeach()
     endif()
+    
 
     set(${UPPER_NAME}_FOUND ${${UPPER_NAME}_FOUND} PARENT_SCOPE)
     set(${UPPER_NAME}_VERSION ${${UPPER_NAME}_VERSION} PARENT_SCOPE)

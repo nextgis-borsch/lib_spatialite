@@ -178,8 +178,8 @@ set(PACKAGE_NAME ${PROJECT_NAME})
 string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
 
 add_subdirectory(src)
-if(BUILD_QT4)
-    add_subdirectory(qt4)
+if(BUILD_QT5)
+    add_subdirectory(qt5)
 endif()
 
 enable_testing()
