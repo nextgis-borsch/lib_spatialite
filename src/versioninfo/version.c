@@ -1,7 +1,7 @@
 /*
  version.c -- Gaia spatial support for SQLite
 
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
  Author: Sandro Furieri a.furieri@lqt.it
 
  ------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -51,8 +51,17 @@ the terms of any one of the MPL, the GPL or the LGPL.
 
 #include <spatialite.h>
 
-const char spatialiteversion[] = VERSION;
-const char spatialitetargetcpu[] = TARGET_CPU;
+const char spatialiteversion[] = SPATIALITE_VERSION;
+
+#if defined(_WIN32) && !defined(__MINGW32__)
+#ifdef _WIN64
+const char spatialitetargetcpu[] = "Windows_64bit";
+#else
+const char spatialitetargetcpu[] = "Windows_32bit";
+#endif
+#else
+const char spatialitetargetcpu[] = SPATIALITE_TARGET_CPU;
+#endif
 
 SPATIALITE_DECLARE const char *
 spatialite_version (void)

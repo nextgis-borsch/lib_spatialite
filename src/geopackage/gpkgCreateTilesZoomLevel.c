@@ -39,13 +39,18 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include <math.h>
 
 #include "spatialite/geopackage.h"
-#include "config.h"
 #include "geopackage_internal.h"
+
+#if defined(_WIN32) && !defined(__MINGW32__)
+#include "config-msvc.h"
+#else
+#include "config.h"
+#endif
 
 #ifdef ENABLE_GEOPACKAGE
 GEOPACKAGE_PRIVATE void
-fnct_gpkgCreateTilesZoomLevel (sqlite3_context * context, int argc
-			       __attribute__ ((unused)), sqlite3_value ** argv)
+fnct_gpkgCreateTilesZoomLevel (sqlite3_context * context, int argc,
+			       sqlite3_value ** argv)
 {
 /* SQL function:
 / gpkgCreateTilesZoomLevel(table_name, zoom_level, extent_width, extent_height)
@@ -69,6 +74,9 @@ fnct_gpkgCreateTilesZoomLevel (sqlite3_context * context, int argc
     sqlite3 *sqlite = NULL;
     char *errMsg = NULL;
     int ret = 0;
+
+    if (argc == 0)
+	argc = 0;		/* suppressing stupid compiler warnings */
 
     if (sqlite3_value_type (argv[0]) != SQLITE_TEXT)
       {
@@ -130,12 +138,13 @@ fnct_gpkgCreateTilesZoomLevel (sqlite3_context * context, int argc
     columns = pow (2, zoomlevel);
     rows = columns;
 
-    sql_stmt = sqlite3_mprintf ("INSERT INTO gpkg_tile_matrix"
-				"(table_name, zoom_level, matrix_width, matrix_height, tile_width, tile_height, pixel_x_size, pixel_y_size)"
-				"VALUES (%Q, %i, %i, %i, %i, %i, %g, %g)",
-				table, zoomlevel, columns, rows, tilesize,
-				tilesize, extent_width / (tilesize * columns),
-				extent_height / (tilesize * rows));
+    sql_stmt =
+	sqlite3_mprintf ("INSERT INTO gpkg_tile_matrix"
+			 "(table_name, zoom_level, matrix_width, matrix_height, tile_width, tile_height, pixel_x_size, pixel_y_size)"
+			 "VALUES (%Q, %i, %i, %i, %i, %i, %g, %g)", table,
+			 zoomlevel, columns, rows, tilesize, tilesize,
+			 extent_width / (tilesize * columns),
+			 extent_height / (tilesize * rows));
     ret = sqlite3_exec (sqlite, sql_stmt, NULL, NULL, &errMsg);
     sqlite3_free (sql_stmt);
     if (ret != SQLITE_OK)

@@ -2,7 +2,7 @@
 
  stored_procedures.c -- SpatiaLite Stored Procedures support
 
- version 4.5, 2017 October 22
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2017
+Portions created by the Initial Developer are Copyright (C) 2017-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -614,7 +614,11 @@ gaia_sql_proc_import (const void *cache, const char *filepath,
     stored_proc_reset_error (cache);
 
 /* opening the input file */
+#ifdef _WIN32
+    in = gaia_win_fopen (filepath, "rb");
+#else
     in = fopen (filepath, "rb");
+#endif
     if (in == NULL)
       {
 	  char *errmsg = sqlite3_mprintf ("Unable to open: %s\n", filepath);
@@ -1263,7 +1267,7 @@ gaia_stored_proc_create_tables (sqlite3 * handle, const void *cache)
 
 /* creating Triggers supporting STORED_PROCEDURES */
     sprintf (sql,
-	     "CREATE TRIGGER storproc_ins BEFORE INSERT ON stored_procedures\n"
+	     "CREATE TRIGGER IF NOT EXISTS storproc_ins BEFORE INSERT ON stored_procedures\n"
 	     "FOR EACH ROW BEGIN\n"
 	     "SELECT RAISE(ROLLBACK, 'Invalid \"sql_proc\": not a BLOB of the SQL Procedure type')\n"
 	     "WHERE SqlProc_IsValid(NEW.sql_proc) <> 1;\nEND");
@@ -1278,7 +1282,7 @@ gaia_stored_proc_create_tables (sqlite3 * handle, const void *cache)
 	  return 0;
       }
     sprintf (sql,
-	     "CREATE TRIGGER storproc_upd BEFORE UPDATE OF sql_proc ON stored_procedures\n"
+	     "CREATE TRIGGER IF NOT EXISTS storproc_upd BEFORE UPDATE OF sql_proc ON stored_procedures\n"
 	     "FOR EACH ROW BEGIN\n"
 	     "SELECT RAISE(ROLLBACK, 'Invalid \"sql_proc\": not a BLOB of the SQL Procedure type')\n"
 	     "WHERE SqlProc_IsValid(NEW.sql_proc) <> 1;\nEND");
@@ -2057,6 +2061,7 @@ do_open_new_connection (sqlite3 * origin, void *cache)
 	  sqlite3_close (handle);
 	  return NULL;
       }
+    sqlite3_enable_load_extension (handle, 1);
     spatialite_internal_init (handle, cache);
     return handle;
 }
@@ -2448,9 +2453,17 @@ gaia_sql_proc_logfile (const void *ctx, const char *filepath, int append)
 
 /* attempting to enable the Logfile */
     if (append)
+#ifdef _WIN32
+	log = gaia_win_fopen (filepath, "ab");
+#else
 	log = fopen (filepath, "ab");
+#endif
     else
+#ifdef _WIN32
+	log = gaia_win_fopen (filepath, "wb");
+#else
 	log = fopen (filepath, "wb");
+#endif
     if (log == NULL)
 	return 0;
 

@@ -208,6 +208,9 @@
 /* Define to the version of this package. */
 #cmakedefine PACKAGE_VERSION "@PACKAGE_VERSION@"
 
+/* Define to the spatialite version. */
+#define SPATIALITE_VERSION "@PACKAGE_VERSION@"
+
 /* Should be defined in order to enable PROJ.6 support. */
 #cmakedefine PROJ_NEW
 

@@ -2,7 +2,7 @@
 
  gg_geoJSON.c -- GeoJSON parser/lexer 
   
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2011-2015
+Portions created by the Initial Developer are Copyright (C) 2011-2021
 the Initial Developer. All Rights Reserved.
 
 Alternatively, the contents of this file may be used under the terms of
@@ -1440,7 +1440,7 @@ geoJSONnormalize (const char *dirty)
 		if (geoJSONcheckGeomCollType (dirty, i + 6))
 		    i_type = i;
 	    }
-  }
+      }
 
     for (i = 0; i < len; i++)
       {
@@ -1466,8 +1466,8 @@ geoJSONnormalize (const char *dirty)
 	      && strncmp (dirty + i, "\"bbox\"", 6) == 0)
 	      i_bbox = i;
       }
-      if (i_geometries >= 0)
-      i_coordinates = i_geometries;
+    if (i_geometries >= 0)
+	i_coordinates = i_geometries;
     n_type = geoJSONlen (i_type, i_coordinates, i_crs, i_bbox, i_end, len);
     n_coordinates =
 	geoJSONlen (i_coordinates, i_type, i_crs, i_bbox, i_end, len);

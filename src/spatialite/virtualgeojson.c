@@ -2,7 +2,7 @@
 
  virtualgeojson.c -- SQLite3 extension [VIRTUAL TABLE GeoJson]
 
- version 5.0, 2018 December 12
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2016
+Portions created by the Initial Developer are Copyright (C) 2016-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -60,7 +60,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
 
 #include <spatialite/gaiaaux.h>
 #include <spatialite.h>
-#include <spatialite/spatialite.h>
+#include <spatialite/spatialite_ext.h>
 #include <spatialite/geojson.h>
 
 #ifdef _WIN32
@@ -2349,7 +2349,11 @@ vgeojson_create (sqlite3 * db, void *pAux, int argc, const char *const *argv,
     p_vt->MaxY = -DBL_MAX;
 
 /* attempting to open the GeoJSON file for reading */
+#ifdef _WIN32
+    in = gaia_win_fopen (path, "rb");
+#else
     in = fopen (path, "rb");
+#endif
     if (in == NULL)
       {
 	  error_message =
@@ -2918,6 +2922,16 @@ vgeojson_eval_constraints (VirtualGeoJsonCursorPtr cursor)
 	  if (pC->iColumn == 0)
 	    {
 		/* the PRIMARY KEY column */
+		if (pC->op == SQLITE_INDEX_CONSTRAINT_ISNULL)
+		  {
+		      ok = 0;
+		      goto done;
+		  }
+		if (pC->op == SQLITE_INDEX_CONSTRAINT_ISNOTNULL)
+		  {
+		      ok = 1;
+		      goto done;
+		  }
 		if (pC->valueType == 'I')
 		  {
 		      switch (pC->op)
@@ -2942,10 +2956,40 @@ vgeojson_eval_constraints (VirtualGeoJsonCursorPtr cursor)
 			    if (cursor->current_fid >= pC->intValue)
 				ok = 1;
 			    break;
+			case SQLITE_INDEX_CONSTRAINT_NE:
+			    if (cursor->current_fid != pC->intValue)
+				ok = 1;
+			    break;
 			};
 		  }
 		goto done;
 	    }
+	  if (pC->iColumn == 1)
+	    {
+		/* the Geometry column */
+		if (cursor->Feature != NULL)
+		  {
+		      switch (pC->op)
+			{
+			case SQLITE_INDEX_CONSTRAINT_ISNULL:
+			    if (cursor->Feature->geometry == NULL)
+				ok = 1;
+			    break;
+			case SQLITE_INDEX_CONSTRAINT_ISNOTNULL:
+			    if (cursor->Feature->geometry != NULL)
+				ok = 1;
+			    break;
+			};
+
+		  }
+		else
+		  {
+		      if (pC->op == SQLITE_INDEX_CONSTRAINT_ISNULL)
+			  ok = 1;
+		  }
+		goto done;
+	    }
+	  /* any other ordinary column */
 	  nCol = 2;
 	  col = cursor->pVtab->Parser->first_col;
 	  while (col)
@@ -2968,6 +3012,19 @@ vgeojson_eval_constraints (VirtualGeoJsonCursorPtr cursor)
 		      col = col->next;
 		      continue;
 		  }
+		switch (pC->op)
+		  {
+		  case SQLITE_INDEX_CONSTRAINT_ISNULL:
+		      if (prop->type == GEOJSON_NULL)
+			  ok = 1;
+		      break;
+		  case SQLITE_INDEX_CONSTRAINT_ISNOTNULL:
+		      if (prop->type != GEOJSON_NULL)
+			  ok = 1;
+		      break;
+		  };
+		if (ok)
+		    break;
 		switch (prop->type)
 		  {
 		  case GEOJSON_INTEGER:
@@ -2993,6 +3050,10 @@ vgeojson_eval_constraints (VirtualGeoJsonCursorPtr cursor)
 				  break;
 			      case SQLITE_INDEX_CONSTRAINT_GE:
 				  if (prop->int_value >= pC->intValue)
+				      ok = 1;
+				  break;
+			      case SQLITE_INDEX_CONSTRAINT_NE:
+				  if (prop->int_value != pC->intValue)
 				      ok = 1;
 				  break;
 			      };
@@ -3023,6 +3084,10 @@ vgeojson_eval_constraints (VirtualGeoJsonCursorPtr cursor)
 				  if (prop->dbl_value >= pC->intValue)
 				      ok = 1;
 				  break;
+			      case SQLITE_INDEX_CONSTRAINT_NE:
+				  if (prop->dbl_value != pC->intValue)
+				      ok = 1;
+				  break;
 			      };
 			}
 		      if (pC->valueType == 'D')
@@ -3047,6 +3112,10 @@ vgeojson_eval_constraints (VirtualGeoJsonCursorPtr cursor)
 				  break;
 			      case SQLITE_INDEX_CONSTRAINT_GE:
 				  if (prop->dbl_value >= pC->dblValue)
+				      ok = 1;
+				  break;
+			      case SQLITE_INDEX_CONSTRAINT_NE:
+				  if (prop->dbl_value != pC->dblValue)
 				      ok = 1;
 				  break;
 			      }
@@ -3077,6 +3146,10 @@ vgeojson_eval_constraints (VirtualGeoJsonCursorPtr cursor)
 				  break;
 			      case SQLITE_INDEX_CONSTRAINT_GE:
 				  if (ret >= 0)
+				      ok = 1;
+				  break;
+			      case SQLITE_INDEX_CONSTRAINT_NE:
+				  if (ret != 0)
 				      ok = 1;
 				  break;
 #ifdef HAVE_DECL_SQLITE_INDEX_CONSTRAINT_LIKE

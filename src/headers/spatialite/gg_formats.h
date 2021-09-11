@@ -1,7 +1,7 @@
 /*
  gg_formats.h -- Gaia common support for geometries: formats
   
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -23,7 +23,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -1689,7 +1689,7 @@ extern "C"
  \param charFrom GNU ICONV name identifying the input charset encoding.
  \param charTo GNU ICONV name identifying the output charset encoding.
 
- \sa gaiaAllocDbf, gaiaFreeDbf, gaiaOpenDbfWrite,
+ \sa gaiaAllocDbf, gaiaFreeDbf, gaiaOpenDbfWrite, gaiaOpenZipDbf,
  gaiaReadDbfEntity, gaiaWriteDbfEntity, gaiaFlushDbfHeader
 
  \note on failure the object member \e Valid will be set to 0; and the
@@ -1699,6 +1699,28 @@ extern "C"
 					  const char *path,
 					  const char *charFrom,
 					  const char *charTo);
+
+/**
+ Open a DBF File contained within a Zipfile (just for checking its fields)
+
+ \param zip_path path of the Zipfile.
+ \param filename filename of the DB file within the Zipfile.
+ \param charFrom GNU ICONV name identifying the input charset encoding.
+ \param charTo GNU ICONV name identifying the output charset encoding.
+ 
+ \return dbf pointer to the DBF File object. NULL on error.
+
+ \sa gaiaAllocDbf, gaiaFreeDbf, gaiaOpenDbfWrite,
+ gaiaReadDbfEntity, gaiaWriteDbfEntity, gaiaFlushDbfHeader
+ 
+ \note you are responsible to destroy (before or after) any allocated DBF File.
+ \n you should phisically open the DBF File in \e read or \e write mode
+ before performing any actual I/O operation.
+ */
+    GAIAGEO_DECLARE gaiaDbfPtr gaiaOpenZipDbf (const char *zip_path,
+					       const char *filename,
+					       const char *charFrom,
+					       const char *charTo);
 
 /** 
  Open a DBF File in write mode,- extended
@@ -1821,6 +1843,94 @@ extern "C"
  */
     GAIAGEO_DECLARE void gaiaFlushDbfHeader (gaiaDbfPtr dbf);
 
+/**
+ Reads from a Memory File
+ 
+ \param ptr pointer to the output buffer.
+ \param bytes numeber of bytes to read.
+ \param mem pointer to the Memory File object.
+
+ \return the number of bytes read.
+
+ \sa gaiaMemFseek
+ */
+    GAIAGEO_DECLARE size_t gaiaMemRead (void *ptr, size_t bytes,
+					gaiaMemFilePtr mem);
+
+/**
+ Repositioning a Memory File
+ 
+ \param mem pointer to the Memry File object.
+ \param offset file offset relative to the start of file
+
+ \return 0 on success; -1 on failure.
+
+ \sa gaiaFseek
+ */
+    GAIAGEO_DECLARE int gaiaMemFseek (gaiaMemFilePtr mem, off_t offset);
+
+/**
+ Attempting to get a WKT from the .PRJ member of a given zipped Shapefile
+ 
+ \param zip_path absolute or relativ pathname leading to the Zipfile.
+ \param basename name of the Shapefile (excluding any .shp, .shx or .dbf suffix)
+
+ \return the returned WKT expression from the .prj member of the zipped Shapefile
+  or NULL on failure
+  
+ \note the WKT expression corresponds to dynamically allocated memory:
+ so you are responsible to free() it before or after.
+ */
+    GAIAGEO_DECLARE char *gaiaReadWktFromZipShp (const char *zip_path,
+						 const char *basename);
+
+/**
+ Will return the number of Shapefiles from within a given Zipfile
+ 
+ \param zip_path absolute or relativ pathname leading to the Zipfile.
+ \param count on success will contain the number of Shapefiles
+
+ \return 0 on failure; any other value on success.
+ */
+    GAIAGEO_DECLARE int gaiaZipfileNumSHP (const char *zip_path, int *count);
+
+/**
+ Will return the basename of the Nth Shapefile from within a given Zipfile
+ 
+ \param zip_path absolute or relativ pathname leading to the Zipfile.
+ \param idx index (1-based) of the Shapefile
+
+ \return the basename of the Nth Shapefile
+  or NULL on failure
+  
+ \note the returned basename corresponds to dynamically allocated memory:
+ so you are responsible to free() it before or after.
+ */
+    GAIAGEO_DECLARE char *gaiaZipfileShpN (const char *zip_path, int idx);
+
+/**
+ Will return the number of DBF files from within a given Zipfile
+ 
+ \param zip_path absolute or relativ pathname leading to the Zipfile.
+ \param count on success will contain the number of DBF files
+
+ \return 0 on failure; any other value on success.
+ */
+    GAIAGEO_DECLARE int gaiaZipfileNumDBF (const char *zip_path, int *count);
+
+/**
+ Will return the filename of the Nth DBF file from within a given Zipfile
+ 
+ \param zip_path absolute or relativ pathname leading to the Zipfile.
+ \param idx index (1-based) of the DBF file
+
+ \return the filename of the Nth DBF file
+  or NULL on failure
+  
+ \note the returned filename corresponds to dynamically allocated memory:
+ so you are responsible to free() it before or after.
+ */
+    GAIAGEO_DECLARE char *gaiaZipfileDbfN (const char *zip_path, int idx);
 
 
 #ifndef OMIT_ICONV		/* ICONV enabled: supporting text reader */

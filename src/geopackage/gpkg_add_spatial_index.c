@@ -40,13 +40,18 @@ the terms of any one of the MPL, the GPL or the LGPL.
 
 #include "spatialite/geopackage.h"
 #include "spatialite/gaiaaux.h"
-#include "config.h"
 #include "geopackage_internal.h"
+
+#if defined(_WIN32) && !defined(__MINGW32__)
+#include "config-msvc.h"
+#else
+#include "config.h"
+#endif
 
 #ifdef ENABLE_GEOPACKAGE
 GEOPACKAGE_PRIVATE void
-fnct_gpkgAddSpatialIndex (sqlite3_context * context, int argc
-			  __attribute__ ((unused)), sqlite3_value ** argv)
+fnct_gpkgAddSpatialIndex (sqlite3_context * context, int argc,
+			  sqlite3_value ** argv)
 {
 /* SQL function:
 / gpkgAddSpatialIndex(table, column)
@@ -115,6 +120,9 @@ fnct_gpkgAddSpatialIndex (sqlite3_context * context, int argc
 	NULL
     };
 
+    if (argc == 0)
+	argc = 0;		/* suppressing stupid compiler warnings */
+
     if (sqlite3_value_type (argv[0]) != SQLITE_TEXT)
       {
 	  sqlite3_result_error (context,
@@ -180,9 +188,10 @@ fnct_gpkgAddSpatialIndex (sqlite3_context * context, int argc
       }
 
 /* creating the R*Tree Virtual Table */
-    sql_stmt = sqlite3_mprintf ("CREATE VIRTUAL TABLE \"rtree_%s_%s\" "
-				"USING rtree(id, minx, maxx, miny, maxy)",
-				xtable, xcolumn);
+    sql_stmt =
+	sqlite3_mprintf ("CREATE VIRTUAL TABLE \"rtree_%s_%s\" "
+			 "USING rtree(id, minx, maxx, miny, maxy)", xtable,
+			 xcolumn);
     ret = sqlite3_exec (sqlite, sql_stmt, NULL, NULL, &errMsg);
     sqlite3_free (sql_stmt);
     if (ret != SQLITE_OK)
@@ -197,11 +206,12 @@ fnct_gpkgAddSpatialIndex (sqlite3_context * context, int argc
     free (xcolumn);
 
 /* registering the GPKG extensions */
-    sql_stmt = sqlite3_mprintf ("INSERT INTO gpkg_extensions "
-				"(table_name, column_name, extension_name, definition, scope) "
-				"VALUES (Lower(%Q), Lower(%Q), 'gpkg_rtree_index', "
-				"'GeoPackage 1.0 Specification Annex L', 'write-only')",
-				table, column);
+    sql_stmt =
+	sqlite3_mprintf ("INSERT INTO gpkg_extensions "
+			 "(table_name, column_name, extension_name, definition, scope) "
+			 "VALUES (Lower(%Q), Lower(%Q), 'gpkg_rtree_index', "
+			 "'GeoPackage 1.0 Specification Annex L', 'write-only')",
+			 table, column);
     ret = sqlite3_exec (sqlite, sql_stmt, NULL, NULL, &errMsg);
     sqlite3_free (sql_stmt);
     if (ret != SQLITE_OK)

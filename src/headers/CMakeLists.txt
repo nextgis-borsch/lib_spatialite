@@ -43,7 +43,6 @@ set(SPL_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/spatialite/gg_xml.h
 	${CMAKE_CURRENT_SOURCE_DIR}/spatialite/gg_wfs.h
 	${CMAKE_CURRENT_SOURCE_DIR}/spatialite/gg_dxf.h
-	${CMAKE_CURRENT_SOURCE_DIR}/spatialite/spatialite.h
 	${CMAKE_CURRENT_SOURCE_DIR}/spatialite/sqlite.h
 	${CMAKE_CURRENT_SOURCE_DIR}/spatialite/debug.h
 	${CMAKE_CURRENT_SOURCE_DIR}/spatialite/geopackage.h

@@ -38,8 +38,13 @@ the terms of any one of the MPL, the GPL or the LGPL.
 */
 
 #include "spatialite/geopackage.h"
-#include "config.h"
 #include "geopackage_internal.h"
+
+#if defined(_WIN32) && !defined(__MINGW32__)
+#include "config-msvc.h"
+#else
+#include "config.h"
+#endif
 
 #ifdef ENABLE_GEOPACKAGE
 
@@ -70,15 +75,22 @@ gpkgMakePoint (double x, double y, int srid, unsigned char **result,
 
     gpkgSetHeader2DMbr (ptr + GEOPACKAGE_HEADER_LEN, x, y, x, y, endian_arch);
 
-    *(ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_2D_ENVELOPE_LEN) =
-	GEOPACKAGE_WKB_LITTLEENDIAN;
-    gaiaExport32 (ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_2D_ENVELOPE_LEN + 1,
-		  GEOPACKAGE_WKB_POINT, 1, endian_arch);
-    gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_2D_ENVELOPE_LEN +
-		  GEOPACKAGE_WKB_HEADER_LEN, x, 1, endian_arch);
-    gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_2D_ENVELOPE_LEN +
-		  GEOPACKAGE_WKB_HEADER_LEN + sizeof (double), y, 1,
-		  endian_arch);
+    *(ptr + GEOPACKAGE_HEADER_LEN +
+      GEOPACKAGE_2D_ENVELOPE_LEN) = GEOPACKAGE_WKB_LITTLEENDIAN;
+    gaiaExport32 (ptr +
+		  GEOPACKAGE_HEADER_LEN +
+		  GEOPACKAGE_2D_ENVELOPE_LEN
+		  + 1, GEOPACKAGE_WKB_POINT, 1, endian_arch);
+    gaiaExport64 (ptr +
+		  GEOPACKAGE_HEADER_LEN +
+		  GEOPACKAGE_2D_ENVELOPE_LEN
+		  + GEOPACKAGE_WKB_HEADER_LEN, x, 1, endian_arch);
+    gaiaExport64 (ptr +
+		  GEOPACKAGE_HEADER_LEN +
+		  GEOPACKAGE_2D_ENVELOPE_LEN
+		  +
+		  GEOPACKAGE_WKB_HEADER_LEN
+		  + sizeof (double), y, 1, endian_arch);
 }
 
 static void
@@ -111,18 +123,28 @@ gpkgMakePointZ (double x, double y, double z, int srid, unsigned char **result,
     gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + 3 * sizeof (double), y, 1, endian_arch);	/* MBR - maximum Y */
     gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + 4 * sizeof (double), z, 1, endian_arch);	/* MBR - maximum Z */
     gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + 5 * sizeof (double), z, 1, endian_arch);	/* MBR - maximum Z */
-    *(ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_3D_ENVELOPE_LEN) =
-	GEOPACKAGE_WKB_LITTLEENDIAN;
-    gaiaExport32 (ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_3D_ENVELOPE_LEN + 1,
-		  GEOPACKAGE_WKB_POINTZ, 1, endian_arch);
-    gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_3D_ENVELOPE_LEN +
-		  GEOPACKAGE_WKB_HEADER_LEN, x, 1, endian_arch);
-    gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_3D_ENVELOPE_LEN +
-		  GEOPACKAGE_WKB_HEADER_LEN + sizeof (double), y, 1,
-		  endian_arch);
-    gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_3D_ENVELOPE_LEN +
-		  GEOPACKAGE_WKB_HEADER_LEN + (2 * sizeof (double)), z, 1,
-		  endian_arch);
+    *(ptr + GEOPACKAGE_HEADER_LEN +
+      GEOPACKAGE_3D_ENVELOPE_LEN) = GEOPACKAGE_WKB_LITTLEENDIAN;
+    gaiaExport32 (ptr +
+		  GEOPACKAGE_HEADER_LEN +
+		  GEOPACKAGE_3D_ENVELOPE_LEN
+		  + 1, GEOPACKAGE_WKB_POINTZ, 1, endian_arch);
+    gaiaExport64 (ptr +
+		  GEOPACKAGE_HEADER_LEN +
+		  GEOPACKAGE_3D_ENVELOPE_LEN
+		  + GEOPACKAGE_WKB_HEADER_LEN, x, 1, endian_arch);
+    gaiaExport64 (ptr +
+		  GEOPACKAGE_HEADER_LEN +
+		  GEOPACKAGE_3D_ENVELOPE_LEN
+		  +
+		  GEOPACKAGE_WKB_HEADER_LEN
+		  + sizeof (double), y, 1, endian_arch);
+    gaiaExport64 (ptr +
+		  GEOPACKAGE_HEADER_LEN +
+		  GEOPACKAGE_3D_ENVELOPE_LEN
+		  +
+		  GEOPACKAGE_WKB_HEADER_LEN
+		  + (2 * sizeof (double)), z, 1, endian_arch);
 }
 
 static void
@@ -155,18 +177,28 @@ gpkgMakePointM (double x, double y, double m, int srid, unsigned char **result,
     gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + 3 * sizeof (double), y, 1, endian_arch);	/* MBR - maximum Y */
     gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + 4 * sizeof (double), m, 1, endian_arch);	/* MBR - maximum M */
     gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + 5 * sizeof (double), m, 1, endian_arch);	/* MBR - maximum M */
-    *(ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_3D_ENVELOPE_LEN) =
-	GEOPACKAGE_WKB_LITTLEENDIAN;
-    gaiaExport32 (ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_3D_ENVELOPE_LEN + 1,
-		  GEOPACKAGE_WKB_POINTM, 1, endian_arch);
-    gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_3D_ENVELOPE_LEN +
-		  GEOPACKAGE_WKB_HEADER_LEN, x, 1, endian_arch);
-    gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_3D_ENVELOPE_LEN +
-		  GEOPACKAGE_WKB_HEADER_LEN + sizeof (double), y, 1,
-		  endian_arch);
-    gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_3D_ENVELOPE_LEN +
-		  GEOPACKAGE_WKB_HEADER_LEN + (2 * sizeof (double)), m, 1,
-		  endian_arch);
+    *(ptr + GEOPACKAGE_HEADER_LEN +
+      GEOPACKAGE_3D_ENVELOPE_LEN) = GEOPACKAGE_WKB_LITTLEENDIAN;
+    gaiaExport32 (ptr +
+		  GEOPACKAGE_HEADER_LEN +
+		  GEOPACKAGE_3D_ENVELOPE_LEN
+		  + 1, GEOPACKAGE_WKB_POINTM, 1, endian_arch);
+    gaiaExport64 (ptr +
+		  GEOPACKAGE_HEADER_LEN +
+		  GEOPACKAGE_3D_ENVELOPE_LEN
+		  + GEOPACKAGE_WKB_HEADER_LEN, x, 1, endian_arch);
+    gaiaExport64 (ptr +
+		  GEOPACKAGE_HEADER_LEN +
+		  GEOPACKAGE_3D_ENVELOPE_LEN
+		  +
+		  GEOPACKAGE_WKB_HEADER_LEN
+		  + sizeof (double), y, 1, endian_arch);
+    gaiaExport64 (ptr +
+		  GEOPACKAGE_HEADER_LEN +
+		  GEOPACKAGE_3D_ENVELOPE_LEN
+		  +
+		  GEOPACKAGE_WKB_HEADER_LEN
+		  + (2 * sizeof (double)), m, 1, endian_arch);
 }
 
 static void
@@ -201,21 +233,34 @@ gpkgMakePointZM (double x, double y, double z, double m, int srid,
     gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + 5 * sizeof (double), z, 1, endian_arch);	/* MBR - maximum Z */
     gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + 6 * sizeof (double), m, 1, endian_arch);	/* MBR - minimum M */
     gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + 7 * sizeof (double), m, 1, endian_arch);	/* MBR - maximum M */
-    *(ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_4D_ENVELOPE_LEN) =
-	GEOPACKAGE_WKB_LITTLEENDIAN;
-    gaiaExport32 (ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_4D_ENVELOPE_LEN + 1,
-		  GEOPACKAGE_WKB_POINTZM, 1, endian_arch);
-    gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_4D_ENVELOPE_LEN +
-		  GEOPACKAGE_WKB_HEADER_LEN, x, 1, endian_arch);
-    gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_4D_ENVELOPE_LEN +
-		  GEOPACKAGE_WKB_HEADER_LEN + sizeof (double), y, 1,
-		  endian_arch);
-    gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_4D_ENVELOPE_LEN +
-		  GEOPACKAGE_WKB_HEADER_LEN + (2 * sizeof (double)), z, 1,
-		  endian_arch);
-    gaiaExport64 (ptr + GEOPACKAGE_HEADER_LEN + GEOPACKAGE_4D_ENVELOPE_LEN +
-		  GEOPACKAGE_WKB_HEADER_LEN + (3 * sizeof (double)), m, 1,
-		  endian_arch);
+    *(ptr + GEOPACKAGE_HEADER_LEN +
+      GEOPACKAGE_4D_ENVELOPE_LEN) = GEOPACKAGE_WKB_LITTLEENDIAN;
+    gaiaExport32 (ptr +
+		  GEOPACKAGE_HEADER_LEN +
+		  GEOPACKAGE_4D_ENVELOPE_LEN
+		  + 1, GEOPACKAGE_WKB_POINTZM, 1, endian_arch);
+    gaiaExport64 (ptr +
+		  GEOPACKAGE_HEADER_LEN +
+		  GEOPACKAGE_4D_ENVELOPE_LEN
+		  + GEOPACKAGE_WKB_HEADER_LEN, x, 1, endian_arch);
+    gaiaExport64 (ptr +
+		  GEOPACKAGE_HEADER_LEN +
+		  GEOPACKAGE_4D_ENVELOPE_LEN
+		  +
+		  GEOPACKAGE_WKB_HEADER_LEN
+		  + sizeof (double), y, 1, endian_arch);
+    gaiaExport64 (ptr +
+		  GEOPACKAGE_HEADER_LEN +
+		  GEOPACKAGE_4D_ENVELOPE_LEN
+		  +
+		  GEOPACKAGE_WKB_HEADER_LEN
+		  + (2 * sizeof (double)), z, 1, endian_arch);
+    gaiaExport64 (ptr +
+		  GEOPACKAGE_HEADER_LEN +
+		  GEOPACKAGE_4D_ENVELOPE_LEN
+		  +
+		  GEOPACKAGE_WKB_HEADER_LEN
+		  + (3 * sizeof (double)), m, 1, endian_arch);
 }
 
 GEOPACKAGE_PRIVATE void
@@ -399,8 +444,8 @@ fnct_gpkgMakePointZ (sqlite3_context * context, int argc UNUSED,
 	  return;
       }
 
-    gpkgMakePointZ (x, y, z, GEOPACKAGE_DEFAULT_UNDEFINED_SRID, &p_result,
-		    &len);
+    gpkgMakePointZ (x, y, z,
+		    GEOPACKAGE_DEFAULT_UNDEFINED_SRID, &p_result, &len);
     if (!p_result)
       {
 	  sqlite3_result_null (context);
@@ -551,8 +596,8 @@ fnct_gpkgMakePointM (sqlite3_context * context, int argc UNUSED,
 	  return;
       }
 
-    gpkgMakePointM (x, y, m, GEOPACKAGE_DEFAULT_UNDEFINED_SRID, &p_result,
-		    &len);
+    gpkgMakePointM (x, y, m,
+		    GEOPACKAGE_DEFAULT_UNDEFINED_SRID, &p_result, &len);
     if (!p_result)
       {
 	  sqlite3_result_null (context);
@@ -718,8 +763,8 @@ fnct_gpkgMakePointZM (sqlite3_context * context, int argc UNUSED,
 	  return;
       }
 
-    gpkgMakePointZM (x, y, z, m, GEOPACKAGE_DEFAULT_UNDEFINED_SRID, &p_result,
-		     &len);
+    gpkgMakePointZM (x, y, z, m,
+		     GEOPACKAGE_DEFAULT_UNDEFINED_SRID, &p_result, &len);
     if (!p_result)
       {
 	  sqlite3_result_null (context);

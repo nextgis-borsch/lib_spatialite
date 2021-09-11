@@ -46,7 +46,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include <stdio.h>
 #include <string.h>
 
-#include "config.h"
+#include <spatialite/gaiaconfig.h>
 
 #include "sqlite3.h"
 #include "spatialite.h"
@@ -108,7 +108,7 @@ main (int argc, char *argv[])
 		   rows, columns);
 	  return -11;
       }
-    if (strcmp (results[1], VERSION) != 0)
+    if (strcmp (results[1], SPATIALITE_VERSION) != 0)
       {
 	  fprintf (stderr,
 		   "Unexpected error: spatialite_version() bad result: %s.\n",

@@ -1,9 +1,9 @@
-.,.,,"AUTHORS,COPYING,INSTALL,README,h"
+.,.,,"AUTHORS,COPYING,INSTALL,README,configure.ac"
 examples,examples,skip,
 m4,m4,skip,
 src,src,skip,
 src/connection_cache,src/connection_cache,,"c,h"
-src/connection_cache/generator,src/connection_cache/generator,,"c"
+src/connection_cache/generator,src/connection_cache/generator,,c
 src/control_points,src/control_points,,"c,h"
 src/cutter,src/cutter,,"c,h"
 src/dxf,src/dxf,,"c,h"
@@ -11,10 +11,10 @@ src/gaiaaux,src/gaiaaux,,"c,h"
 src/gaiaexif,src/gaiaexif,,"c,h"
 src/gaiageo,src/gaiageo,,"c,h"
 src/geopackage,src/geopackage,,"c,h"
-src/headers,src/headers,,"h"
-src/headers/spatialite,src/headers/spatialite,,"h"
+src/headers,src/headers,,h
+src/headers/spatialite,src/headers/spatialite,,"debug.h,gaiaaux.h,gaiamatrix.h,gg_advanced.h,gg_dxf.h,gg_mbr.h,gg_wfs.h,sqlite.h,gaia_network.h,gaiaexif.h,geojson.h,gg_const.h,gg_dynamic.h,gg_sequence.h,gg_xml.h,stored_procedures.h,control_points.h,gaia_topology.h,gaiageo.h,geopackage.h,gg_core.h,gg_formats.h,gg_structs.h,spatialite_ext.h"
 src/md5,src/md5,,"c,h"
-src/shapefiles,src/shapefiles,,"c"
+src/shapefiles,src/shapefiles,,c
 src/spatialite,src/spatialite,,"c,h"
 src/srsinit,src/srsinit,,"c,h"
 src/srsinit/epsg_update,src/srsinit/epsg_update,,"c,h"

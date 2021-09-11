@@ -43,7 +43,16 @@ the terms of any one of the MPL, the GPL or the LGPL.
  
 */
 
+
+#if defined(_WIN32) && !defined(__MINGW32__)
+#include "config-msvc.h"
+#else
 #include "config.h"
+#endif
+
+#ifdef _WIN32
+#define strcasecmp	_stricmp
+#endif /* not WIN32 */
 
 #ifdef ENABLE_GEOPACKAGE	/* enabling GeoPackage extensions */
 
@@ -210,9 +219,8 @@ create_gpkg_destination (sqlite3 * handle, const char *create_sql,
 
 /* adding the geometry triggers */
     sql =
-	sqlite3_mprintf
-	("SELECT gpkgAddGeometryTriggers(Lower(%Q), Lower(%Q))",
-	 table_name, column_name);
+	sqlite3_mprintf ("SELECT gpkgAddGeometryTriggers(Lower(%Q), Lower(%Q))",
+			 table_name, column_name);
     ret = sqlite3_exec (handle, sql, NULL, NULL, &sql_err);
     sqlite3_free (sql);
     if (ret != SQLITE_OK)
@@ -228,8 +236,8 @@ create_gpkg_destination (sqlite3 * handle, const char *create_sql,
 	  /* adding Spatial Index support */
 	  sql =
 	      sqlite3_mprintf
-	      ("SELECT gpkgAddSpatialIndex(Lower(%Q), Lower(%Q))",
-	       table_name, column_name);
+	      ("SELECT gpkgAddSpatialIndex(Lower(%Q), Lower(%Q))", table_name,
+	       column_name);
 	  ret = sqlite3_exec (handle, sql, NULL, NULL, &sql_err);
 	  sqlite3_free (sql);
 	  if (ret != SQLITE_OK)
@@ -553,9 +561,8 @@ create_Spatialite2GPKG_statements (sqlite3 * handle_in, sqlite3 * handle_out,
     sqlite3_free (out2_sql);
 
 /* preparing the IN stmt */
-    ret =
-	sqlite3_prepare_v2 (handle_in, in_sql, strlen (in_sql), &xstmt_in,
-			    NULL);
+    ret = sqlite3_prepare_v2 (handle_in,
+			      in_sql, strlen (in_sql), &xstmt_in, NULL);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "SELECT FROM \"%s\" error: %s\n", table_name,
@@ -564,9 +571,8 @@ create_Spatialite2GPKG_statements (sqlite3 * handle_in, sqlite3 * handle_out,
       }
 
 /* preparing the OUT stmt */
-    ret =
-	sqlite3_prepare_v2 (handle_out, out_sql, strlen (out_sql), &xstmt_out,
-			    NULL);
+    ret = sqlite3_prepare_v2 (handle_out,
+			      out_sql, strlen (out_sql), &xstmt_out, NULL);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "INSERT INTO \"%s\" error: %s\n", table_name,
@@ -726,9 +732,8 @@ create_GPKG2Spatialite_statements (sqlite3 * handle_in, sqlite3 * handle_out,
     sqlite3_free (out2_sql);
 
 /* preparing the IN stmt */
-    ret =
-	sqlite3_prepare_v2 (handle_in, in_sql, strlen (in_sql), &xstmt_in,
-			    NULL);
+    ret = sqlite3_prepare_v2 (handle_in,
+			      in_sql, strlen (in_sql), &xstmt_in, NULL);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "SELECT FROM \"%s\" error: %s\n", table_name,
@@ -737,9 +742,8 @@ create_GPKG2Spatialite_statements (sqlite3 * handle_in, sqlite3 * handle_out,
       }
 
 /* preparing the OUT stmt */
-    ret =
-	sqlite3_prepare_v2 (handle_out, out_sql, strlen (out_sql), &xstmt_out,
-			    NULL);
+    ret = sqlite3_prepare_v2 (handle_out,
+			      out_sql, strlen (out_sql), &xstmt_out, NULL);
     if (ret != SQLITE_OK)
       {
 	  fprintf (stderr, "INSERT INTO \"%s\" error: %s\n", table_name,
@@ -874,13 +878,15 @@ do_insert_content (sqlite3 * handle, const char *table_name,
 
     xtable = gaiaDoubleQuotedSql (table_name);
     xgeom = gaiaDoubleQuotedSql (geometry_column);
-    sql = sqlite3_mprintf ("INSERT OR IGNORE INTO gpkg_contents (table_name, data_type, "
-			   "identifier, description, last_change, min_x, min_y, max_x, max_y, srs_id) "
-			   "SELECT Lower(%Q), 'features', Lower(%Q), ' ', "
-			   "strftime('%%Y-%%m-%%dT%%H:%%M:%%fZ', 'now'), Min(ST_MinX(\"%s\")), "
-			   "Min(ST_MinY(\"%s\")), Max(ST_MaxX(\"%s\")), Max(ST_MaxY(\"%s\")), %d "
-			   "FROM \"%s\"", table_name, table_name, xgeom, xgeom,
-			   xgeom, xgeom, srid, xtable);
+    sql =
+	sqlite3_mprintf
+	("INSERT OR IGNORE INTO gpkg_contents (table_name, data_type, "
+	 "identifier, description, last_change, min_x, min_y, max_x, max_y, srs_id) "
+	 "SELECT Lower(%Q), 'features', Lower(%Q), ' ', "
+	 "strftime('%%Y-%%m-%%dT%%H:%%M:%%fZ', 'now'), Min(ST_MinX(\"%s\")), "
+	 "Min(ST_MinY(\"%s\")), Max(ST_MaxX(\"%s\")), Max(ST_MaxY(\"%s\")), %d "
+	 "FROM \"%s\"", table_name, table_name, xgeom, xgeom, xgeom, xgeom,
+	 srid, xtable);
     free (xgeom);
     free (xtable);
     ret = sqlite3_exec (handle, sql, NULL, NULL, &sql_err);
@@ -910,13 +916,15 @@ copy_spatialite2GPKG (sqlite3 * handle_in, sqlite3 * handle_out, int legacy)
 
     if (legacy)
       {
-	  sql = "SELECT f_table_name, f_geometry_column, type, "
+	  sql =
+	      "SELECT f_table_name, f_geometry_column, type, "
 	      "coord_dimension, srid, spatial_index_enabled "
 	      "FROM geometry_columns";
       }
     else
       {
-	  sql = "SELECT f_table_name, f_geometry_column, geometry_type, "
+	  sql =
+	      "SELECT f_table_name, f_geometry_column, geometry_type, "
 	      "srid, spatial_index_enabled FROM geometry_columns";
       }
     ret = sqlite3_get_table (handle_in, sql, &results, &rows, &columns, NULL);
@@ -1107,7 +1115,8 @@ copy_GPKG2Spatialite (sqlite3 * handle_in, sqlite3 * handle_out)
     sqlite3_stmt *stmt_in = NULL;
     sqlite3_stmt *stmt_out = NULL;
 
-    sql = "SELECT table_name, column_name, geometry_type_name, "
+    sql =
+	"SELECT table_name, column_name, geometry_type_name, "
 	"srs_id, z, m FROM gpkg_geometry_columns";
     ret = sqlite3_get_table (handle_in, sql, &results, &rows, &columns, NULL);
     if (ret != SQLITE_OK)

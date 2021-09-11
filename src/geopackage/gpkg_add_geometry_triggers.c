@@ -40,13 +40,18 @@ the terms of any one of the MPL, the GPL or the LGPL.
 
 #include "spatialite/geopackage.h"
 #include "spatialite/gaiaaux.h"
-#include "config.h"
 #include "geopackage_internal.h"
+
+#if defined(_WIN32) && !defined(__MINGW32__)
+#include "config-msvc.h"
+#else
+#include "config.h"
+#endif
 
 #ifdef ENABLE_GEOPACKAGE
 GEOPACKAGE_PRIVATE void
-fnct_gpkgAddGeometryTriggers (sqlite3_context * context, int argc
-			      __attribute__ ((unused)), sqlite3_value ** argv)
+fnct_gpkgAddGeometryTriggers (sqlite3_context * context, int argc,
+			      sqlite3_value ** argv)
 {
 /* SQL function:
 / gpkgAddGeometryTriggers(table, column)
@@ -65,34 +70,29 @@ fnct_gpkgAddGeometryTriggers (sqlite3_context * context, int argc
     int ret = 0;
     int i = 0;
     const char *trigger_stmts[] = {
-	"CREATE TRIGGER \"fgti_%s_%s\"\n"
-	    "BEFORE INSERT ON \"%s\"\n"
+	"CREATE TRIGGER \"fgti_%s_%s\"\n" "BEFORE INSERT ON \"%s\"\n"
 	    "FOR EACH ROW BEGIN\n"
 	    "SELECT RAISE (ROLLBACK, 'insert on \"%s\" violates constraint: "
 	    "ST_GeometryType(\"%s\") is not assignable from "
 	    "gpkg_geometry_columns.geometry_type_name value')\n"
-	    "WHERE (SELECT geometry_type_name\n"
-	    "FROM gpkg_geometry_columns\n"
+	    "WHERE (SELECT geometry_type_name\n" "FROM gpkg_geometry_columns\n"
 	    "WHERE Lower(table_name) = Lower(%Q)\n"
 	    "AND Lower(column_name) = Lower(%Q)\n"
 	    "AND gpkg_IsAssignable(geometry_type_name, "
 	    "ST_GeometryType(NEW.\"%s\")) = 0);\nEND",
 
-	"CREATE TRIGGER \"fgtu_%s_%s\"\n"
-	    "BEFORE UPDATE OF \"%s\" ON \"%s\"\n"
+	"CREATE TRIGGER \"fgtu_%s_%s\"\n" "BEFORE UPDATE OF \"%s\" ON \"%s\"\n"
 	    "FOR EACH ROW BEGIN\n"
 	    "SELECT RAISE (ROLLBACK, 'update of \"%s\" on \"%s\" violates constraint: "
 	    "ST_GeometryType(\"%s\") is not assignable from "
 	    "gpkg_geometry_columns.geometry_type_name value')\n"
-	    "WHERE (SELECT geometry_type_name\n"
-	    "FROM gpkg_geometry_columns\n"
+	    "WHERE (SELECT geometry_type_name\n" "FROM gpkg_geometry_columns\n"
 	    "WHERE Lower(table_name) = Lower(%Q) "
 	    "AND Lower(column_name) = Lower(%Q) "
 	    "AND gpkg_IsAssignable(geometry_type_name, "
 	    "ST_GeometryType(NEW.\"%s\")) = 0);\nEND",
 
-	"CREATE TRIGGER \"fgsi_%s_%s\"\n"
-	    "BEFORE INSERT ON \"%s\"\n"
+	"CREATE TRIGGER \"fgsi_%s_%s\"\n" "BEFORE INSERT ON \"%s\"\n"
 	    "FOR EACH ROW BEGIN\n"
 	    "SELECT RAISE (ROLLBACK, 'insert on \"%s\" violates constraint: "
 	    "ST_SRID(\"%s\") does not match gpkg_geometry_columns.srs_id value')\n"
@@ -101,8 +101,7 @@ fnct_gpkgAddGeometryTriggers (sqlite3_context * context, int argc
 	    "AND Lower(column_name) = Lower(%Q) "
 	    "AND ST_SRID(NEW.\"%s\") <> srs_id);\nEND",
 
-	"CREATE TRIGGER \"fgsu_%s_%s\"\n"
-	    "BEFORE UPDATE OF \"%s\" ON \"%s\"\n"
+	"CREATE TRIGGER \"fgsu_%s_%s\"\n" "BEFORE UPDATE OF \"%s\" ON \"%s\"\n"
 	    "FOR EACH ROW BEGIN\n"
 	    "SELECT RAISE (ROLLBACK, 'update of \"%s\" on \"%s\" violates constraint: "
 	    "ST_SRID(\"%s\") does not match gpkg_geometry_columns.srs_id value')\n"
@@ -113,6 +112,9 @@ fnct_gpkgAddGeometryTriggers (sqlite3_context * context, int argc
 
 	NULL
     };
+
+    if (argc == 0)
+	argc = 0;		/* suppressing stupid compiler warnings */
 
     if (sqlite3_value_type (argv[0]) != SQLITE_TEXT)
       {
@@ -161,11 +163,12 @@ fnct_gpkgAddGeometryTriggers (sqlite3_context * context, int argc
     free (xcolumn);
 
 /* registering the GPKG extensions */
-    sql_stmt = sqlite3_mprintf ("INSERT INTO gpkg_extensions "
-				"(table_name, column_name, extension_name, definition, scope) "
-				"VALUES (Lower(%Q), Lower(%Q), 'gpkg_geometry_type_trigger', "
-				"'GeoPackage 1.0 Specification Annex N', 'write-only')",
-				table, column);
+    sql_stmt =
+	sqlite3_mprintf ("INSERT INTO gpkg_extensions "
+			 "(table_name, column_name, extension_name, definition, scope) "
+			 "VALUES (Lower(%Q), Lower(%Q), 'gpkg_geometry_type_trigger', "
+			 "'GeoPackage 1.0 Specification Annex N', 'write-only')",
+			 table, column);
     ret = sqlite3_exec (sqlite, sql_stmt, NULL, NULL, &errMsg);
     sqlite3_free (sql_stmt);
     if (ret != SQLITE_OK)
@@ -174,11 +177,12 @@ fnct_gpkgAddGeometryTriggers (sqlite3_context * context, int argc
 	  sqlite3_free (errMsg);
 	  return;
       }
-    sql_stmt = sqlite3_mprintf ("INSERT INTO gpkg_extensions "
-				"(table_name, column_name, extension_name, definition, scope) "
-				"VALUES (Lower(%Q), Lower(%Q), 'gpkg_srs_id_trigger', "
-				"'GeoPackage 1.0 Specification Annex N', 'write-only')",
-				table, column);
+    sql_stmt =
+	sqlite3_mprintf ("INSERT INTO gpkg_extensions "
+			 "(table_name, column_name, extension_name, definition, scope) "
+			 "VALUES (Lower(%Q), Lower(%Q), 'gpkg_srs_id_trigger', "
+			 "'GeoPackage 1.0 Specification Annex N', 'write-only')",
+			 table, column);
     ret = sqlite3_exec (sqlite, sql_stmt, NULL, NULL, &errMsg);
     sqlite3_free (sql_stmt);
     if (ret != SQLITE_OK)

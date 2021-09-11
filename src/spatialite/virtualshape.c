@@ -2,7 +2,7 @@
 
  virtualshape.c -- SQLite3 extension [VIRTUAL TABLE accessing Shapefile]
 
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -58,7 +58,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include <spatialite/sqlite.h>
 #include <spatialite/debug.h>
 
-#include <spatialite/spatialite.h>
+#include <spatialite/spatialite_ext.h>
 #include <spatialite/gaiaaux.h>
 #include <spatialite/gaiageo.h>
 #include <spatialite_private.h>
@@ -904,6 +904,16 @@ vshp_eval_constraints (VirtualShapeCursorPtr cursor)
 	  if (pC->iColumn == 0)
 	    {
 		/* the PRIMARY KEY column */
+		if (pC->op == SQLITE_INDEX_CONSTRAINT_ISNULL)
+		  {
+		      ok = 0;
+		      goto done;
+		  }
+		if (pC->op == SQLITE_INDEX_CONSTRAINT_ISNOTNULL)
+		  {
+		      ok = 1;
+		      goto done;
+		  }
 		if (pC->valueType == 'I')
 		  {
 		      switch (pC->op)
@@ -928,10 +938,40 @@ vshp_eval_constraints (VirtualShapeCursorPtr cursor)
 			    if (cursor->current_row >= pC->intValue)
 				ok = 1;
 			    break;
+			case SQLITE_INDEX_CONSTRAINT_NE:
+			    if (cursor->current_row != pC->intValue)
+				ok = 1;
+			    break;
 			};
 		  }
 		goto done;
 	    }
+	  /* the Geometry column */
+	  nCol = 1;
+	  pFld = cursor->pVtab->Shp->Dbf->First;
+	  while (pFld)
+	    {
+		if (nCol == pC->iColumn)
+		  {
+		      if ((pFld->Value))
+			{
+			    switch (pC->op)
+			      {
+			      case SQLITE_INDEX_CONSTRAINT_ISNULL:
+				  if (pFld->Value->Type == GAIA_NULL_VALUE)
+				      ok = 1;
+				  break;
+			      case SQLITE_INDEX_CONSTRAINT_ISNOTNULL:
+				  if (pFld->Value->Type != GAIA_NULL_VALUE)
+				      ok = 1;
+				  break;
+			      };
+			}
+		      goto done;
+		  }
+		pFld = pFld->Next;
+	    }
+	  /* any other ordinary column */
 	  nCol = 2;
 	  pFld = cursor->pVtab->Shp->Dbf->First;
 	  while (pFld)
@@ -940,6 +980,19 @@ vshp_eval_constraints (VirtualShapeCursorPtr cursor)
 		  {
 		      if ((pFld->Value))
 			{
+			    switch (pC->op)
+			      {
+			      case SQLITE_INDEX_CONSTRAINT_ISNULL:
+				  if (pFld->Value->Type == GAIA_NULL_VALUE)
+				      ok = 1;
+				  break;
+			      case SQLITE_INDEX_CONSTRAINT_ISNOTNULL:
+				  if (pFld->Value->Type != GAIA_NULL_VALUE)
+				      ok = 1;
+				  break;
+			      };
+			    if (ok)
+				break;
 			    switch (pFld->Value->Type)
 			      {
 			      case GAIA_INT_VALUE:
@@ -969,6 +1022,11 @@ vshp_eval_constraints (VirtualShapeCursorPtr cursor)
 					      break;
 					  case SQLITE_INDEX_CONSTRAINT_GE:
 					      if (pFld->Value->IntValue >=
+						  pC->intValue)
+						  ok = 1;
+					      break;
+					  case SQLITE_INDEX_CONSTRAINT_NE:
+					      if (pFld->Value->IntValue !=
 						  pC->intValue)
 						  ok = 1;
 					      break;
@@ -1005,6 +1063,11 @@ vshp_eval_constraints (VirtualShapeCursorPtr cursor)
 						  pC->intValue)
 						  ok = 1;
 					      break;
+					  case SQLITE_INDEX_CONSTRAINT_NE:
+					      if (pFld->Value->DblValue !=
+						  pC->intValue)
+						  ok = 1;
+					      break;
 					  };
 				    }
 				  if (pC->valueType == 'D')
@@ -1033,6 +1096,11 @@ vshp_eval_constraints (VirtualShapeCursorPtr cursor)
 					      break;
 					  case SQLITE_INDEX_CONSTRAINT_GE:
 					      if (pFld->Value->DblValue >=
+						  pC->dblValue)
+						  ok = 1;
+					      break;
+					  case SQLITE_INDEX_CONSTRAINT_NE:
+					      if (pFld->Value->DblValue !=
 						  pC->dblValue)
 						  ok = 1;
 					      break;
@@ -1068,13 +1136,16 @@ vshp_eval_constraints (VirtualShapeCursorPtr cursor)
 					      if (ret >= 0)
 						  ok = 1;
 					      break;
+					  case SQLITE_INDEX_CONSTRAINT_NE:
+					      if (ret != 0)
+						  ok = 1;
+					      break;
 #ifdef HAVE_DECL_SQLITE_INDEX_CONSTRAINT_LIKE
 					  case SQLITE_INDEX_CONSTRAINT_LIKE:
 					      ret =
 						  sqlite3_strlike (pC->txtValue,
-								   pFld->
-								   Value->TxtValue,
-								   0);
+								   pFld->Value->
+								   TxtValue, 0);
 					      if (ret == 0)
 						  ok = 1;
 					      break;
@@ -1145,6 +1216,11 @@ vshp_filter (sqlite3_vtab_cursor * pCursor, int idxNum, const char *idxStr,
 		if (pC->txtValue)
 		    strcpy (pC->txtValue,
 			    (char *) sqlite3_value_text (argv[i]));
+	    }
+	  if (sqlite3_value_type (argv[i]) == SQLITE_BLOB)
+	    {
+		pC->valueType = 'B';
+		fprintf (stderr, "cmp BLOB\n");
 	    }
 	  if (cursor->firstConstraint == NULL)
 	      cursor->firstConstraint = pC;

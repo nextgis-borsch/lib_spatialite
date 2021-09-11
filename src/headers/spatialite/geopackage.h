@@ -2,7 +2,7 @@
 
     GeoPackage extensions for SpatiaLite / SQLite
      
-    version 4.3, 2015 June 29
+    version 5.0, 2020 August 1
  
 Version: MPL 1.1/GPL 2.0/LGPL 2.1
 
@@ -20,7 +20,7 @@ The Original Code is GeoPackage Extensions
 
 The Initial Developer of the Original Code is Brad Hards (bradh@frogmouth.net)
  
-Portions created by the Initial Developer are Copyright (C) 2012-2015
+Portions created by the Initial Developer are Copyright (C) 2012-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):

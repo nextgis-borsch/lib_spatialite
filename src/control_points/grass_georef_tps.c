@@ -2,7 +2,7 @@
 
  grass_georef_tps.c -- strictly derived from Grass GIS code: lib/imagery/georef_tps.c
     
- version 4.3, 2015 May 5
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 

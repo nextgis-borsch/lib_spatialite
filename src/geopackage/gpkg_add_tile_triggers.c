@@ -38,13 +38,18 @@ the terms of any one of the MPL, the GPL or the LGPL.
 */
 
 #include "spatialite/geopackage.h"
-#include "config.h"
 #include "geopackage_internal.h"
+
+#if defined(_WIN32) && !defined(__MINGW32__)
+#include "config-msvc.h"
+#else
+#include "config.h"
+#endif
 
 #ifdef ENABLE_GEOPACKAGE
 GEOPACKAGE_PRIVATE void
-fnct_gpkgAddTileTriggers (sqlite3_context * context, int argc
-			  __attribute__ ((unused)), sqlite3_value ** argv)
+fnct_gpkgAddTileTriggers (sqlite3_context * context, int argc,
+			  sqlite3_value ** argv)
 {
 /* SQL function:
 / gpkgAddTileTriggers(table)
@@ -61,16 +66,14 @@ fnct_gpkgAddTileTriggers (sqlite3_context * context, int argc
     int i = 0;
     /* Note: the code below relies on there being twelve (or less) varargs, all of which are the table name */
     const char *trigger_stmts[] = {
-	"CREATE TRIGGER \"%s_zoom_insert\"\n"
-	    "BEFORE INSERT ON \"%s\"\n"
+	"CREATE TRIGGER \"%s_zoom_insert\"\n" "BEFORE INSERT ON \"%s\"\n"
 	    "FOR EACH ROW BEGIN\n"
 	    "SELECT RAISE(ABORT, 'insert on table ''%s'' violates constraint: zoom_level not specified for table in gpkg_tile_matrix')\n"
 	    "WHERE NOT (NEW.zoom_level IN (SELECT zoom_level FROM gpkg_tile_matrix WHERE table_name = %Q));\n"
 	    "END",
 
 	"CREATE TRIGGER \"%s_zoom_update\"\n"
-	    "BEFORE UPDATE OF zoom_level ON \"%s\"\n"
-	    "FOR EACH ROW BEGIN\n"
+	    "BEFORE UPDATE OF zoom_level ON \"%s\"\n" "FOR EACH ROW BEGIN\n"
 	    "SELECT RAISE(ABORT, 'update on table ''%s'' violates constraint: zoom_level not specified for table in gpkg_tile_matrix')\n"
 	    "WHERE NOT (NEW.zoom_level IN (SELECT zoom_level FROM gpkg_tile_matrix WHERE table_name = %Q));\n"
 	    "END",
@@ -113,6 +116,9 @@ fnct_gpkgAddTileTriggers (sqlite3_context * context, int argc
 
 	NULL
     };
+
+    if (argc == 0)
+	argc = 0;		/* suppressing stupid compiler warnings */
 
     if (sqlite3_value_type (argv[0]) != SQLITE_TEXT)
       {

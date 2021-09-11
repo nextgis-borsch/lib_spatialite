@@ -38,12 +38,17 @@ the terms of any one of the MPL, the GPL or the LGPL.
 */
 
 #include "spatialite/geopackage.h"
-#include "config.h"
 #include "geopackage_internal.h"
+
+#if defined(_WIN32) && !defined(__MINGW32__)
+#include "config-msvc.h"
+#else
+#include "config.h"
+#endif
 
 #ifdef ENABLE_GEOPACKAGE
 GEOPACKAGE_PRIVATE void
-fnct_gpkgGetNormalZoom (sqlite3_context * context, int argc UNUSED,
+fnct_gpkgGetNormalZoom (sqlite3_context * context, int argc,
 			sqlite3_value ** argv)
 {
 /* SQL function:
@@ -69,6 +74,9 @@ fnct_gpkgGetNormalZoom (sqlite3_context * context, int argc UNUSED,
     int columns = 0;
     int ret = 0;
 
+    if (argc == 0)
+	argc = 0;		/* suppressing stupid compiler warnings */
+
     if (sqlite3_value_type (argv[0]) != SQLITE_TEXT)
       {
 	  sqlite3_result_error (context,
@@ -93,9 +101,8 @@ fnct_gpkgGetNormalZoom (sqlite3_context * context, int argc UNUSED,
 	 table);
 
     sqlite = sqlite3_context_db_handle (context);
-    ret =
-	sqlite3_get_table (sqlite, sql_stmt, &results, &rows, &columns,
-			   &errMsg);
+    ret = sqlite3_get_table (sqlite,
+			     sql_stmt, &results, &rows, &columns, &errMsg);
     sqlite3_free (sql_stmt);
     if (ret != SQLITE_OK)
       {
@@ -116,7 +123,8 @@ fnct_gpkgGetNormalZoom (sqlite3_context * context, int argc UNUSED,
     max_zoom_level = strtol (results[1 * columns + 0], &endptr, 10);
     if ((endptr == results[1 * columns + 0])
 	|| (max_zoom_level < 0)
-	|| (errno == ERANGE && max_zoom_level == LONG_MAX)
+	|| (errno == ERANGE
+	    && max_zoom_level == LONG_MAX)
 	|| (errno != 0 && max_zoom_level == 0))
       {
 	  sqlite3_free_table (results);
