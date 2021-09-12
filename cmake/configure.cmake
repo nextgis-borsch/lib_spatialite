@@ -170,3 +170,9 @@ configure_file(${CMAKE_SOURCE_DIR}/cmake/config.h.cmake.in ${CMAKE_CURRENT_BINAR
 configure_file(${CMAKE_SOURCE_DIR}/cmake/config.h.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/spatialite/gaiaconfig.h IMMEDIATE @ONLY)
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
+
+if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/spatialite/gaiaconfig-msvc.h
+                  ${CMAKE_CURRENT_BINARY_DIR}/spatialite/gaiaconfig.h
+            DESTINATION "${INSTALL_INC_DIR}/spatialite")
+endif()
