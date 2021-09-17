@@ -77,7 +77,7 @@ if(BUILD_SHARED_LIBS)
     endif()
 elseif(OSX_FRAMEWORK)
     add_library(${LIB_NAME} SHARED ${CSOURCES} ${TARGET_OBJECTS} ${PRIV_HEADERS} ${MAIN_HEADERS} ${SPL_HEADERS})
-    set_source_files_properties("${SPL_HEADERS}" PROPERTIES MACOSX_PACKAGE_LOCATION "Headers/spatialite")
+    set_property(SOURCE ${SPL_HEADERS} PROPERTY MACOSX_PACKAGE_LOCATION "Headers/spatialite")
     set_target_properties(${LIB_NAME} PROPERTIES
       FRAMEWORK TRUE
       FRAMEWORK_VERSION ${FRAMEWORK_VERSION}
