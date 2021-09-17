@@ -1,7 +1,7 @@
 /*
  alloc_cache.c -- Gaia spatial support for SQLite
 
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -23,7 +23,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2013-2015
+Portions created by the Initial Developer are Copyright (C) 2013-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -46,15 +46,15 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include <stdio.h>
 #include <string.h>
 
+#if defined(_WIN32)
+#include <windows.h>
+#include <libloaderapi.h>
+#endif
 
 #if defined(_WIN32) && !defined(__MINGW32__)
 #include <windows.h>
 #else
 #include <pthread.h>
-#endif
-
-#if defined(_WIN32)
-#include <libloaderapi.h>
 #endif
 
 #if defined(_WIN32) && !defined(__MINGW32__)
@@ -413,10 +413,12 @@ init_splite_internal_cache (struct splite_internal_cache *cache)
     else if (atoi (tinyPoint) != 0)
 	cache->tinyPointEnabled = 1;
     cache->lastPostgreSqlError = NULL;
+#ifndef OMIT_GEOS		/* including GEOS */
     cache->buffer_end_cap_style = GEOSBUF_CAP_ROUND;
     cache->buffer_join_style = GEOSBUF_JOIN_ROUND;
     cache->buffer_mitre_limit = 5.0;
     cache->buffer_quadrant_segments = 30;
+#endif /* end including GEOS */
 /* initializing an empty linked list of Topologies */
     cache->firstTopology = NULL;
     cache->lastTopology = NULL;
@@ -500,7 +502,7 @@ spatialite_alloc_reentrant ()
 /* initializing GEOS and PROJ.4 handles */
 
 #ifndef OMIT_GEOS		/* initializing GEOS */
-    cache->GEOS_handle = GEOS_init_r (NULL, NULL);
+    cache->GEOS_handle = GEOS_init_r ();
     GEOSContext_setNoticeMessageHandler_r (cache->GEOS_handle,
 					   conn_geos_warning, cache);
     GEOSContext_setErrorMessageHandler_r (cache->GEOS_handle, conn_geos_error,
@@ -591,7 +593,7 @@ spatialite_alloc_reentrant ()
     if (proj_set_ext_var && win_prefix && proj_db_path)
       {
 	  char *proj_lib = sqlite3_mprintf ("PROJ_LIB=%s", win_prefix);
-	  putenv (proj_lib);
+	  _putenv (proj_lib);
 	  sqlite3_free (proj_lib);
       }
     if (win_prefix != NULL)
@@ -1591,11 +1593,14 @@ gaiaSetCurrentCachedProj (const void
       {
 	  gaiaProjAreaPtr bbox_out =
 	      (gaiaProjAreaPtr) (cache->proj6_cached_area);
+	  if (bbox_out != NULL)
+	      free (bbox_out);
 	  bbox_out = malloc (sizeof (gaiaProjArea));
 	  bbox_out->WestLongitude = bbox_in->WestLongitude;
 	  bbox_out->SouthLatitude = bbox_in->SouthLatitude;
 	  bbox_out->EastLongitude = bbox_in->EastLongitude;
 	  bbox_out->NorthLatitude = bbox_in->NorthLatitude;
+	  cache->proj6_cached_area = bbox_out;
       }
     return 1;
 }

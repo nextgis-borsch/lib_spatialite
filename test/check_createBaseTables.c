@@ -77,11 +77,11 @@ main (int argc UNUSED, char *argv[]UNUSED)
 	  return -1;
       }
     ret =
-	sqlite3_exec (db_handle, "SELECT InitSpatialMetadata(1, 'WGS84')", NULL,
+	sqlite3_exec (db_handle, "SELECT InitSpatialMetadataFull(1, 'WGS84')", NULL,
 		      NULL, &err_msg);
     if (ret != SQLITE_OK)
       {
-	  fprintf (stderr, "Unexpected InitSpatialMetadata result: %i, (%s)\n",
+	  fprintf (stderr, "Unexpected InitSpatialMetadataFull result: %i, (%s)\n",
 		   ret, err_msg);
 	  sqlite3_free (err_msg);
 	  return -2;

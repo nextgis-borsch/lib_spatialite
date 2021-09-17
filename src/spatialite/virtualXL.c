@@ -2,7 +2,7 @@
 
  virtualXLc -- SQLite3 extension [VIRTUAL TABLE accessing .XLS]
 
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -56,7 +56,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
 
 #include <spatialite/sqlite.h>
 
-#include <spatialite/spatialite.h>
+#include <spatialite/spatialite_ext.h>
 #include <spatialite/gaiaaux.h>
 #include <spatialite/gaiageo.h>
 
@@ -540,6 +540,10 @@ vXL_eval_constraints (VirtualXLCursorPtr cursor)
 			    if (cur_row >= pC->intValue)
 				ok = 1;
 			    break;
+			case SQLITE_INDEX_CONSTRAINT_NE:
+			    if (cur_row != pC->intValue)
+				ok = 1;
+			    break;
 			};
 		  }
 		goto done;
@@ -552,6 +556,18 @@ vXL_eval_constraints (VirtualXLCursorPtr cursor)
 				     (unsigned short) pC->iColumn - 1, &cell);
 	  else
 	      cell.type = FREEXL_CELL_NULL;
+	  if (pC->op == SQLITE_INDEX_CONSTRAINT_ISNULL)
+	    {
+		if (cell.type == FREEXL_CELL_NULL)
+		    ok = 1;
+		goto done;
+	    }
+	  if (pC->op == SQLITE_INDEX_CONSTRAINT_ISNOTNULL)
+	    {
+		if (cell.type != FREEXL_CELL_NULL)
+		    ok = 1;
+		goto done;
+	    }
 	  if (cell.type == FREEXL_CELL_INT)
 	    {
 		if (pC->valueType == 'I')
@@ -578,6 +594,10 @@ vXL_eval_constraints (VirtualXLCursorPtr cursor)
 			    if (cell.value.int_value >= pC->intValue)
 				ok = 1;
 			    break;
+			case SQLITE_INDEX_CONSTRAINT_NE:
+			    if (cell.value.int_value != pC->intValue)
+				ok = 1;
+			    break;
 			};
 		  }
 		if (pC->valueType == 'D')
@@ -602,6 +622,10 @@ vXL_eval_constraints (VirtualXLCursorPtr cursor)
 			    break;
 			case SQLITE_INDEX_CONSTRAINT_GE:
 			    if (cell.value.int_value >= pC->dblValue)
+				ok = 1;
+			    break;
+			case SQLITE_INDEX_CONSTRAINT_NE:
+			    if (cell.value.int_value != pC->dblValue)
 				ok = 1;
 			    break;
 			};
@@ -633,6 +657,10 @@ vXL_eval_constraints (VirtualXLCursorPtr cursor)
 			    if (cell.value.double_value >= pC->intValue)
 				ok = 1;
 			    break;
+			case SQLITE_INDEX_CONSTRAINT_NE:
+			    if (cell.value.double_value != pC->intValue)
+				ok = 1;
+			    break;
 			};
 		  }
 		if (pC->valueType == 'D')
@@ -657,6 +685,10 @@ vXL_eval_constraints (VirtualXLCursorPtr cursor)
 			    break;
 			case SQLITE_INDEX_CONSTRAINT_GE:
 			    if (cell.value.double_value >= pC->dblValue)
+				ok = 1;
+			    break;
+			case SQLITE_INDEX_CONSTRAINT_NE:
+			    if (cell.value.double_value != pC->dblValue)
 				ok = 1;
 			    break;
 			};
@@ -689,6 +721,10 @@ vXL_eval_constraints (VirtualXLCursorPtr cursor)
 		      break;
 		  case SQLITE_INDEX_CONSTRAINT_GE:
 		      if (ret >= 0)
+			  ok = 1;
+		      break;
+		  case SQLITE_INDEX_CONSTRAINT_NE:
+		      if (ret != 0)
 			  ok = 1;
 		      break;
 #ifdef HAVE_DECL_SQLITE_INDEX_CONSTRAINT_LIKE

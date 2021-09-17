@@ -39,25 +39,20 @@
 **
 ****************************************************************************/
 
-#ifndef QSPATIALITE_MAIN_H
-#define QSPATIALITE_MAIN_H
+#include "smain.h"
+#include <qsqldriverplugin.h>
+#include "qsql_spatialite.h"
 
-#include <QSqlDriverPlugin>
-#include <QStringList>
-
-#if QT_VERSION < 0x050000
-#define Q_PLUGIN_METADATA(x)
-#endif
-
-class QSpatiaLiteDriverPlugin : public QSqlDriverPlugin
+QSpatiaLiteDriverPlugin::QSpatiaLiteDriverPlugin()
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QSqlDriverFactoryInterface" FILE "qspatialite.json")
-  public:
-    QSpatiaLiteDriverPlugin();
+}
 
-    QSqlDriver* create( const QString & );
-    QStringList keys() const;
-};
-
-#endif
+QSqlDriver *QSpatiaLiteDriverPlugin::create( const QString &name )
+{
+  if ( name == QLatin1String( "QSPATIALITE" ) )
+  {
+    QSpatiaLiteDriver *driver = new QSpatiaLiteDriver();
+    return driver;
+  }
+  return nullptr;
+}

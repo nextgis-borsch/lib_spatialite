@@ -2,7 +2,7 @@
 
  virtualgpkg.c -- SQLite3 extension [VIRTUAL TABLE accessing GPKG tables]
 
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2015
+Portions created by the Initial Developer are Copyright (C) 2015-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -55,7 +55,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
 
 #include <spatialite/sqlite.h>
 
-#include <spatialite/spatialite.h>
+#include <spatialite/spatialite_ext.h>
 #include <spatialite/gaiaaux.h>
 #include <spatialite/gaiageo.h>
 #include <spatialite/geopackage.h>
@@ -74,6 +74,10 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #define LONG64_MAX	9223372036854775807LL
 #define LONG64_MIN	(-LONG64_MAX + 1)
 #endif
+
+#ifdef _WIN32
+#define strcasecmp	_stricmp
+#endif /* not WIN32 */
 
 #ifdef ENABLE_GEOPACKAGE	/* only if GeoPackage support is enabled */
 

@@ -1,7 +1,7 @@
 /*
  gg_core.h -- Gaia common support for geometries: core functions
   
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -23,7 +23,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -58,6 +58,12 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #ifdef __cplusplus
 extern "C"
 {
+#endif
+
+#if defined(_WIN32) && !defined(__MINGW32__)
+#include <spatialite/gaiaconfig-msvc.h>
+#else
+#include <spatialite/gaiaconfig.h>
 #endif
 
 /* constant values for gaiaGeodesicArcLength return_type */
@@ -1652,7 +1658,8 @@ extern "C"
  */
     GAIAGEO_DECLARE gaiaGeomCollPtr
 	gaiaAddMeasure (gaiaGeomCollPtr geom, double m_start, double m_end);
-
+	
+#ifndef OMIT_GEOS		/* including GEOS */
 /**
  Will interpolate the M-value for a LinestringM at the point closest to the 
  given Point.
@@ -1668,7 +1675,8 @@ extern "C"
  */
     GAIAGEO_DECLARE int
 	gaiaInterpolatePoint (const void *p_cache, gaiaGeomCollPtr line,
-			      gaiaGeomCollPtr point, double *m_value);
+			      gaiaGeomCollPtr point, double *m_value);		      
+#endif /* end including GEOS */
 
 /**
  Return a GeometryCollection containing elements matching the specified range of measures
@@ -1719,7 +1727,7 @@ extern "C"
  \sa gaiaIsValidTrajectory, gaiaFreeGeomColl
 
  \note you are responsible to destroy (before or after) any allocated Geometry,
- this including any Geometry returned by gaiaLineInterpolatePoint()\n
+ this including any Geometry returned by gaiaTrajectoryInterpolatePoint()\n
  not reentrant and thread unsafe.
  
  \note a Geometry is considered to be a valid Trajectory if it contains
@@ -2247,6 +2255,37 @@ extern "C"
  */
     GAIAGEO_DECLARE gaiaGeomCollPtr gaiaMakePolygon (gaiaGeomCollPtr exterior,
 						     gaiaGeomCollPtr interiors);
+
+/**
+ Computes the Curvosity Index for some Linestrings
+
+ \param p_cache a memory pointer returned by spatialite_alloc_connection()
+ \param line a generic Linestring.
+ \param extra_points number of points to be interpolated at regular
+ distance into the reference line.
+
+ \return the calculated Curvosity Index (expected to be in the range between 0.0 and 1.0).
+ */
+    GAIAGEO_DECLARE double gaiaCurvosityIndex (const void *p_cache,
+					       gaiaLinestringPtr line,
+					       int extra_points);
+
+/**
+ Computes the Uphill and Downhill total Height for some 3D Linestrings
+
+ \param line a generic Linestring.
+ \param up on completion this variable will contain the total Uphill Height.\n
+ Will always be ZERO for any 2D Linestring.
+ \param down on completion this variable will contain the total Downhill Height.\n
+ Will always be ZERO for any 2D Linestring.
+
+ */
+    GAIAGEO_DECLARE void gaiaUpDownHeight (gaiaLinestringPtr line, double *up,
+					   double *down);
+	
+#ifdef _WIN32				      
+	GAIAGEO_DECLARE FILE * gaia_win_fopen(const char *path, const char *mode);
+#endif
 
 #ifdef __cplusplus
 }

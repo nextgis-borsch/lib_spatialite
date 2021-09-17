@@ -39,13 +39,18 @@ the terms of any one of the MPL, the GPL or the LGPL.
 
 #include "spatialite/geopackage.h"
 #include <spatialite/gaiaexif.h>
-#include "config.h"
 #include "geopackage_internal.h"
+
+#if defined(_WIN32) && !defined(__MINGW32__)
+#include "config-msvc.h"
+#else
+#include "config.h"
+#endif
 
 #ifdef ENABLE_GEOPACKAGE
 
 GEOPACKAGE_PRIVATE void
-fnct_gpkgGetImageType (sqlite3_context * context, int argc UNUSED,
+fnct_gpkgGetImageType (sqlite3_context * context, int argc,
 		       sqlite3_value ** argv)
 {
 /* SQL function:
@@ -67,6 +72,9 @@ fnct_gpkgGetImageType (sqlite3_context * context, int argc UNUSED,
     unsigned char *p_blob = NULL;
     int n_bytes = 0;
     int blobType;
+
+    if (argc == 0)
+	argc = 0;		/* suppressing stupid compiler warnings */
 
     if (sqlite3_value_type (argv[0]) != SQLITE_BLOB)
       {

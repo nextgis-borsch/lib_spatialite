@@ -3,7 +3,7 @@
  grass_crs.h -- private header file required by source file derived from
                 Grass GIS
     
- version 4.3, 2015 May 5
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -32,7 +32,11 @@
 */
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifdef _WIN32
+#define GCP_PRIVATE
+#else
 #define GCP_PRIVATE __attribute__ ((visibility("hidden")))
+#endif
 #endif
 
 /* STRUCTURE FOR USE INTERNALLY WITH THESE FUNCTIONS.  THESE FUNCTIONS EXPECT

@@ -3,7 +3,7 @@
  gaia_auxtopo_table.c -- implementation of the Topology module
                          methods processing a whole GeoTable
     
- version 4.3, 2015 July 15
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -25,7 +25,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2015
+Portions created by the Initial Developer are Copyright (C) 2015-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s): 
@@ -4539,7 +4539,7 @@ auxtopo_polygonize_face_edges (struct face_edges *list, const void *cache)
 }
 
 TOPOLOGY_PRIVATE gaiaGeomCollPtr
-auxtopo_polygonize_face_edges_generalize (struct face_edges * list,
+auxtopo_polygonize_face_edges_generalize (struct face_edges *list,
 					  const void *cache)
 {
 /* attempting to reaggregrate Polygons from valid Edges */
@@ -7953,6 +7953,7 @@ topoGeo_EdgeHeal_common (GaiaTopologyAccessorPtr accessor, int mode_new)
     char *edge;
     char *xedge;
     int loop = 1;
+    int loop_count;
     sqlite3_stmt *stmt1 = NULL;
     sqlite3_stmt *stmt2 = NULL;
     sqlite3_stmt *stmt3 = NULL;
@@ -7996,12 +7997,10 @@ topoGeo_EdgeHeal_common (GaiaTopologyAccessorPtr accessor, int mode_new)
     xedge = gaiaDoubleQuotedSql (edge);
     sqlite3_free (edge);
     sql =
-	sqlite3_mprintf ("SELECT e1.edge_id, e2.edge_id FROM \"%s\" AS n "
-			 "JOIN \"%s\" AS e1 ON (n.node_id = e1.end_node) "
-			 "JOIN \"%s\" AS e2 ON (n.node_id = e2.start_node) "
-			 "WHERE n.node_id = ? AND e1.start_node <> e1.end_node "
-			 "AND e2.start_node <> e2.end_node",
-			 xnode, xedge, xedge);
+	sqlite3_mprintf ("SELECT e.edge_id FROM \"%s\" AS n "
+			 "JOIN \"%s\" AS e ON (n.node_id = e.start_node OR n.node_id = e.end_node) "
+			 "WHERE n.node_id = ? AND e.start_node <> e.end_node",
+			 xnode, xedge);
     free (xnode);
     free (xedge);
     ret = sqlite3_prepare_v2 (topo->db_handle, sql, strlen (sql), &stmt2, NULL);
@@ -8054,6 +8053,7 @@ topoGeo_EdgeHeal_common (GaiaTopologyAccessorPtr accessor, int mode_new)
 		      sqlite3_bind_int64 (stmt2, 1,
 					  sqlite3_column_int64 (stmt1, 0));
 
+		      loop_count = 0;
 		      while (1)
 			{
 			    /* scrolling the result set rows */
@@ -8062,16 +8062,24 @@ topoGeo_EdgeHeal_common (GaiaTopologyAccessorPtr accessor, int mode_new)
 				break;	/* end of result set */
 			    if (ret == SQLITE_ROW)
 			      {
-				  edge_1_id = sqlite3_column_int64 (stmt2, 0);
-				  edge_2_id = sqlite3_column_int64 (stmt2, 1);
-				  if (edge_1_id == edge_2_id)
+				  loop_count++;
+				  if (loop_count == 1)
+				      edge_1_id =
+					  sqlite3_column_int64 (stmt2, 0);
+				  else if (loop_count == 2)
+				      edge_2_id =
+					  sqlite3_column_int64 (stmt2, 0);
+				  else
 				    {
-					/* can't Heal - dog chasing its tail */
-					edge_1_id = -1;
-					edge_2_id = -1;
-					continue;
+					char *msg =
+					    sqlite3_mprintf
+					    ("TopoGeo_%sEdgeHeal error: \"Unexpected loop_count > 2\"",
+					     mode_new ? "New" : "Mod");
+					gaiatopo_set_last_error_msg (accessor,
+								     msg);
+					sqlite3_free (msg);
+					goto error;
 				    }
-				  break;
 			      }
 			    else
 			      {
@@ -8085,8 +8093,22 @@ topoGeo_EdgeHeal_common (GaiaTopologyAccessorPtr accessor, int mode_new)
 				  goto error;
 			      }
 			}
-		      if (edge_1_id < 0 && edge_2_id < 0)
-			  break;
+		      if (loop_count != 2 || edge_1_id < 0 || edge_2_id < 0)
+			{
+			    /* discarding invalid Edges */
+			    edge_1_id = -1;
+			    edge_2_id = -1;
+			    loop_count = 0;
+			    continue;
+			}
+		      if (edge_1_id == edge_2_id)
+			{
+			    /* can't Heal - dog chasing its tail */
+			    edge_1_id = -1;
+			    edge_2_id = -1;
+			    loop_count = 0;
+			    continue;
+			}
 
 		      /* healing a couple of Edges */
 		      sqlite3_reset (stmt3);
@@ -8097,7 +8119,7 @@ topoGeo_EdgeHeal_common (GaiaTopologyAccessorPtr accessor, int mode_new)
 		      if (ret == SQLITE_DONE || ret == SQLITE_ROW)
 			{
 			    loop = 1;
-			    continue;
+			    break;
 			}
 		      else
 			{

@@ -2,7 +2,7 @@
 
  gg_xml.c -- XML Document implementation
     
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -438,7 +438,7 @@ sniff_sld_payload (xmlNodePtr node, int *layers, int *point, int *line,
 static void
 sniff_payload (xmlDocPtr xml_doc, int *is_iso_metadata,
 	       int *is_sld_se_vector_style, int *is_sld_se_raster_style,
-	       int *is_sld_style, int *is_svg, int *is_gpx)
+	       int *is_sld_style, int *is_svg, int *is_gpx, int *is_map_config)
 {
 /* sniffing the payload type */
     xmlNodePtr root = xmlDocGetRootElement (xml_doc);
@@ -490,6 +490,8 @@ sniff_payload (xmlDocPtr xml_doc, int *is_iso_metadata,
 	      *is_svg = 1;
 	  if (strcmp (name, "gpx") == 0)
 	      *is_gpx = 1;
+	  if (strcmp (name, "RL2MapConfig") == 0)
+	      *is_map_config = 1;
       }
 }
 
@@ -1453,6 +1455,147 @@ retrieve_sld_se_identifiers (xmlDocPtr xml_doc, char **name, char **title,
 	*abstract = string;
 }
 
+static void
+find_map_config_name (xmlNodePtr node, char **string)
+{
+/* recursively scanning the DOM tree [name] */
+    while (node)
+      {
+	  if (node->type == XML_ELEMENT_NODE)
+	    {
+		const char *name = (const char *) (node->name);
+		if (strcmp (name, "Name") == 0)
+		  {
+		      xmlNodePtr child = node->children;
+		      if (child)
+			{
+			    if (child->type == XML_TEXT_NODE)
+			      {
+				  int len;
+				  const char *value =
+				      (const char *) (child->content);
+				  len = strlen (value);
+				  if (*string != NULL)
+				      free (*string);
+				  *string = malloc (len + 1);
+				  strcpy (*string, value);
+			      }
+			}
+		  }
+	    }
+	  node = node->next;
+      }
+}
+
+static void
+find_map_config_title (xmlNodePtr node, char **string)
+{
+/* recursively scanning the DOM tree [title] */
+    while (node)
+      {
+	  if (node->type == XML_ELEMENT_NODE)
+	    {
+		const char *name = (const char *) (node->name);
+		if (strcmp (name, "Title") == 0)
+		  {
+		      xmlNodePtr child = node->children;
+		      if (child)
+			{
+			    if (child->type == XML_TEXT_NODE)
+			      {
+				  int len;
+				  const char *value =
+				      (const char *) (child->content);
+				  len = strlen (value);
+				  if (*string != NULL)
+				      free (*string);
+				  *string = malloc (len + 1);
+				  strcpy (*string, value);
+			      }
+			}
+		  }
+		if (strcmp (name, "Description") == 0)
+		    find_map_config_title (node->children, string);
+	    }
+	  node = node->next;
+      }
+}
+
+static void
+find_map_config_abstract (xmlNodePtr node, char **string)
+{
+/* recursively scanning the DOM tree [abstract] */
+    while (node)
+      {
+	  if (node->type == XML_ELEMENT_NODE)
+	    {
+		const char *name = (const char *) (node->name);
+		if (strcmp (name, "Abstract") == 0)
+		  {
+		      xmlNodePtr child = node->children;
+		      if (child)
+			{
+			    if (child->type == XML_TEXT_NODE)
+			      {
+				  int len;
+				  const char *value =
+				      (const char *) (child->content);
+				  len = strlen (value);
+				  if (*string != NULL)
+				      free (*string);
+				  *string = malloc (len + 1);
+				  strcpy (*string, value);
+			      }
+			}
+		  }
+		if (strcmp (name, "Description") == 0)
+		    find_map_config_abstract (node->children, string);
+	    }
+	  node = node->next;
+      }
+}
+
+static void
+retrieve_map_config_identifiers (xmlDocPtr xml_doc, char **name, char **title,
+				 char **abstract)
+{
+/*
+/ attempting to retrieve the Name, Title and Abstract items 
+/ from a Map Config document
+*/
+    xmlNodePtr root = xmlDocGetRootElement (xml_doc);
+    char *string;
+    const char *xname = (const char *) (root->name);
+
+    *name = NULL;
+    *title = NULL;
+    *abstract = NULL;
+
+    if (xname != NULL)
+      {
+	  if (strcmp (xname, "RL2MapConfig") != 0)
+	      return;
+      }
+
+/* attempting to retrieve the Name item */
+    string = NULL;
+    find_map_config_name (root->children, &string);
+    if (string)
+	*name = string;
+
+/* attempting to retrieve the Title item */
+    string = NULL;
+    find_map_config_title (root->children, &string);
+    if (string)
+	*title = string;
+
+/* attempting to retrieve the Abstract item */
+    string = NULL;
+    find_map_config_abstract (root->children, &string);
+    if (string)
+	*abstract = string;
+}
+
 GAIAGEO_DECLARE void
 gaiaXmlToBlob (const void *p_cache, const unsigned char *xml, int xml_len,
 	       int compressed, const char *schemaURI, unsigned char **result,
@@ -1471,6 +1614,7 @@ gaiaXmlToBlob (const void *p_cache, const unsigned char *xml, int xml_len,
     int is_sld_style = 0;
     int is_svg = 0;
     int is_gpx = 0;
+    int is_map_config = 0;
     int len;
     int zip_len;
     short uri_len = 0;
@@ -1611,7 +1755,8 @@ gaiaXmlToBlob (const void *p_cache, const unsigned char *xml, int xml_len,
 
 /* testing for special cases: ISO Metadata, SLD/SE Styles and SVG */
     sniff_payload (xml_doc, &is_iso_metadata, &is_sld_se_vector_style,
-		   &is_sld_se_raster_style, &is_sld_style, &is_svg, &is_gpx);
+		   &is_sld_se_raster_style, &is_sld_style, &is_svg, &is_gpx,
+		   &is_map_config);
     if (is_iso_metadata)
 	retrieve_iso_identifiers (xml_doc, &fileIdentifier,
 				  &parentIdentifier, &title, &abstract,
@@ -1620,6 +1765,8 @@ gaiaXmlToBlob (const void *p_cache, const unsigned char *xml, int xml_len,
 	retrieve_sld_identifiers (xml_doc, &name, &title, &abstract);
     else if (is_sld_se_vector_style || is_sld_se_raster_style)
 	retrieve_sld_se_identifiers (xml_doc, &name, &title, &abstract);
+    else if (is_map_config)
+	retrieve_map_config_identifiers (xml_doc, &name, &title, &abstract);
     xmlFreeDoc (xml_doc);
 
     if (compressed)
@@ -1688,6 +1835,8 @@ gaiaXmlToBlob (const void *p_cache, const unsigned char *xml, int xml_len,
 	flags |= GAIA_XML_SVG;
     if (is_gpx)
 	flags |= GAIA_XML_GPX;
+    if (is_map_config)
+	flags |= GAIA_XML_MAP_CONFIG;
     *(buf + 1) = flags;		/* XmlBLOB flags */
     *(buf + 2) = GAIA_XML_HEADER;	/* HEADER signature */
     gaiaExport32 (buf + 3, xml_len, 1, endian_arch);	/* the uncompressed XMLDocument size */
@@ -2599,7 +2748,7 @@ gaiaXmlTextFromBlob (const unsigned char *blob, int blob_size, int indent)
 {
 /* attempting to extract an XMLDocument from within an XmlBLOB buffer */
 
-#ifndef OMIT_ICONV	/* only if ICONV is supported */
+#ifndef OMIT_ICONV		/* only if ICONV is supported */
     int compressed = 0;
     int little_endian = 0;
     unsigned char flag;
@@ -2740,12 +2889,12 @@ gaiaXmlTextFromBlob (const unsigned char *blob, int blob_size, int indent)
       }
     xmlSetGenericErrorFunc ((void *) stderr, NULL);
     return NULL;
-    
+
 #else
-	if (blob != NULL && blob_size == 0 && indent == 0)
-	blob = NULL;	/* silencing stupid compiler warnings */
+    if (blob != NULL && blob_size == 0 && indent == 0)
+	blob = NULL;		/* silencing stupid compiler warnings */
 #endif
-	return NULL;
+    return NULL;
 }
 
 GAIAGEO_DECLARE void
@@ -2925,7 +3074,11 @@ gaiaXmlStore (const unsigned char *blob, int size, const char *path, int indent)
 	return 0;
 
 /* exporting the XML Document into an external file */
+#ifdef _WIN32
+    fl = gaia_win_fopen (path, "wb");
+#else
     fl = fopen (path, "wb");
+#endif
     if (fl == NULL)
       {
 	  spatialite_e ("Unable to open \"%s\"\n", path);
@@ -2987,7 +3140,8 @@ gaiaIsIsoMetadataXmlBlob (const unsigned char *blob, int blob_size)
     if (!gaiaIsValidXmlBlob (blob, blob_size))
 	return -1;		/* cannot be an XmlBLOB */
     flag = *(blob + 1);
-    if ((flag & GAIA_XML_ISO_METADATA) == GAIA_XML_ISO_METADATA)
+    if (((flag & GAIA_XML_ISO_METADATA) == GAIA_XML_ISO_METADATA)
+	&& ((flag & GAIA_XML_MAP_CONFIG) != GAIA_XML_MAP_CONFIG))
 	iso_metadata = 1;
     return iso_metadata;
 }
@@ -3003,7 +3157,8 @@ gaiaIsSldSeVectorStyleXmlBlob (const unsigned char *blob, int blob_size)
     if (!gaiaIsValidXmlBlob (blob, blob_size))
 	return -1;		/* cannot be an XmlBLOB */
     flag = *(blob + 1);
-    if ((flag & GAIA_XML_SLD_SE_VECTOR_STYLE) == GAIA_XML_SLD_SE_VECTOR_STYLE)
+    if (((flag & GAIA_XML_SLD_SE_VECTOR_STYLE) == GAIA_XML_SLD_SE_VECTOR_STYLE)
+	&& ((flag & GAIA_XML_SLD_STYLE) != GAIA_XML_SLD_STYLE))
 	sld_se_style = 1;
     return sld_se_style;
 }
@@ -3041,6 +3196,22 @@ gaiaIsSldStyleXmlBlob (const unsigned char *blob, int blob_size)
 }
 
 GAIAGEO_DECLARE int
+gaiaIsMapConfigXmlBlob (const unsigned char *blob, int blob_size)
+{
+/* Checks if a valid XmlBLOB buffer does actually contains a MapConfig or not */
+    int sld_style = 0;
+    unsigned char flag;
+
+/* validity check */
+    if (!gaiaIsValidXmlBlob (blob, blob_size))
+	return -1;		/* cannot be an XmlBLOB */
+    flag = *(blob + 1);
+    if ((flag & GAIA_XML_MAP_CONFIG) == GAIA_XML_MAP_CONFIG)
+	sld_style = 1;
+    return sld_style;
+}
+
+GAIAGEO_DECLARE int
 gaiaIsSvgXmlBlob (const unsigned char *blob, int blob_size)
 {
 /* Checks if a valid XmlBLOB buffer does actually contains an SVG image or not */
@@ -3067,7 +3238,8 @@ gaiaIsGpxXmlBlob (const unsigned char *blob, int blob_size)
     if (!gaiaIsValidXmlBlob (blob, blob_size))
 	return -1;		/* cannot be an XmlBLOB */
     flag = *(blob + 1);
-    if ((flag & GAIA_XML_GPX) == GAIA_XML_GPX)
+    if (((flag & GAIA_XML_GPX) == GAIA_XML_GPX)
+	&& ((flag & GAIA_XML_MAP_CONFIG) != GAIA_XML_MAP_CONFIG))
 	gpx = 1;
     return gpx;
 }

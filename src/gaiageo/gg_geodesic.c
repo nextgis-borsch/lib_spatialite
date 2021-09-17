@@ -2,7 +2,7 @@
 
  gg_geodesic.c -- Gaia functions for geodesic calculations
   
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -539,7 +539,7 @@ gaiaGeodesicArcLength (sqlite3 * sqlite, const void *data,
 	|| geom2->FirstLinestring != NULL || geom2->FirstPolygon != NULL)
 	return 0;
     if (geom1->FirstPoint == NULL || geom1->FirstPoint != geom1->LastPoint ||
-	geom2->FirstPoint == NULL || geom->FirstPoint != geom2->LastPoint)
+	geom2->FirstPoint == NULL || geom2->FirstPoint != geom2->LastPoint)
 	return 0;
 #endif
 

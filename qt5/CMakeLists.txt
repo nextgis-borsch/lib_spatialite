@@ -3,8 +3,7 @@
 # Purpose:  CMake build scripts
 # Author:   Dmitry Baryshnikov, dmitry.baryshnikov@nextgis.com
 ################################################################################
-# Copyright (C) 2018, NextGIS <info@nextgis.com>
-# Copyright (C) 2018 Dmitry Baryshnikov
+# Copyright (C) 2020, NextGIS <info@nextgis.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -24,39 +23,46 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 ################################################################################
-remove_definitions(-D_ANSI_SOURCE)
 
-find_anyproject(Qt4 REQUIRED COMPONENTS QtCore QtSql)
+find_anyproject(Qt5 REQUIRED COMPONENTS Core Sql)
+set(CMAKE_AUTOMOC ON)
 
-add_definitions(-DQT_BUILD_SQL_LIB -DQT_PLUGIN -DQT_NO_DEBUG -DQT_SHARED)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${SQLITE3_INCLUDE_DIR})
+add_definitions(${QT_DEFINITIONS})
+add_definitions(-DQT_PLUGIN)
+add_definitions(-DQT_NO_DEBUG)
+add_definitions(-DQT_SHARED)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+include_directories(SYSTEM
+    ${SQLITE3_INCLUDE_DIR}
+    ${Qt5Sql_PRIVATE_INCLUDE_DIRS}
+)
 
-set(CSOURCES
-    main.cpp
+set(QSQLSPATIALITE_SRC 
     qsql_spatialite.cpp
-    qgsslconnect.cpp
+    smain.cpp
+    qgssqliteutils.cpp
+    qgsspatialiteutils.cpp
 )
 
-set(HHEADERS
-    main.h
-    qgsslconnect.h
-    qsql_spatialite.h
-    # qsqlcachedresult_p.h
+add_library(qsqlspatialite SHARED ${QSQLSPATIALITE_SRC})
+
+target_link_libraries(qsqlspatialite
+    Qt5::Core
+    Qt5::Sql
+    ${LIB_NAME}
+    ${SPATIALITE_LIBRARY}
+    ${SQLITE3_LIBRARIES}
 )
 
-qt4_wrap_cpp(MOC_SRCS4 ${HHEADERS})
-
-add_library(qsqlspatialite SHARED ${CSOURCES} ${HHEADERS} ${MOC_SRCS4})
-
-target_link_libraries(qsqlspatialite PRIVATE Qt4::QtCore Qt4::QtSql ${LIB_NAME} ${SQLITE3_LIBRARIES})
-set_target_properties(qsqlspatialite PROPERTIES CXX_STANDARD 11)
+install(TARGETS qsqlspatialite
+  LIBRARY DESTINATION ${INSTALL_LIB_DIR}/qt5/plugins/sqldrivers
+  RUNTIME DESTINATION ${INSTALL_LIB_DIR}/qt5/plugins/sqldrivers
+)
 
 if(OSX_FRAMEWORK)
-    set(INSTALL_MODULES_DIR Library/Plugins/Qt4/sqldrivers)
+    set(INSTALL_MODULES_DIR Library/Plugins/Qt5/sqldrivers)
 else()
-    set(INSTALL_MODULES_DIR ${INSTALL_LIB_DIR}/qt4/plugins/sqldrivers)
+    set(INSTALL_MODULES_DIR ${INSTALL_LIB_DIR}/qt5/plugins/sqldrivers)
 endif()
 
 if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)

@@ -22,17 +22,15 @@
 
 function(check_version major minor rev)
 
-    set(CHECK_FILE ${CMAKE_CURRENT_SOURCE_DIR}/config-msvc.h)
-    file(READ ${CHECK_FILE} _VERSION_H_CONTENTS)
+    set(filename "${CMAKE_SOURCE_DIR}/configure.ac")
+    file(READ ${filename} FILE_CONTENTS)
+    string(REGEX MATCH "AC_INIT\\([A-Za-z]+, [0-9]+\\.[0-9]+\\.[0-9]+" VERSION_STR ${FILE_CONTENTS})
+    string(REGEX MATCHALL "[0-9]+" VERSIONS_LIST ${VERSION_STR})
 
-    string(REGEX MATCH "PACKAGE_VERSION[ \t]+\"([0-9].[0-9].[0-9]+)"
-        VERSION ${_VERSION_H_CONTENTS})
-    string (REGEX MATCH "([0-9].[0-9].[0-9]+)"
-        VERSION ${VERSION})
-
-    string(SUBSTRING ${VERSION} 0 1 MAJOR_VERSION)
-    string(SUBSTRING ${VERSION} 2 1 MINOR_VERSION)
-    string(SUBSTRING ${VERSION} 4 1 REV_VERSION)
+    list(APPEND VERSIONS_LIST 0) #if the VERSION_LIST size == 2
+    list(GET VERSIONS_LIST 0 MAJOR_VERSION)
+    list(GET VERSIONS_LIST 1 MINOR_VERSION)
+    list(GET VERSIONS_LIST 2 REV_VERSION)
 
     set(${major} ${MAJOR_VERSION} PARENT_SCOPE)
     set(${minor} ${MINOR_VERSION} PARENT_SCOPE)

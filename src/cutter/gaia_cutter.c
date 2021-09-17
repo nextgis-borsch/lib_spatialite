@@ -2,7 +2,7 @@
 
  gaia_cutter.c -- implementation of the Cutter module
     
- version 4.3, 2015 July 2
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2015
+Portions created by the Initial Developer are Copyright (C) 2015-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s): 
@@ -674,7 +674,8 @@ do_check_input (sqlite3 * handle, const char *db_prefix, const char *table,
 
 /* checking if the table really exists */
     xtable = gaiaDoubleQuotedSql (table);
-    sql = sqlite3_mprintf ("PRAGMA \"%s\".table_info(\"%s\")", xprefix, xtable);
+    sql =
+	sqlite3_mprintf ("PRAGMA \"%s\".table_info(\"%s\")", xprefix, xtable);
     free (xtable);
     ret = sqlite3_get_table (handle, sql, &results, &rows, &columns, &errMsg);
     sqlite3_free (sql);
@@ -709,14 +710,16 @@ do_check_input (sqlite3 * handle, const char *db_prefix, const char *table,
 /* checking geometry_columns */
     count = 0;
     if (xgeometry == NULL)
-	sql = sqlite3_mprintf ("SELECT f_geometry_column, srid, geometry_type "
-			       "FROM \"%s\".geometry_columns WHERE Lower(f_table_name) = Lower(%Q)",
-			       xprefix, table, xgeometry);
+	sql =
+	    sqlite3_mprintf ("SELECT f_geometry_column, srid, geometry_type "
+			     "FROM \"%s\".geometry_columns WHERE Lower(f_table_name) = Lower(%Q)",
+			     xprefix, table, xgeometry);
     else
-	sql = sqlite3_mprintf ("SELECT f_geometry_column, srid, geometry_type "
-			       "FROM \"%s\".geometry_columns WHERE Lower(f_table_name) = Lower(%Q) "
-			       "AND Lower(f_geometry_column) = Lower(%Q)",
-			       xprefix, table, xgeometry);
+	sql =
+	    sqlite3_mprintf ("SELECT f_geometry_column, srid, geometry_type "
+			     "FROM \"%s\".geometry_columns WHERE Lower(f_table_name) = Lower(%Q) "
+			     "AND Lower(f_geometry_column) = Lower(%Q)",
+			     xprefix, table, xgeometry);
     ret = sqlite3_get_table (handle, sql, &results, &rows, &columns, &errMsg);
     sqlite3_free (sql);
     if (ret != SQLITE_OK)
@@ -829,7 +832,8 @@ do_check_blade (sqlite3 * handle, const char *db_prefix, const char *table,
 
 /* checking if the table really exists */
     xtable = gaiaDoubleQuotedSql (table);
-    sql = sqlite3_mprintf ("PRAGMA \"%s\".table_info(\"%s\")", xprefix, xtable);
+    sql =
+	sqlite3_mprintf ("PRAGMA \"%s\".table_info(\"%s\")", xprefix, xtable);
     free (xtable);
     ret = sqlite3_get_table (handle, sql, &results, &rows, &columns, &errMsg);
     sqlite3_free (sql);
@@ -864,14 +868,16 @@ do_check_blade (sqlite3 * handle, const char *db_prefix, const char *table,
 /* checking geometry_columns */
     count = 0;
     if (xgeometry == NULL)
-	sql = sqlite3_mprintf ("SELECT f_geometry_column, srid, geometry_type "
-			       "FROM \"%s\".geometry_columns WHERE Lower(f_table_name) = Lower(%Q)",
-			       xprefix, table, xgeometry);
+	sql =
+	    sqlite3_mprintf ("SELECT f_geometry_column, srid, geometry_type "
+			     "FROM \"%s\".geometry_columns WHERE Lower(f_table_name) = Lower(%Q)",
+			     xprefix, table, xgeometry);
     else
-	sql = sqlite3_mprintf ("SELECT f_geometry_column, srid, geometry_type "
-			       "FROM \"%s\".geometry_columns WHERE Lower(f_table_name) = Lower(%Q) "
-			       "AND Lower(f_geometry_column) = Lower(%Q)",
-			       xprefix, table, xgeometry);
+	sql =
+	    sqlite3_mprintf ("SELECT f_geometry_column, srid, geometry_type "
+			     "FROM \"%s\".geometry_columns WHERE Lower(f_table_name) = Lower(%Q) "
+			     "AND Lower(f_geometry_column) = Lower(%Q)",
+			     xprefix, table, xgeometry);
     ret = sqlite3_get_table (handle, sql, &results, &rows, &columns, &errMsg);
     sqlite3_free (sql);
     if (ret != SQLITE_OK)
@@ -971,7 +977,8 @@ do_check_nulls (sqlite3 * handle, const char *db_prefix, const char *table,
 /* retrieving all PK columns */
     xprefix = gaiaDoubleQuotedSql (db_prefix);
     xtable = gaiaDoubleQuotedSql (table);
-    sql = sqlite3_mprintf ("PRAGMA \"%s\".table_info(\"%s\")", xprefix, xtable);
+    sql =
+	sqlite3_mprintf ("PRAGMA \"%s\".table_info(\"%s\")", xprefix, xtable);
     free (xprefix);
     free (xtable);
     ret = sqlite3_get_table (handle, sql, &results, &rows, &columns, &errMsg);
@@ -1047,14 +1054,16 @@ do_check_nulls (sqlite3 * handle, const char *db_prefix, const char *table,
     if (null_geom)
       {
 	  sql =
-	      sqlite3_mprintf ("Invalid %s: found NULL Geometries !!!", which);
+	      sqlite3_mprintf ("Invalid %s: found NULL Geometries !!!",
+			       which);
 	  do_update_message (message, sql);
 	  sqlite3_free (sql);
 	  goto error;
       }
     if (null_pk)
       {
-	  sql = sqlite3_mprintf ("Invalid %s: found NULL PK Values !!!", which);
+	  sql =
+	      sqlite3_mprintf ("Invalid %s: found NULL PK Values !!!", which);
 	  do_update_message (message, sql);
 	  sqlite3_free (sql);
 	  goto error;
@@ -1076,8 +1085,8 @@ do_check_nulls (sqlite3 * handle, const char *db_prefix, const char *table,
 }
 
 static int
-do_check_valid (sqlite3 * handle, const char *out_table, const char *input_geom,
-		char **message)
+do_check_valid (sqlite3 * handle, const char *out_table,
+		const char *input_geom, char **message)
 {
 /* checking for Invalid Output Geoms */
     int ret;
@@ -1143,7 +1152,8 @@ check_spatial_index (sqlite3 * handle, const char *db_prefix,
 
 /* inspecting the table */
     xtable = gaiaDoubleQuotedSql (idx_name);
-    sql = sqlite3_mprintf ("PRAGMA \"%s\".table_info(\"%s\")", xprefix, xtable);
+    sql =
+	sqlite3_mprintf ("PRAGMA \"%s\".table_info(\"%s\")", xprefix, xtable);
     free (xtable);
     ret = sqlite3_get_table (handle, sql, &results, &rows, &columns, &errMsg);
     sqlite3_free (sql);
@@ -1368,7 +1378,8 @@ do_check_output (sqlite3 * handle, const char *db_prefix, const char *table,
 
 /* checking if the table already exists */
     xtable = gaiaDoubleQuotedSql (table);
-    sql = sqlite3_mprintf ("PRAGMA \"%s\".table_info(\"%s\")", xprefix, xtable);
+    sql =
+	sqlite3_mprintf ("PRAGMA \"%s\".table_info(\"%s\")", xprefix, xtable);
     free (xtable);
     ret = sqlite3_get_table (handle, sql, &results, &rows, &columns, &errMsg);
     sqlite3_free (sql);
@@ -1440,7 +1451,8 @@ do_get_input_pk (struct output_table *tbl, sqlite3 * handle,
 
 /* inspecting the table */
     xtable = gaiaDoubleQuotedSql (table);
-    sql = sqlite3_mprintf ("PRAGMA \"%s\".table_info(\"%s\")", xprefix, xtable);
+    sql =
+	sqlite3_mprintf ("PRAGMA \"%s\".table_info(\"%s\")", xprefix, xtable);
     free (xtable);
     ret = sqlite3_get_table (handle, sql, &results, &rows, &columns, &errMsg);
     sqlite3_free (sql);
@@ -1498,7 +1510,8 @@ do_get_blade_pk (struct output_table *tbl, sqlite3 * handle,
 
 /* inspecting the table */
     xtable = gaiaDoubleQuotedSql (table);
-    sql = sqlite3_mprintf ("PRAGMA \"%s\".table_info(\"%s\")", xprefix, xtable);
+    sql =
+	sqlite3_mprintf ("PRAGMA \"%s\".table_info(\"%s\")", xprefix, xtable);
     free (xtable);
     ret = sqlite3_get_table (handle, sql, &results, &rows, &columns, &errMsg);
     sqlite3_free (sql);
@@ -2070,7 +2083,8 @@ do_prepare_polygon (gaiaPolygonPtr pg, int srid)
 
 /* Exterior Ring */
     rng = pg->Exterior;
-    new_pg = gaiaAddPolygonToGeomColl (new_geom, rng->Points, pg->NumInteriors);
+    new_pg =
+	gaiaAddPolygonToGeomColl (new_geom, rng->Points, pg->NumInteriors);
     new_rng = new_pg->Exterior;
     for (iv = 0; iv < rng->Points; iv++)
       {
@@ -2192,7 +2206,8 @@ do_insert_output_row (struct output_table *tbl, const void *cache,
 		  {
 		      /* Input Primary Key Column(s) */
 		  case SQLITE_INTEGER:
-		      sqlite3_bind_int64 (stmt_out, icol, var->value.intValue);
+		      sqlite3_bind_int64 (stmt_out, icol,
+					  var->value.intValue);
 		      break;
 		  case SQLITE_FLOAT:
 		      sqlite3_bind_double (stmt_out, icol,
@@ -2227,7 +2242,8 @@ do_insert_output_row (struct output_table *tbl, const void *cache,
 		  {
 		      /* Blade Primary Key Column(s) */
 		  case SQLITE_INTEGER:
-		      sqlite3_bind_int64 (stmt_out, icol, var->value.intValue);
+		      sqlite3_bind_int64 (stmt_out, icol,
+					  var->value.intValue);
 		      break;
 		  case SQLITE_FLOAT:
 		      sqlite3_bind_double (stmt_out, icol,
@@ -2298,9 +2314,9 @@ do_insert_output_row (struct output_table *tbl, const void *cache,
 
 static int
 do_create_input_statement (struct output_table *tbl, sqlite3 * handle,
-			   const char *input_db_prefix, const char *input_table,
-			   const char *input_geom, sqlite3_stmt ** stmt_in,
-			   char **message)
+			   const char *input_db_prefix,
+			   const char *input_table, const char *input_geom,
+			   sqlite3_stmt ** stmt_in, char **message)
 {
 /* creating a Prepared Statemet - SELECT geometry FROM Input */
     sqlite3_stmt *stmt = NULL;
@@ -2332,7 +2348,8 @@ do_create_input_statement (struct output_table *tbl, sqlite3 * handle,
 	    {
 		xcolumn = gaiaDoubleQuotedSql (col->base_name);
 		if (comma)
-		    sql = sqlite3_mprintf ("%s AND \"%s\" = ?", prev, xcolumn);
+		    sql =
+			sqlite3_mprintf ("%s AND \"%s\" = ?", prev, xcolumn);
 		else
 		    sql = sqlite3_mprintf ("%s \"%s\" = ?", prev, xcolumn);
 		free (xcolumn);
@@ -2514,15 +2531,16 @@ do_prepare_temp_points (struct output_table *tbl, sqlite3 * handle,
     xcolumn1 = gaiaDoubleQuotedSql (input_geom);
     xcolumn2 = gaiaDoubleQuotedSql (blade_geom);
     sql =
-	sqlite3_mprintf ("%s, ST_Touches(i.\"%s\", b.\"%s\") AS touches", prev,
-			 xcolumn1, xcolumn2);
+	sqlite3_mprintf ("%s, ST_Touches(i.\"%s\", b.\"%s\") AS touches",
+			 prev, xcolumn1, xcolumn2);
     free (xcolumn1);
     free (xcolumn2);
     sqlite3_free (prev);
     prev = sql;
     xprefix = gaiaDoubleQuotedSql (input_db_prefix);
     xtable = gaiaDoubleQuotedSql (input_table);
-    sql = sqlite3_mprintf ("%s FROM \"%s\".\"%s\" AS i", prev, xprefix, xtable);
+    sql =
+	sqlite3_mprintf ("%s FROM \"%s\".\"%s\" AS i", prev, xprefix, xtable);
     free (xprefix);
     free (xtable);
     sqlite3_free (prev);
@@ -2530,8 +2548,8 @@ do_prepare_temp_points (struct output_table *tbl, sqlite3 * handle,
     xprefix = gaiaDoubleQuotedSql (blade_db_prefix);
     xtable = gaiaDoubleQuotedSql (blade_table);
     sql =
-	sqlite3_mprintf ("%s LEFT JOIN \"%s\".\"%s\" AS b ON (", prev, xprefix,
-			 xtable);
+	sqlite3_mprintf ("%s LEFT JOIN \"%s\".\"%s\" AS b ON (", prev,
+			 xprefix, xtable);
     free (xprefix);
     free (xtable);
     sqlite3_free (prev);
@@ -2635,9 +2653,11 @@ do_create_temp_linestrings (struct output_table *tbl, sqlite3 * handle,
 		xcolumn2 = gaiaDoubleQuotedSql (col->real_name);
 		if (comma)
 		    sql =
-			sqlite3_mprintf ("%s, \"%s\" GENERIC", prev, xcolumn2);
+			sqlite3_mprintf ("%s, \"%s\" GENERIC", prev,
+					 xcolumn2);
 		else
-		    sql = sqlite3_mprintf ("%s \"%s\" GENERIC", prev, xcolumn2);
+		    sql =
+			sqlite3_mprintf ("%s \"%s\" GENERIC", prev, xcolumn2);
 		free (xcolumn2);
 		comma = 1;
 		sqlite3_free (prev);
@@ -2750,9 +2770,11 @@ do_create_temp_polygons (struct output_table *tbl, sqlite3 * handle,
 		xcolumn2 = gaiaDoubleQuotedSql (col->real_name);
 		if (comma)
 		    sql =
-			sqlite3_mprintf ("%s, \"%s\" GENERIC", prev, xcolumn2);
+			sqlite3_mprintf ("%s, \"%s\" GENERIC", prev,
+					 xcolumn2);
 		else
-		    sql = sqlite3_mprintf ("%s \"%s\" GENERIC", prev, xcolumn2);
+		    sql =
+			sqlite3_mprintf ("%s \"%s\" GENERIC", prev, xcolumn2);
 		free (xcolumn2);
 		comma = 1;
 		sqlite3_free (prev);
@@ -2992,7 +3014,8 @@ do_insert_temporary_linestring_intersection (struct output_table *tbl,
 					     const void *cache,
 					     sqlite3_stmt * stmt_out,
 					     struct temporary_row *row,
-					     int n_geom, gaiaGeomCollPtr nodes,
+					     int n_geom,
+					     gaiaGeomCollPtr nodes,
 					     char **message)
 {
 /* inserting an Input/Blade intersection into the Linestrings Helper Table */
@@ -3030,7 +3053,8 @@ do_insert_temporary_linestring_intersection (struct output_table *tbl,
 		  {
 		      /* Input Primary Key Column(s) */
 		  case SQLITE_INTEGER:
-		      sqlite3_bind_int64 (stmt_out, icol, var->value.intValue);
+		      sqlite3_bind_int64 (stmt_out, icol,
+					  var->value.intValue);
 		      break;
 		  case SQLITE_FLOAT:
 		      sqlite3_bind_double (stmt_out, icol,
@@ -3068,7 +3092,8 @@ do_insert_temporary_linestring_intersection (struct output_table *tbl,
 		  {
 		      /* Blade Primary Key Column(s) */
 		  case SQLITE_INTEGER:
-		      sqlite3_bind_int64 (stmt_out, icol, var->value.intValue);
+		      sqlite3_bind_int64 (stmt_out, icol,
+					  var->value.intValue);
 		      break;
 		  case SQLITE_FLOAT:
 		      sqlite3_bind_double (stmt_out, icol,
@@ -3115,7 +3140,7 @@ do_extract_linestring_nodes (const void *cache, sqlite3_stmt * stmt_nodes,
 			     gaiaLinestringPtr input_ln, int srid,
 			     gaiaGeomCollPtr blade_g)
 {
-/* finding the points of intersection between tweo lines (nodes) */
+/* finding the points of intersection between two lines (nodes) */
     int ret;
     gaiaGeomCollPtr input_g;
     gaiaGeomCollPtr result = NULL;
@@ -3139,11 +3164,11 @@ do_extract_linestring_nodes (const void *cache, sqlite3_stmt * stmt_nodes,
     sqlite3_reset (stmt_nodes);
     sqlite3_clear_bindings (stmt_nodes);
     input_g = do_prepare_linestring (input_ln, srid);
-    gaiaToSpatiaLiteBlobWkbEx2 (input_g, &input_blob, &input_blob_sz, gpkg_mode,
-				tiny_point);
+    gaiaToSpatiaLiteBlobWkbEx2 (input_g, &input_blob, &input_blob_sz,
+				gpkg_mode, tiny_point);
     gaiaFreeGeomColl (input_g);
-    gaiaToSpatiaLiteBlobWkbEx2 (blade_g, &blade_blob, &blade_blob_sz, gpkg_mode,
-				tiny_point);
+    gaiaToSpatiaLiteBlobWkbEx2 (blade_g, &blade_blob, &blade_blob_sz,
+				gpkg_mode, tiny_point);
     sqlite3_bind_blob (stmt_nodes, 1, input_blob, input_blob_sz, free);
     sqlite3_bind_blob (stmt_nodes, 2, blade_blob, blade_blob_sz, free);
 
@@ -3179,8 +3204,8 @@ do_populate_temp_linestrings (struct output_table *tbl, sqlite3 * handle,
 			      const char *blade_db_prefix,
 			      const char *blade_table, const char *blade_geom,
 			      const char *spatial_index_prefix,
-			      const char *spatial_index, const char *tmp_table,
-			      int type, char **message)
+			      const char *spatial_index,
+			      const char *tmp_table, int type, char **message)
 {
 /* populating the temporary helper table - LINESTRINGs */
     int ret;
@@ -3248,7 +3273,8 @@ do_populate_temp_linestrings (struct output_table *tbl, sqlite3 * handle,
       }
     xprefix = gaiaDoubleQuotedSql (input_db_prefix);
     xtable = gaiaDoubleQuotedSql (input_table);
-    sql = sqlite3_mprintf ("%s FROM \"%s\".\"%s\" AS i", prev, xprefix, xtable);
+    sql =
+	sqlite3_mprintf ("%s FROM \"%s\".\"%s\" AS i", prev, xprefix, xtable);
     free (xprefix);
     free (xtable);
     sqlite3_free (prev);
@@ -3316,7 +3342,8 @@ do_populate_temp_linestrings (struct output_table *tbl, sqlite3 * handle,
 	    {
 		xcolumn = gaiaDoubleQuotedSql (col->base_name);
 		if (comma)
-		    sql = sqlite3_mprintf ("%s AND \"%s\" = ?", prev, xcolumn);
+		    sql =
+			sqlite3_mprintf ("%s AND \"%s\" = ?", prev, xcolumn);
 		else
 		    sql = sqlite3_mprintf ("%s \"%s\" = ?", prev, xcolumn);
 		free (xcolumn);
@@ -3357,7 +3384,8 @@ do_populate_temp_linestrings (struct output_table *tbl, sqlite3 * handle,
 	    {
 		xcolumn = gaiaDoubleQuotedSql (col->base_name);
 		if (comma)
-		    sql = sqlite3_mprintf ("%s AND \"%s\" = ?", prev, xcolumn);
+		    sql =
+			sqlite3_mprintf ("%s AND \"%s\" = ?", prev, xcolumn);
 		else
 		    sql = sqlite3_mprintf ("%s \"%s\" = ?", prev, xcolumn);
 		free (xcolumn);
@@ -3441,7 +3469,8 @@ do_populate_temp_linestrings (struct output_table *tbl, sqlite3 * handle,
 
 /* composing the SQL statement - finding NODES */
     sql =
-	sqlite3_mprintf ("SELECT CollectionExtract(ST_Intersection(?, ?), 1)");
+	sqlite3_mprintf
+	("SELECT CollectionExtract(ST_Intersection(?, ?), 1)");
 
 /* creating a Prepared Statement - finding NODES */
     ret = sqlite3_prepare_v2 (handle, sql, strlen (sql), &stmt_nodes, NULL);
@@ -3755,20 +3784,24 @@ do_cut_tmp_linestrings (sqlite3 * handle, const void *cache,
 		    && sqlite3_column_type (stmt_in, 1) == SQLITE_BLOB)
 		  {
 		      pk = sqlite3_column_int64 (stmt_in, 0);
-		      blob = (unsigned char *) sqlite3_column_blob (stmt_in, 1);
+		      blob =
+			  (unsigned char *) sqlite3_column_blob (stmt_in, 1);
 		      blob_sz = sqlite3_column_bytes (stmt_in, 1);
 		      input_g = gaiaFromSpatiaLiteBlobWkbEx (blob, blob_sz,
 							     gpkg_mode,
 							     gpkg_amphibious);
 		      result =
-			  gaiaGeometryIntersection_r (cache, input_g, blade_g);
+			  gaiaGeometryIntersection_r (cache, input_g,
+						      blade_g);
 		      if (result != NULL)
 			{
-			    gaiaToSpatiaLiteBlobWkbEx2 (result, &blob, &blob_sz,
-							gpkg_mode, tiny_point);
+			    gaiaToSpatiaLiteBlobWkbEx2 (result, &blob,
+							&blob_sz, gpkg_mode,
+							tiny_point);
 			    gaiaFreeGeomColl (result);
 			    if (!do_update_tmp_cut_linestring
-				(handle, stmt_upd, pk, blob, blob_sz, message))
+				(handle, stmt_upd, pk, blob, blob_sz,
+				 message))
 				goto error;
 			}
 		      gaiaFreeGeomColl (input_g);
@@ -3888,7 +3921,8 @@ do_split_linestrings (struct output_table *tbl, sqlite3 * handle,
     xcolumn1 = gaiaDoubleQuotedSql (xprefix);
     sqlite3_free (xprefix);
     sql =
-	sqlite3_mprintf ("%s) WHERE t.\"%s\" IS NULL GROUP BY", prev, xcolumn1);
+	sqlite3_mprintf ("%s) WHERE t.\"%s\" IS NULL GROUP BY", prev,
+			 xcolumn1);
     free (xcolumn1);
     sqlite3_free (prev);
     prev = sql;
@@ -4254,7 +4288,8 @@ do_insert_temporary_polygons (struct output_table *tbl, sqlite3 * handle,
 	  else
 	    {
 		/* some error occurred */
-		do_update_sql_error (message, "INSERT INTO TEMPORARY POLYGONS",
+		do_update_sql_error (message,
+				     "INSERT INTO TEMPORARY POLYGONS",
 				     sqlite3_errmsg (handle));
 		return 0;
 	    }
@@ -4267,8 +4302,8 @@ static int
 do_insert_temporary_polygon_intersection (struct output_table *tbl,
 					  sqlite3 * handle,
 					  sqlite3_stmt * stmt_out,
-					  struct temporary_row *row, int n_geom,
-					  char **message)
+					  struct temporary_row *row,
+					  int n_geom, char **message)
 {
 /* inserting an Input/Blade intersection into the Polygons Helper Table */
     int ret;
@@ -4293,7 +4328,8 @@ do_insert_temporary_polygon_intersection (struct output_table *tbl,
 		  {
 		      /* Input Primary Key Column(s) */
 		  case SQLITE_INTEGER:
-		      sqlite3_bind_int64 (stmt_out, icol, var->value.intValue);
+		      sqlite3_bind_int64 (stmt_out, icol,
+					  var->value.intValue);
 		      break;
 		  case SQLITE_FLOAT:
 		      sqlite3_bind_double (stmt_out, icol,
@@ -4331,7 +4367,8 @@ do_insert_temporary_polygon_intersection (struct output_table *tbl,
 		  {
 		      /* Blade Primary Key Column(s) */
 		  case SQLITE_INTEGER:
-		      sqlite3_bind_int64 (stmt_out, icol, var->value.intValue);
+		      sqlite3_bind_int64 (stmt_out, icol,
+					  var->value.intValue);
 		      break;
 		  case SQLITE_FLOAT:
 		      sqlite3_bind_double (stmt_out, icol,
@@ -4367,8 +4404,8 @@ static int
 do_populate_temp_polygons (struct output_table *tbl, sqlite3 * handle,
 			   const void *cache, const char *input_db_prefix,
 			   const char *input_table, const char *input_geom,
-			   const char *blade_db_prefix, const char *blade_table,
-			   const char *blade_geom,
+			   const char *blade_db_prefix,
+			   const char *blade_table, const char *blade_geom,
 			   const char *spatial_index_prefix,
 			   const char *spatial_index, const char *tmp_table,
 			   int type, char **message)
@@ -4447,7 +4484,8 @@ do_populate_temp_polygons (struct output_table *tbl, sqlite3 * handle,
       }
     xprefix = gaiaDoubleQuotedSql (input_db_prefix);
     xtable = gaiaDoubleQuotedSql (input_table);
-    sql = sqlite3_mprintf ("%s FROM \"%s\".\"%s\" AS i", prev, xprefix, xtable);
+    sql =
+	sqlite3_mprintf ("%s FROM \"%s\".\"%s\" AS i", prev, xprefix, xtable);
     free (xprefix);
     free (xtable);
     sqlite3_free (prev);
@@ -4515,7 +4553,8 @@ do_populate_temp_polygons (struct output_table *tbl, sqlite3 * handle,
 	    {
 		xcolumn = gaiaDoubleQuotedSql (col->base_name);
 		if (comma)
-		    sql = sqlite3_mprintf ("%s AND \"%s\" = ?", prev, xcolumn);
+		    sql =
+			sqlite3_mprintf ("%s AND \"%s\" = ?", prev, xcolumn);
 		else
 		    sql = sqlite3_mprintf ("%s \"%s\" = ?", prev, xcolumn);
 		free (xcolumn);
@@ -4556,7 +4595,8 @@ do_populate_temp_polygons (struct output_table *tbl, sqlite3 * handle,
 	    {
 		xcolumn = gaiaDoubleQuotedSql (col->base_name);
 		if (comma)
-		    sql = sqlite3_mprintf ("%s AND \"%s\" = ?", prev, xcolumn);
+		    sql =
+			sqlite3_mprintf ("%s AND \"%s\" = ?", prev, xcolumn);
 		else
 		    sql = sqlite3_mprintf ("%s \"%s\" = ?", prev, xcolumn);
 		free (xcolumn);
@@ -4778,9 +4818,11 @@ do_populate_temp_polygons (struct output_table *tbl, sqlite3 * handle,
 		  {
 		      /* Blade is completely Covered By Input */
 		      gaiaGeomCollPtr g =
-			  gaiaGeometryIntersection_r (cache, input_g, blade_g);
+			  gaiaGeometryIntersection_r (cache, input_g,
+						      blade_g);
 		      if (!do_insert_temporary_polygons
-			  (tbl, handle, cache, stmt_tmp, &row, g, message, -1))
+			  (tbl, handle, cache, stmt_tmp, &row, g, message,
+			   -1))
 			{
 			    reset_temporary_row (&row);
 			    gaiaFreeGeomColl (input_g);
@@ -4809,7 +4851,8 @@ do_populate_temp_polygons (struct output_table *tbl, sqlite3 * handle,
 			{
 			    /* saving an Input/Blade intersection */
 			    if (!do_insert_temporary_polygon_intersection
-				(tbl, handle, stmt_tmp, &row, n_geom, message))
+				(tbl, handle, stmt_tmp, &row, n_geom,
+				 message))
 			      {
 				  reset_temporary_row (&row);
 				  gaiaFreeGeomColl (input_g);
@@ -4954,20 +4997,24 @@ do_cut_tmp_polygons (sqlite3 * handle, const void *cache,
 		    && sqlite3_column_type (stmt_in, 1) == SQLITE_BLOB)
 		  {
 		      pk = sqlite3_column_int64 (stmt_in, 0);
-		      blob = (unsigned char *) sqlite3_column_blob (stmt_in, 1);
+		      blob =
+			  (unsigned char *) sqlite3_column_blob (stmt_in, 1);
 		      blob_sz = sqlite3_column_bytes (stmt_in, 1);
 		      input_g = gaiaFromSpatiaLiteBlobWkbEx (blob, blob_sz,
 							     gpkg_mode,
 							     gpkg_amphibious);
 		      result =
-			  gaiaGeometryIntersection_r (cache, input_g, blade_g);
+			  gaiaGeometryIntersection_r (cache, input_g,
+						      blade_g);
 		      if (result != NULL)
 			{
-			    gaiaToSpatiaLiteBlobWkbEx2 (result, &blob, &blob_sz,
-							gpkg_mode, tiny_point);
+			    gaiaToSpatiaLiteBlobWkbEx2 (result, &blob,
+							&blob_sz, gpkg_mode,
+							tiny_point);
 			    gaiaFreeGeomColl (result);
 			    if (!do_update_tmp_cut_polygon
-				(handle, stmt_upd, pk, blob, blob_sz, message))
+				(handle, stmt_upd, pk, blob, blob_sz,
+				 message))
 				goto error;
 			}
 		      gaiaFreeGeomColl (input_g);
@@ -5079,7 +5126,8 @@ do_split_polygons (struct output_table *tbl, sqlite3 * handle,
     xcolumn1 = gaiaDoubleQuotedSql (xprefix);
     sqlite3_free (xprefix);
     sql =
-	sqlite3_mprintf ("%s) WHERE t.\"%s\" IS NULL GROUP BY", prev, xcolumn1);
+	sqlite3_mprintf ("%s) WHERE t.\"%s\" IS NULL GROUP BY", prev,
+			 xcolumn1);
     free (xcolumn1);
     sqlite3_free (prev);
     prev = sql;
@@ -5339,14 +5387,17 @@ do_compute_diff_polygs (const void *cache, sqlite3_stmt * stmt_diff,
     sqlite3_reset (stmt_diff);
     sqlite3_clear_bindings (stmt_diff);
     input_g = do_prepare_polygon (input_pg, srid);
-    gaiaToSpatiaLiteBlobWkbEx2 (input_g, &input_blob, &input_blob_sz, gpkg_mode,
-				tiny_point);
+    gaiaToSpatiaLiteBlobWkbEx2 (input_g, &input_blob, &input_blob_sz,
+				gpkg_mode, tiny_point);
     gaiaFreeGeomColl (input_g);
-    gaiaToSpatiaLiteBlobWkbEx2 (union_g, &union_blob, &union_blob_sz, gpkg_mode,
-				tiny_point);
-    sqlite3_bind_blob (stmt_diff, 1, input_blob, input_blob_sz, SQLITE_STATIC);
-    sqlite3_bind_blob (stmt_diff, 2, union_blob, union_blob_sz, SQLITE_STATIC);
-    sqlite3_bind_blob (stmt_diff, 3, union_blob, union_blob_sz, SQLITE_STATIC);
+    gaiaToSpatiaLiteBlobWkbEx2 (union_g, &union_blob, &union_blob_sz,
+				gpkg_mode, tiny_point);
+    sqlite3_bind_blob (stmt_diff, 1, input_blob, input_blob_sz,
+		       SQLITE_STATIC);
+    sqlite3_bind_blob (stmt_diff, 2, union_blob, union_blob_sz,
+		       SQLITE_STATIC);
+    sqlite3_bind_blob (stmt_diff, 3, union_blob, union_blob_sz,
+		       SQLITE_STATIC);
 
     while (1)
       {
@@ -5580,7 +5631,8 @@ do_get_uncovered_polygons (struct output_table *tbl, sqlite3 * handle,
 
 /* composing the Prepared Statement - polygons difference */
     sql =
-	sqlite3_mprintf ("SELECT ST_Difference(ST_Snap(?, ?, 0.000000001), ?)");
+	sqlite3_mprintf
+	("SELECT ST_Difference(ST_Snap(?, ?, 0.000000001), ?)");
 
 /* creating a Prepared Statement - polygons difference */
     ret = sqlite3_prepare_v2 (handle, sql, strlen (sql), &stmt_diff, NULL);
@@ -6008,7 +6060,8 @@ do_insert_output_polygons (struct output_table *tbl, sqlite3 * handle,
 		if (sqlite3_column_type (stmt_in, icol) == SQLITE_INTEGER)
 		    n_geom = sqlite3_column_int (stmt_in, icol);
 		icol++;
-		if (check_same_input (&prev_row, &row) && n_geom == prev_ngeom)
+		if (check_same_input (&prev_row, &row)
+		    && n_geom == prev_ngeom)
 		    ;
 		else
 		    prog_res = 1;
@@ -6063,101 +6116,43 @@ do_insert_output_polygons (struct output_table *tbl, sqlite3 * handle,
     return 0;
 }
 
-static gaiaGeomCollPtr
-do_compute_diff_lines (const void *cache, sqlite3_stmt * stmt_diff,
-		       gaiaLinestringPtr input_ln, int srid,
-		       gaiaGeomCollPtr union_g)
-{
-/* computing the difference between two Linestrings */
-    int ret;
-    gaiaGeomCollPtr input_g;
-    gaiaGeomCollPtr result = NULL;
-    unsigned char *input_blob = NULL;
-    int input_blob_sz;
-    unsigned char *union_blob = NULL;
-    int union_blob_sz;
-    int gpkg_mode = 0;
-    int gpkg_amphibious = 0;
-    int tiny_point = 0;
-
-    if (cache != NULL)
-      {
-	  struct splite_internal_cache *pcache =
-	      (struct splite_internal_cache *) cache;
-	  gpkg_mode = pcache->gpkg_mode;
-	  gpkg_amphibious = pcache->gpkg_amphibious_mode;
-	  tiny_point = pcache->tinyPointEnabled;
-      }
-
-    sqlite3_reset (stmt_diff);
-    sqlite3_clear_bindings (stmt_diff);
-    input_g = do_prepare_linestring (input_ln, srid);
-    gaiaToSpatiaLiteBlobWkbEx2 (input_g, &input_blob, &input_blob_sz, gpkg_mode,
-				tiny_point);
-    gaiaFreeGeomColl (input_g);
-    gaiaToSpatiaLiteBlobWkbEx2 (union_g, &union_blob, &union_blob_sz, gpkg_mode,
-				tiny_point);
-    sqlite3_bind_blob (stmt_diff, 1, input_blob, input_blob_sz, SQLITE_STATIC);
-    sqlite3_bind_blob (stmt_diff, 2, union_blob, union_blob_sz, SQLITE_STATIC);
-    sqlite3_bind_blob (stmt_diff, 3, union_blob, union_blob_sz, SQLITE_STATIC);
-
-    while (1)
-      {
-	  /* scrolling the result set rows */
-	  ret = sqlite3_step (stmt_diff);
-	  if (ret == SQLITE_DONE)
-	      break;		/* end of result set */
-	  if (ret == SQLITE_ROW)
-	    {
-		/* fetched one row from the resultset */
-		if (sqlite3_column_type (stmt_diff, 0) == SQLITE_BLOB)
-		  {
-		      const unsigned char *blob =
-			  sqlite3_column_blob (stmt_diff, 0);
-		      int blob_sz = sqlite3_column_bytes (stmt_diff, 0);
-		      result =
-			  gaiaFromSpatiaLiteBlobWkbEx (blob, blob_sz,
-						       gpkg_mode,
-						       gpkg_amphibious);
-		  }
-	    }
-      }
-
-    free (input_blob);
-    free (union_blob);
-    return result;
-}
-
 static int
 do_get_uncovered_linestrings (struct output_table *tbl, sqlite3 * handle,
 			      const void *cache, const char *input_db_prefix,
 			      const char *input_table, const char *input_geom,
+			      const char *blade_db_prefix,
+			      const char *blade_table, const char *blade_geom,
 			      const char *tmp_table, int type, char **message)
 {
 /* recovering all Input portions not covered by any Blade */
-    int ret;
+    sqlite3_stmt *stmt_nodes = NULL;
+    sqlite3_stmt *stmt_blades = NULL;
     sqlite3_stmt *stmt_in = NULL;
     sqlite3_stmt *stmt_out = NULL;
-    sqlite3_stmt *stmt_diff = NULL;
-    char *xprefix;
-    char *xtable;
-    char *xcolumn1;
-    char *xcolumn2;
+    unsigned char *nodes_blob = NULL;
+    int nodes_blob_sz;
+    unsigned char *blades_blob = NULL;
+    int blades_blob_sz;
     char *sql;
     char *prev;
     struct output_column *col;
     int comma = 0;
+    char *xprefix;
+    char *xcolumn;
+    char *xcolumn2;
+    char *xtable;
+    int ret;
+    int gpkg_amphibious = 0;
+    int gpkg_mode = 0;
     int cast2d = 0;
     int cast3d = 0;
-    int gpkg_mode = 0;
-    int gpkg_amphibious = 0;
 
     if (cache != NULL)
       {
 	  struct splite_internal_cache *pcache =
 	      (struct splite_internal_cache *) cache;
-	  gpkg_mode = pcache->gpkg_mode;
 	  gpkg_amphibious = pcache->gpkg_amphibious_mode;
+	  gpkg_mode = pcache->gpkg_mode;
       }
 
     switch (type)
@@ -6172,7 +6167,118 @@ do_get_uncovered_linestrings (struct output_table *tbl, sqlite3 * handle,
 	  break;
       };
 
-/* composing the SQL statement - union of all already assigned portions */
+    xcolumn = sqlite3_mprintf ("%s_nodes_geom", tmp_table);
+    xcolumn2 = gaiaDoubleQuotedSql (xcolumn);
+    sqlite3_free (xcolumn);
+    xtable = gaiaDoubleQuotedSql (tmp_table);
+    sql =
+	sqlite3_mprintf
+	("SELECT ST_UnaryUnion(ST_COLLECT(\"%s\")) FROM TEMP.\"%s\"",
+	 xcolumn2, xtable);
+    free (xcolumn2);
+    free (xtable);
+/* creating a Prepared Statement - Nodes */
+    ret = sqlite3_prepare_v2 (handle, sql, strlen (sql), &stmt_nodes, NULL);
+    sqlite3_free (sql);
+    if (ret != SQLITE_OK)
+      {
+	  do_update_sql_error (message, "SELECT FROM NODES",
+			       sqlite3_errmsg (handle));
+	  goto error;
+      }
+
+    while (1)
+      {
+	  /* scrolling the result set rows - Nodes */
+	  ret = sqlite3_step (stmt_nodes);
+	  if (ret == SQLITE_DONE)
+	      break;		/* end of result set */
+	  if (ret == SQLITE_ROW)
+	    {
+		/* fetched one row from the resultset */
+		if (sqlite3_column_type (stmt_nodes, 0) == SQLITE_BLOB)
+		  {
+		      const unsigned char *blob =
+			  sqlite3_column_blob (stmt_nodes, 0);
+		      nodes_blob_sz = sqlite3_column_bytes (stmt_nodes, 0);
+		      nodes_blob = malloc (nodes_blob_sz);
+		      memcpy (nodes_blob, blob, nodes_blob_sz);
+		  }
+		else
+		  {
+		      do_update_message (message, "Unexpected NULL Nodes\n");
+		      goto error;
+		  }
+	    }
+	  else
+	    {
+		do_update_sql_error (message,
+				     "step: NODES", sqlite3_errmsg (handle));
+		goto error;
+	    }
+      }
+    sqlite3_finalize (stmt_nodes);
+    stmt_nodes = NULL;
+
+    xcolumn = gaiaDoubleQuotedSql (blade_geom);
+    xprefix = gaiaDoubleQuotedSql (blade_db_prefix);
+    xtable = gaiaDoubleQuotedSql (blade_table);
+    sql =
+	sqlite3_mprintf
+	("SELECT ST_UnaryUnion(ST_Collect(ST_Snap(\"%s\", ?, 0.000000001))) FROM \"%s\".\"%s\"",
+	 xcolumn, xprefix, xtable);
+    free (xcolumn);
+    free (xprefix);
+    free (xtable);
+/* creating a Prepared Statement - Snapped Blades */
+    ret = sqlite3_prepare_v2 (handle, sql, strlen (sql), &stmt_blades, NULL);
+    sqlite3_free (sql);
+    if (ret != SQLITE_OK)
+      {
+	  do_update_sql_error (message, "SELECT FROM BLADES",
+			       sqlite3_errmsg (handle));
+	  goto error;
+      }
+
+    sqlite3_reset (stmt_blades);
+    sqlite3_clear_bindings (stmt_blades);
+    sqlite3_bind_blob (stmt_blades, 1, nodes_blob, nodes_blob_sz,
+		       SQLITE_STATIC);
+    while (1)
+      {
+	  /* scrolling the result set rows - Snapped Blades */
+	  ret = sqlite3_step (stmt_blades);
+	  if (ret == SQLITE_DONE)
+	      break;		/* end of result set */
+	  if (ret == SQLITE_ROW)
+	    {
+		/* fetched one row from the resultset */
+		if (sqlite3_column_type (stmt_blades, 0) == SQLITE_BLOB)
+		  {
+		      const unsigned char *blob =
+			  sqlite3_column_blob (stmt_blades, 0);
+		      blades_blob_sz = sqlite3_column_bytes (stmt_blades, 0);
+		      blades_blob = malloc (blades_blob_sz);
+		      memcpy (blades_blob, blob, blades_blob_sz);
+		  }
+		else
+		  {
+		      do_update_message (message,
+					 "Unexpected NULL Snapped Blades\n");
+		      goto error;
+		  }
+	    }
+	  else
+	    {
+		do_update_sql_error (message,
+				     "step: SNAPPED BLADES",
+				     sqlite3_errmsg (handle));
+		goto error;
+	    }
+      }
+    sqlite3_finalize (stmt_blades);
+    stmt_blades = NULL;
+
     sql = sqlite3_mprintf ("SELECT");
     prev = sql;
     col = tbl->first;
@@ -6181,95 +6287,36 @@ do_get_uncovered_linestrings (struct output_table *tbl, sqlite3 * handle,
 	  /* Input Primary Key Column(s) */
 	  if (col->role == GAIA_CUTTER_INPUT_PK)
 	    {
-		xcolumn1 = gaiaDoubleQuotedSql (col->base_name);
+		xcolumn = gaiaDoubleQuotedSql (col->base_name);
 		if (comma)
-		    sql = sqlite3_mprintf ("%s, i.\"%s\"", prev, xcolumn1);
+		    sql = sqlite3_mprintf ("%s, \"%s\"", prev, xcolumn);
 		else
-		    sql = sqlite3_mprintf ("%s i.\"%s\"", prev, xcolumn1);
-		free (xcolumn1);
+		    sql = sqlite3_mprintf ("%s \"%s\"", prev, xcolumn);
+		free (xcolumn);
 		comma = 1;
 		sqlite3_free (prev);
 		prev = sql;
 	    }
 	  col = col->next;
       }
-    xcolumn1 = gaiaDoubleQuotedSql (input_geom);
-    xprefix = sqlite3_mprintf ("%s_geom", tmp_table);
-    xcolumn2 = gaiaDoubleQuotedSql (xprefix);
-    sqlite3_free (xprefix);
-    sql =
-	sqlite3_mprintf ("%s, i.\"%s\", ST_UnaryUnion(ST_Collect(t.\"%s\")) ",
-			 prev, xcolumn1, xcolumn2);
-    free (xcolumn1);
-    free (xcolumn2);
-    sqlite3_free (prev);
     prev = sql;
+    xcolumn = gaiaDoubleQuotedSql (input_geom);
     xprefix = gaiaDoubleQuotedSql (input_db_prefix);
     xtable = gaiaDoubleQuotedSql (input_table);
-    xcolumn1 = gaiaDoubleQuotedSql (tmp_table);
     sql =
 	sqlite3_mprintf
-	("%s FROM \"%s\".\"%s\" AS i LEFT JOIN TEMP.\"%s\" AS t ON (", prev,
-	 xprefix, xtable, xcolumn1);
+	("%s, ST_Difference(ST_Snap(\"%s\", ?, 0.000000001), ?) FROM \"%s\".\"%s\"",
+	 prev, xcolumn, xprefix, xtable);
+    sqlite3_free (prev);
+    free (xcolumn);
     free (xprefix);
     free (xtable);
-    free (xcolumn1);
-    sqlite3_free (prev);
-    prev = sql;
-    comma = 0;
-    col = tbl->first;
-    while (col != NULL)
-      {
-	  /* Input Primary Key Column(s) */
-	  if (col->role == GAIA_CUTTER_INPUT_PK)
-	    {
-		xcolumn1 = gaiaDoubleQuotedSql (col->base_name);
-		xcolumn2 = gaiaDoubleQuotedSql (col->real_name);
-		if (comma)
-		    sql =
-			sqlite3_mprintf ("%s AND i.\"%s\" = t.\"%s\"", prev,
-					 xcolumn1, xcolumn2);
-		else
-		    sql =
-			sqlite3_mprintf ("%s i.\"%s\" = t.\"%s\"", prev,
-					 xcolumn1, xcolumn2);
-		free (xcolumn1);
-		free (xcolumn2);
-		comma = 1;
-		sqlite3_free (prev);
-		prev = sql;
-	    }
-	  col = col->next;
-      }
-    sql = sqlite3_mprintf ("%s) GROUP BY", prev);
-    sqlite3_free (prev);
-    prev = sql;
-    comma = 0;
-    col = tbl->first;
-    while (col != NULL)
-      {
-	  /* Input Primary Key Column(s) */
-	  if (col->role == GAIA_CUTTER_INPUT_PK)
-	    {
-		xcolumn1 = gaiaDoubleQuotedSql (col->base_name);
-		if (comma)
-		    sql = sqlite3_mprintf ("%s, i.\"%s\"", prev, xcolumn1);
-		else
-		    sql = sqlite3_mprintf ("%s i.\"%s\"", prev, xcolumn1);
-		free (xcolumn1);
-		comma = 1;
-		sqlite3_free (prev);
-		prev = sql;
-	    }
-	  col = col->next;
-      }
-
-/* creating a Prepared Statement - SELECT FROM TMP */
+/* creating a Prepared Statement - Uncovered Linestrings */
     ret = sqlite3_prepare_v2 (handle, sql, strlen (sql), &stmt_in, NULL);
     sqlite3_free (sql);
     if (ret != SQLITE_OK)
       {
-	  do_update_sql_error (message, "SELECT FROM TMP Union-Geometries",
+	  do_update_sql_error (message, "SELECT FROM UNCOVERED LINESTRINGS",
 			       sqlite3_errmsg (handle));
 	  goto error;
       }
@@ -6331,23 +6378,14 @@ do_get_uncovered_linestrings (struct output_table *tbl, sqlite3 * handle,
 	  goto error;
       }
 
-/* composing the Prepared Statement - linestrings difference */
-    sql =
-	sqlite3_mprintf ("SELECT ST_Difference(ST_Snap(?, ?, 0.000000001), ?)");
-
-/* creating a Prepared Statement - linestrings difference */
-    ret = sqlite3_prepare_v2 (handle, sql, strlen (sql), &stmt_diff, NULL);
-    sqlite3_free (sql);
-    if (ret != SQLITE_OK)
-      {
-	  do_update_sql_error (message, "LINESTRINGS DIFFERENCE",
-			       sqlite3_errmsg (handle));
-	  goto error;
-      }
-
+    sqlite3_reset (stmt_in);
+    sqlite3_clear_bindings (stmt_in);
+    sqlite3_bind_blob (stmt_in, 1, nodes_blob, nodes_blob_sz, SQLITE_STATIC);
+    sqlite3_bind_blob (stmt_in, 2, blades_blob, blades_blob_sz,
+		       SQLITE_STATIC);
     while (1)
       {
-	  /* scrolling the result set rows - from Temporary Helper */
+	  /* scrolling the result set rows - Uncovered Linestrings */
 	  ret = sqlite3_step (stmt_in);
 	  if (ret == SQLITE_DONE)
 	      break;		/* end of result set */
@@ -6357,10 +6395,6 @@ do_get_uncovered_linestrings (struct output_table *tbl, sqlite3 * handle,
 		struct temporary_row row;
 		int icol = 0;
 		int icol2 = 0;
-		gaiaGeomCollPtr input_g = NULL;
-		gaiaGeomCollPtr union_g = NULL;
-		const unsigned char *blob;
-		int blob_sz;
 
 		row.first_input = NULL;
 		row.last_input = NULL;
@@ -6410,94 +6444,68 @@ do_get_uncovered_linestrings (struct output_table *tbl, sqlite3 * handle,
 			}
 		      col = col->next;
 		  }
-		/* fetching the "geom" column value */
 		if (sqlite3_column_type (stmt_in, icol) == SQLITE_BLOB)
 		  {
-		      blob = sqlite3_column_blob (stmt_in, icol);
-		      blob_sz = sqlite3_column_bytes (stmt_in, icol);
-		      input_g =
-			  gaiaFromSpatiaLiteBlobWkbEx (blob, blob_sz,
-						       gpkg_mode,
-						       gpkg_amphibious);
-		  }
-		icol++;
-		/* fetching the "union_geom" column value */
-		if (sqlite3_column_type (stmt_in, icol) == SQLITE_BLOB)
-		  {
-		      blob = sqlite3_column_blob (stmt_in, icol);
-		      blob_sz = sqlite3_column_bytes (stmt_in, icol);
-		      union_g =
-			  gaiaFromSpatiaLiteBlobWkbEx (blob, blob_sz,
-						       gpkg_mode,
-						       gpkg_amphibious);
-		  }
-		if (union_g == NULL)
-		  {
-		      /* fully uncovered Input Geometry */
-		      if (!do_insert_temporary_linestrings
-			  (tbl, handle, cache, stmt_out, &row, input_g,
-			   message, -1))
+		      gaiaGeomCollPtr geom;
+		      const unsigned char *blob =
+			  sqlite3_column_blob (stmt_in, icol);
+		      int blob_sz = sqlite3_column_bytes (stmt_in, icol);
+		      geom = gaiaFromSpatiaLiteBlobWkbEx (blob, blob_sz,
+							  gpkg_mode,
+							  gpkg_amphibious);
+		      if (geom != NULL)
 			{
-			    reset_temporary_row (&row);
-			    gaiaFreeGeomColl (input_g);
-			    goto error;
-			}
-		  }
-		else
-		  {
-		      /* partialy uncovered Input Geometry */
-		      int n_geom = 0;
-		      gaiaLinestringPtr ln = input_g->FirstLinestring;
-		      while (ln != NULL)
-			{
-			    gaiaGeomCollPtr diff_g =
-				do_compute_diff_lines (cache, stmt_diff, ln,
-						       input_g->Srid,
-						       union_g);
-			    n_geom++;
-			    if (diff_g != NULL)
+			    if (!do_insert_temporary_linestrings
+				(tbl, handle, cache, stmt_out, &row, geom,
+				 message, -1))
 			      {
-				  if (!do_insert_temporary_linestrings
-				      (tbl, handle, cache, stmt_out, &row,
-				       diff_g, message, n_geom))
-				    {
-					reset_temporary_row (&row);
-					gaiaFreeGeomColl (input_g);
-					gaiaFreeGeomColl (union_g);
-					gaiaFreeGeomColl (diff_g);
-					goto error;
-				    }
-				  gaiaFreeGeomColl (diff_g);
+				  reset_temporary_row (&row);
+				  gaiaFreeGeomColl (geom);
+				  goto error;
 			      }
-			    ln = ln->Next;
+			    gaiaFreeGeomColl (geom);
 			}
 		  }
-
 		reset_temporary_row (&row);
-		gaiaFreeGeomColl (input_g);
-		gaiaFreeGeomColl (union_g);
 	    }
 	  else
 	    {
 		do_update_sql_error (message,
-				     "step: SELECT FROM TEMPORARY LINESTRINGS",
+				     "step: UNCOVERED LINESTRINGS",
 				     sqlite3_errmsg (handle));
 		goto error;
 	    }
       }
-
-    sqlite3_finalize (stmt_in);
-    sqlite3_finalize (stmt_out);
-    sqlite3_finalize (stmt_diff);
+    if (stmt_in != NULL)
+	sqlite3_finalize (stmt_in);
+    stmt_in = NULL;
+    if (stmt_out != NULL)
+	sqlite3_finalize (stmt_out);
+    if (nodes_blob != NULL)
+      {
+	  free (nodes_blob);
+	  nodes_blob = NULL;
+      }
+    if (blades_blob != NULL)
+      {
+	  free (blades_blob);
+	  blades_blob = NULL;
+      }
     return 1;
 
   error:
+    if (stmt_nodes != NULL)
+	sqlite3_finalize (stmt_nodes);
+    if (stmt_blades != NULL)
+	sqlite3_finalize (stmt_blades);
     if (stmt_in != NULL)
 	sqlite3_finalize (stmt_in);
     if (stmt_out != NULL)
 	sqlite3_finalize (stmt_out);
-    if (stmt_diff != NULL)
-	sqlite3_finalize (stmt_diff);
+    if (nodes_blob != NULL)
+	free (nodes_blob);
+    if (blades_blob != NULL)
+	free (blades_blob);
     return 0;
 }
 
@@ -6803,7 +6811,8 @@ do_insert_output_linestrings (struct output_table *tbl, sqlite3 * handle,
 		if (sqlite3_column_type (stmt_in, icol) == SQLITE_INTEGER)
 		    n_geom = sqlite3_column_int (stmt_in, icol);
 		icol++;
-		if (check_same_input (&prev_row, &row) && n_geom == prev_ngeom)
+		if (check_same_input (&prev_row, &row)
+		    && n_geom == prev_ngeom)
 		    ;
 		else
 		    prog_res = 1;
@@ -7123,7 +7132,8 @@ do_finish_output (struct output_table *tbl, sqlite3 * handle,
 			sqlite3_mprintf ("%s AND \"%s\" IS NULL", prev,
 					 xcolumn2);
 		else
-		    sql = sqlite3_mprintf ("%s \"%s\" IS NULL", prev, xcolumn2);
+		    sql =
+			sqlite3_mprintf ("%s \"%s\" IS NULL", prev, xcolumn2);
 		free (xcolumn2);
 		comma = 1;
 		sqlite3_free (prev);
@@ -7232,7 +7242,8 @@ do_finish_output (struct output_table *tbl, sqlite3 * handle,
     prev = sql;
     sql =
 	sqlite3_mprintf
-	("%s WHERE i.rowid IN (SELECT in_rowid FROM TEMP.tmpcutternull)", prev);
+	("%s WHERE i.rowid IN (SELECT in_rowid FROM TEMP.tmpcutternull)",
+	 prev);
     sqlite3_free (prev);
 
 /* creating the OUTPUT prepared statement */
@@ -7367,7 +7378,8 @@ do_finish_output (struct output_table *tbl, sqlite3 * handle,
 				  break;
 			      case SQLITE_FLOAT:
 				  sqlite3_bind_double (stmt_out, icol,
-						       var->value.doubleValue);
+						       var->
+						       value.doubleValue);
 				  break;
 			      case SQLITE_TEXT:
 				  sqlite3_bind_text (stmt_out, icol,
@@ -7424,9 +7436,9 @@ do_cut_points (struct output_table *tbl, sqlite3 * handle, const void *cache,
 {
 /* cutting Input POINTs */
     if (!do_prepare_temp_points
-	(tbl, handle, input_db_prefix, input_table, input_geom, blade_db_prefix,
-	 blade_table, blade_geom, spatial_index_prefix, spatial_index,
-	 tmp_table, message))
+	(tbl, handle, input_db_prefix, input_table, input_geom,
+	 blade_db_prefix, blade_table, blade_geom, spatial_index_prefix,
+	 spatial_index, tmp_table, message))
 	return 0;
     if (!do_insert_output_points
 	(tbl, handle, cache, input_db_prefix, input_table, input_geom,
@@ -7464,7 +7476,7 @@ do_cut_linestrings (struct output_table *tbl, sqlite3 * handle,
 	return 0;
     if (!do_get_uncovered_linestrings
 	(tbl, handle, cache, input_db_prefix, input_table, input_geom,
-	 *tmp_table, type, message))
+	 blade_db_prefix, blade_table, blade_geom, *tmp_table, type, message))
 	return 0;
     if (!do_insert_output_linestrings
 	(tbl, handle, cache, input_db_prefix, input_table, input_geom,
@@ -7479,13 +7491,14 @@ do_cut_linestrings (struct output_table *tbl, sqlite3 * handle,
 }
 
 static int
-do_cut_polygons (struct output_table *tbl, sqlite3 * handle, const void *cache,
-		 const char *input_db_prefix, const char *input_table,
-		 const char *input_geom, const char *blade_db_prefix,
-		 const char *blade_table, const char *blade_geom,
-		 const char *spatial_index_prefix, const char *spatial_index,
-		 const char *out_table, char **tmp_table, int *drop_tmp_table,
-		 int type, char **message)
+do_cut_polygons (struct output_table *tbl, sqlite3 * handle,
+		 const void *cache, const char *input_db_prefix,
+		 const char *input_table, const char *input_geom,
+		 const char *blade_db_prefix, const char *blade_table,
+		 const char *blade_geom, const char *spatial_index_prefix,
+		 const char *spatial_index, const char *out_table,
+		 char **tmp_table, int *drop_tmp_table, int type,
+		 char **message)
 {
 /* cutting Input POLYGONs */
     if (!do_create_temp_polygons (tbl, handle, tmp_table, message))
@@ -7552,17 +7565,20 @@ gaiaCutter (sqlite3 * handle, const void *cache, const char *xin_db_prefix,
 	blade_db_prefix = xblade_db_prefix;
     if (input_table == NULL)
       {
-	  do_update_message (message, "ERROR: input table name can't be NULL");
+	  do_update_message (message,
+			     "ERROR: input table name can't be NULL");
 	  goto end;
       }
     if (blade_table == NULL)
       {
-	  do_update_message (message, "ERROR: blade table name can't be NULL");
+	  do_update_message (message,
+			     "ERROR: blade table name can't be NULL");
 	  goto end;
       }
     if (out_table == NULL)
       {
-	  do_update_message (message, "ERROR: output table name can't be NULL");
+	  do_update_message (message,
+			     "ERROR: output table name can't be NULL");
 	  goto end;
       }
     if (!do_check_input
@@ -7702,7 +7718,8 @@ gaiaCutter (sqlite3 * handle, const void *cache, const char *xin_db_prefix,
 	  if (!do_cut_points
 	      (tbl, handle, cache, in_db_prefix, input_table, input_geom,
 	       blade_db_prefix, blade_table, blade_geom, spatial_index_prefix,
-	       spatial_index, out_table, &tmp_table, &drop_tmp_table, message))
+	       spatial_index, out_table, &tmp_table, &drop_tmp_table,
+	       message))
 	      goto end;
       }
     if (ln_type)

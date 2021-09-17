@@ -1,7 +1,7 @@
 /* 
  gaiaaux.h -- Gaia common utility functions
   
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -23,7 +23,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -518,6 +518,20 @@ extern "C"
  You are required to explicitly free() any string returned by this function.
  */
     GAIAAUX_DECLARE char *gaiaFileExtFromPath (const char *path);
+
+/**
+ Return a text string containing no repeated whitespaces
+
+ \param string the input string to be cleaned
+
+ \return the corresponding string containing no repeated whitespaces,
+ or NULL on failure
+
+ \note this function will return a dynamically allocated buffer created 
+ by malloc(). 
+ You are required to explicitly free() any string returned by this function.
+ */
+    GAIAAUX_DECLARE char *gaiaRemoveExtraSpaces (const char *string);
 
 #ifdef __cplusplus
 }

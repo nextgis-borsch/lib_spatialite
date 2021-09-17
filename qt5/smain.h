@@ -3,7 +3,7 @@
 ** Copyright (C) 2012 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
 **
-** This file is part of the QtSql module of the Qt Toolkit.
+** This file is part of the plugins of the Qt Toolkit.
 **
 ** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
@@ -39,62 +39,22 @@
 **
 ****************************************************************************/
 
-#ifndef QSQLCACHEDRESULT_P_H
-#define QSQLCACHEDRESULT_P_H
+#ifndef QSPATIALITE_MAIN_H
+#define QSPATIALITE_MAIN_H
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the Qt API.  It exists for the convenience
-// of other Qt classes.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
-//
+#include <QSqlDriverPlugin>
+#include <QStringList>
 
-#include "QtSql/qsqlresult.h"
-
-QT_BEGIN_NAMESPACE
-
-class QVariant;
-template <typename T> class QVector;
-
-class QSqlCachedResultPrivate;
-
-class Q_SQL_EXPORT QSqlCachedResult: public QSqlResult
+class QSpatiaLiteDriverPlugin : public QSqlDriverPlugin
 {
+    Q_OBJECT
+    Q_PLUGIN_METADATA( IID "org.qt-project.Qt.QSqlDriverFactoryInterface" FILE "qspatialite.json" )
+
   public:
-    virtual ~QSqlCachedResult();
+    QSpatiaLiteDriverPlugin();
 
-    typedef QVector<QVariant> ValueCache;
-
-  protected:
-    QSqlCachedResult( const QSqlDriver * db );
-
-    void init( int colCount );
-    void cleanup();
-    void clearValues();
-
-    virtual bool gotoNext( ValueCache &values, int index ) = 0;
-
-    QVariant data( int i );
-    bool isNull( int i );
-    bool fetch( int i );
-    bool fetchNext();
-    bool fetchPrevious();
-    bool fetchFirst();
-    bool fetchLast();
-
-    int colCount() const;
-    ValueCache &cache();
-
-    void virtual_hook( int id, void *data );
-  private:
-    bool cacheNext();
-    QSqlCachedResultPrivate *d;
+    QSqlDriver *create( const QString & ) override;
+    QStringList keys() const;
 };
 
-QT_END_NAMESPACE
-
-#endif // QSQLCACHEDRESULT_P_H
+#endif

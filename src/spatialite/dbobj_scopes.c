@@ -2,7 +2,7 @@
 
  dbobj_scopes.c -- DB objects scopes
 
- version 5.0, 2018 May 25
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2018
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -2207,13 +2207,10 @@ scope_is_internal_table (const char *tbl_name, char **sys_scope)
 	|| strcasecmp (tbl_name, "SE_fonts") == 0
 	|| strcasecmp (tbl_name, "SE_vector_styles") == 0
 	|| strcasecmp (tbl_name, "SE_raster_styles") == 0
-	|| strcasecmp (tbl_name, "SE_group_styles") == 0
 	|| strcasecmp (tbl_name, "SE_vector_styled_layers") == 0
 	|| strcasecmp (tbl_name, "SE_vector_styled_layers") == 0
 	|| strcasecmp (tbl_name, "SE_raster_styled_layers") == 0
-	|| strcasecmp (tbl_name, "SE_styled_groups") == 0
-	|| strcasecmp (tbl_name, "SE_styled_group_refs") == 0
-	|| strcasecmp (tbl_name, "SE_styled_group_styles") == 0)
+	|| strcasecmp (tbl_name, "rl2map_configurations") == 0)
       {
 	  *sys_scope = sqlite3_mprintf ("SLD/SE Styling");
 	  return 1;
@@ -2263,7 +2260,7 @@ scope_is_internal_view (const char *tbl_name, char **sys_scope)
       }
     if (strcasecmp (tbl_name, "spatial_ref_sys_all") == 0)
       {
-	  *sys_scope = sqlite3_mprintf ("Spatial Tables Catalog");
+	  *sys_scope = sqlite3_mprintf ("CRS Catalog");
 	  return 1;
       }
     if (strcasecmp (tbl_name, "raster_coverages_ref_sys") == 0)
@@ -2294,8 +2291,8 @@ scope_is_internal_view (const char *tbl_name, char **sys_scope)
 	|| strcasecmp (tbl_name, "SE_raster_styles_view") == 0
 	|| strcasecmp (tbl_name, "SE_vector_styled_layers_view") == 0
 	|| strcasecmp (tbl_name, "SE_raster_styled_layers_view") == 0
-	|| strcasecmp (tbl_name, "SE_styled_groups_view") == 0
-	|| strcasecmp (tbl_name, "SE_group_styles_view") == 0)
+	|| strcasecmp (tbl_name, "rl2map_configurations") == 0
+	|| strcasecmp (tbl_name, "rl2map_configurations_view") == 0)
       {
 	  *sys_scope = sqlite3_mprintf ("SLD/SE Styling");
 	  return 1;
@@ -2326,10 +2323,6 @@ scope_is_internal_index (const char *tbl_name)
 	|| strcasecmp (tbl_name, "idx_ISO_metadata_parents") == 0
 	|| strcasecmp (tbl_name, "idx_ISO_metadata_reference_ids") == 0
 	|| strcasecmp (tbl_name, "idx_ISO_metadata_reference_parents") == 0)
-	return 1;
-    if (strcasecmp (tbl_name, "idx_SE_styled_vgroups") == 0
-	|| strcasecmp (tbl_name, "idx_SE_styled_rgroups") == 0
-	|| strcasecmp (tbl_name, "idx_SE_styled_groups_paint") == 0)
 	return 1;
     if (strcasecmp (tbl_name, "idx_vector_coverages") == 0
 	|| strcasecmp (tbl_name, "idx_wms_getcapabilities") == 0
@@ -2529,21 +2522,17 @@ scope_is_internal_trigger (const char *tbl_name)
 	|| strcasecmp (tbl_name, "seraster_style_name_ins") == 0
 	|| strcasecmp (tbl_name, "seraster_style_name_upd") == 0)
 	return 1;
-    if (strcasecmp (tbl_name, "segroup_style_insert") == 0
-	|| strcasecmp (tbl_name, "segroup_style_update") == 0
-	|| strcasecmp (tbl_name, "segroup_style_name_ins") == 0
-	|| strcasecmp (tbl_name, "segroup_style_name_upd") == 0)
+    if (strcasecmp (tbl_name, "rl2map_config_insert") == 0
+	|| strcasecmp (tbl_name, "rl2map_config_update") == 0
+	|| strcasecmp (tbl_name, "rl2map_config_name_ins") == 0
+	|| strcasecmp (tbl_name, "rl2map_config_name_upd") == 0)
 	return 1;
     if (strcasecmp (tbl_name, "sevstl_coverage_name_insert") == 0
 	|| strcasecmp (tbl_name, "sevstl_coverage_name_update") == 0
 	|| strcasecmp (tbl_name, "serstl_coverage_name_insert") == 0
-	|| strcasecmp (tbl_name, "serstl_coverage_name_update") == 0
-	|| strcasecmp (tbl_name, "segrp_group_name_insert") == 0
-	|| strcasecmp (tbl_name, "segrp_group_name_update") == 0)
+	|| strcasecmp (tbl_name, "serstl_coverage_name_update") == 0)
 	return 1;
-    if (strcasecmp (tbl_name, "segrrefs_group_name_insert") == 0
-	|| strcasecmp (tbl_name, "segrrefs_group_name_update") == 0
-	|| strcasecmp (tbl_name, "segrrefs_vector_coverage_name_insert") == 0
+    if (strcasecmp (tbl_name, "segrrefs_vector_coverage_name_insert") == 0
 	|| strcasecmp (tbl_name, "segrrefs_vector_coverage_name_update") == 0
 	|| strcasecmp (tbl_name, "segrrefs_raster_coverage_name_insert") == 0
 	|| strcasecmp (tbl_name, "segrrefs_raster_coverage_name_update") == 0
@@ -2552,9 +2541,7 @@ scope_is_internal_trigger (const char *tbl_name)
 	|| strcasecmp (tbl_name, "segrrefs_insert_2") == 0
 	|| strcasecmp (tbl_name, "segrrefs_update_2") == 0)
 	return 1;
-    if (strcasecmp (tbl_name, "segrpstl_group_name_insert") == 0
-	|| strcasecmp (tbl_name, "segrpstl_group_name_update") == 0
-	|| strcasecmp (tbl_name, "storproc_ins") == 0
+    if (strcasecmp (tbl_name, "storproc_ins") == 0
 	|| strcasecmp (tbl_name, "storproc_upd") == 0)
 	return 1;
     if (strcasecmp (tbl_name, "ISO_metadata_md_scope_insert") == 0

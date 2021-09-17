@@ -39,8 +39,17 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include <math.h>
 
 #include "spatialite/geopackage.h"
-#include "config.h"
 #include "geopackage_internal.h"
+
+#if defined(_WIN32) && !defined(__MINGW32__)
+#include "config-msvc.h"
+#else
+#include "config.h"
+#endif
+
+#ifdef _WIN32
+#define strcasecmp	_stricmp
+#endif /* not WIN32 */
 
 #ifdef ENABLE_GEOPACKAGE
 
@@ -57,8 +66,8 @@ static char *SUPPORTED_GEOMETRY_TYPES[] = {
 };
 
 GEOPACKAGE_PRIVATE void
-fnct_gpkgAddGeometryColumn (sqlite3_context * context, int argc
-			    __attribute__ ((unused)), sqlite3_value ** argv)
+fnct_gpkgAddGeometryColumn (sqlite3_context * context, int argc,
+			    sqlite3_value ** argv)
 {
 /* SQL function:
 / gpkgAddGeomtryColumn(table_name, geometry_column_name, geometry_type, with_z, with_m, srs_id)
@@ -89,6 +98,9 @@ fnct_gpkgAddGeometryColumn (sqlite3_context * context, int argc
     sqlite3 *sqlite = NULL;
     char *errMsg = NULL;
     int ret = 0;
+
+    if (argc == 0)
+	argc = 0;		/* suppressing stupid compiler warnings */
 
     if (sqlite3_value_type (argv[0]) != SQLITE_TEXT)
       {
@@ -176,11 +188,12 @@ fnct_gpkgAddGeometryColumn (sqlite3_context * context, int argc
     srid = sqlite3_value_int (argv[5]);
 
     sqlite = sqlite3_context_db_handle (context);
-    
-    sql_stmt = sqlite3_mprintf("INSERT OR IGNORE INTO gpkg_contents "
-                 "(table_name, data_type, srs_id, min_x, min_y, max_x, max_y) "
-                 "VALUES (%Q, 'features', %i, NULL, NULL, NULL, NULL)",
-                 table, srid);
+
+    sql_stmt =
+	sqlite3_mprintf ("INSERT OR IGNORE INTO gpkg_contents "
+			 "(table_name, data_type, srs_id, min_x, min_y, max_x, max_y) "
+			 "VALUES (%Q, 'features', %i, NULL, NULL, NULL, NULL)",
+			 table, srid);
 
     ret = sqlite3_exec (sqlite, sql_stmt, NULL, NULL, &errMsg);
     sqlite3_free (sql_stmt);
@@ -192,11 +205,12 @@ fnct_gpkgAddGeometryColumn (sqlite3_context * context, int argc
       }
 
     /* Add column definition to metadata table */
-    sql_stmt = sqlite3_mprintf ("INSERT INTO gpkg_geometry_columns "
-				"(table_name, column_name, geometry_type_name, srs_id, z, m) "
-				"VALUES (%Q, %Q, %Q, %i, %i, %i)",
-				table, geometry_column_name, geometry_type_name,
-				srid, with_z, with_m);
+    sql_stmt =
+	sqlite3_mprintf ("INSERT INTO gpkg_geometry_columns "
+			 "(table_name, column_name, geometry_type_name, srs_id, z, m) "
+			 "VALUES (%Q, %Q, %Q, %i, %i, %i)", table,
+			 geometry_column_name, geometry_type_name, srid, with_z,
+			 with_m);
 
     ret = sqlite3_exec (sqlite, sql_stmt, NULL, NULL, &errMsg);
     sqlite3_free (sql_stmt);
@@ -208,8 +222,9 @@ fnct_gpkgAddGeometryColumn (sqlite3_context * context, int argc
       }
 
     /* extend table_name to actually have a geometry column */
-    sql_stmt = sqlite3_mprintf ("ALTER TABLE %s ADD COLUMN %s %s",
-				table, geometry_column_name, geometry_type_name);
+    sql_stmt =
+	sqlite3_mprintf ("ALTER TABLE %s ADD COLUMN %s %s", table,
+			 geometry_column_name, geometry_type_name);
     ret = sqlite3_exec (sqlite, sql_stmt, NULL, NULL, &errMsg);
     sqlite3_free (sql_stmt);
     if (ret != SQLITE_OK)

@@ -2,7 +2,7 @@
 
  gg_advanced.c -- Gaia advanced geometric operations
   
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -303,6 +303,166 @@ gaiaClockwise (gaiaRingPtr p)
 	p->Clockwise = 0;
     else
 	p->Clockwise = 1;
+}
+
+GAIAGEO_DECLARE double
+gaiaCurvosityIndex (const void *p_cache, gaiaLinestringPtr ln, int extra_points)
+{
+/* calculates the Curvosity Index of some Linestring */
+#ifndef OMIT_GEOS		/* including GEOS */
+    double x;
+    double y;
+    double z;
+    double m;
+    int iv;
+    int ov;
+    gaiaGeomCollPtr geo = NULL;
+    gaiaLinestringPtr refln;
+    double refline_length;
+    double line_length =
+	gaiaMeasureLength (ln->DimensionModel, ln->Coords, ln->Points);
+
+/* building the Reference Line */
+    refln = gaiaAllocLinestring (2 + extra_points);
+/* inserting the first vertex of Line into the Reference Line */
+    iv = 0;
+    ov = 0;
+    if (ln->DimensionModel == GAIA_XY_Z)
+      {
+	  gaiaGetPointXYZ (ln->Coords, iv, &x, &y, &z);
+      }
+    else if (ln->DimensionModel == GAIA_XY_M)
+      {
+	  gaiaGetPointXYM (ln->Coords, iv, &x, &y, &m);
+      }
+    else if (ln->DimensionModel == GAIA_XY_Z_M)
+      {
+	  gaiaGetPointXYZM (ln->Coords, iv, &x, &y, &z, &m);
+      }
+    else
+      {
+	  gaiaGetPoint (ln->Coords, iv, &x, &y);
+      }
+    gaiaSetPoint (refln->Coords, 0, x, y);
+    ov++;
+    if (extra_points > 0)
+      {
+	  /* inserting all interpolated points into the Reference Line */
+	  int i;
+	  double perc = 1.0 / (double) (extra_points + 1);
+	  double progr = perc;
+	  gaiaGeomCollPtr geo;
+	  gaiaGeomCollPtr result;
+	  gaiaPointPtr pt;
+	  if (ln->DimensionModel == GAIA_XY_Z)
+	      geo = gaiaAllocGeomCollXYZ ();
+	  else if (ln->DimensionModel == GAIA_XY_M)
+	      geo = gaiaAllocGeomCollXYM ();
+	  else if (ln->DimensionModel == GAIA_XY_Z_M)
+	      geo = gaiaAllocGeomCollXYZM ();
+	  else
+	      geo = gaiaAllocGeomColl ();
+	  gaiaInsertLinestringInGeomColl (geo, ln);
+	  for (i = 0; i < extra_points; i++)
+	    {
+		if (p_cache != NULL)
+		    result = gaiaLineInterpolatePoint_r (p_cache, geo, progr);
+		else
+		    result = gaiaLineInterpolatePoint (geo, progr);
+		if (result == NULL)
+		    goto error;
+		pt = result->FirstPoint;
+		if (pt == NULL)
+		    goto error;
+		x = pt->X;
+		y = pt->Y;
+		gaiaFreeGeomColl (result);
+		gaiaSetPoint (refln->Coords, ov, x, y);
+		ov++;
+		progr += perc;
+	    }
+	  geo->FirstLinestring = NULL;	/* releasing ownership on Line */
+	  geo->LastLinestring = NULL;
+	  gaiaFreeGeomColl (geo);
+      }
+/* inserting the last vertex of Line into the Reference Line */
+    iv = ln->Points - 1;
+    if (ln->DimensionModel == GAIA_XY_Z)
+      {
+	  gaiaGetPointXYZ (ln->Coords, iv, &x, &y, &z);
+      }
+    else if (ln->DimensionModel == GAIA_XY_M)
+      {
+	  gaiaGetPointXYM (ln->Coords, iv, &x, &y, &m);
+      }
+    else if (ln->DimensionModel == GAIA_XY_Z_M)
+      {
+	  gaiaGetPointXYZM (ln->Coords, iv, &x, &y, &z, &m);
+      }
+    else
+      {
+	  gaiaGetPoint (ln->Coords, iv, &x, &y);
+      }
+    gaiaSetPoint (refln->Coords, ov, x, y);
+    refline_length =
+	gaiaMeasureLength (refln->DimensionModel, refln->Coords, refln->Points);
+    return (refline_length / line_length);
+
+  error:
+    if (geo != NULL)
+      {
+	  geo->FirstLinestring = NULL;	/* releasing ownership on Line */
+	  geo->LastLinestring = NULL;
+	  gaiaFreeGeomColl (geo);
+      }	      
+#endif /* end including GEOS */
+    return -1.0;
+}
+
+GAIAGEO_DECLARE void
+gaiaUpDownHeight (gaiaLinestringPtr ln, double *up, double *down)
+{
+/* calculates the Uphill and Downhill Height of some Linestring */
+    double x;
+    double y;
+    double z;
+    double m;
+    int iv;
+    double prev_z;
+    double tot_up = 0.0;
+    double tot_down = 0.0;
+
+/* inserting the last vertex of Line into the Reference Line */
+    if (ln->DimensionModel == GAIA_XY || ln->DimensionModel == GAIA_XY_M)
+      {
+	  *up = 0.0;
+	  *down = 0.0;
+	  goto stop;
+      }
+    for (iv = 0; iv < ln->Points; iv++)
+      {
+	  if (ln->DimensionModel == GAIA_XY_Z)
+	    {
+		gaiaGetPointXYZ (ln->Coords, iv, &x, &y, &z);
+	    }
+	  else if (ln->DimensionModel == GAIA_XY_Z_M)
+	    {
+		gaiaGetPointXYZM (ln->Coords, iv, &x, &y, &z, &m);
+	    }
+	  if (iv == 0)
+	    {
+		prev_z = z;
+		continue;
+	    }
+	  if (z > prev_z)
+	      tot_up += z - prev_z;
+	  else
+	      tot_down += prev_z - z;
+	  prev_z = z;
+      }
+  stop:
+    *up = tot_up;
+    *down = tot_down;
 }
 
 GAIAGEO_DECLARE int

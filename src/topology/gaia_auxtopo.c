@@ -2,7 +2,7 @@
 
  gaia_auxtopo.c -- implementation of the Topology module methods
     
- version 4.3, 2015 July 15
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2015
+Portions created by the Initial Developer are Copyright (C) 2015-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s): 
@@ -73,6 +73,8 @@ CIG: 6038019AE5
 #include "config.h"
 #endif
 
+#include <spatialite_private.h>
+
 #ifdef ENABLE_RTTOPO		/* only if RTTOPO is enabled */
 
 #include <spatialite/sqlite.h>
@@ -83,7 +85,6 @@ CIG: 6038019AE5
 #include <spatialite/gaiaaux.h>
 
 #include <spatialite.h>
-#include <spatialite_private.h>
 
 #include <librttopo.h>
 
@@ -6101,10 +6102,6 @@ auxtopo_insert_into_topology (GaiaTopologyAccessorPtr accessor,
 }
 
 #endif /* end ENABLE_RTTOPO conditionals */
-
-#ifndef ENABLE_RTTOPO
-#include "spatialite_private.h"
-#endif
 
 SPATIALITE_PRIVATE void
 finalize_topologies (const void *p_cache)

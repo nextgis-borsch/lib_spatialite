@@ -1,7 +1,7 @@
 /*
  gg_wfs.h -- Gaia common support for WFS
   
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -23,7 +23,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -197,19 +197,20 @@ extern "C"
  \b void \b myfunct(\b int \b count, \b void \b *ptr);
  \n and will cyclically report how many features have been processed since the initial call start.
  */
-    SPATIALITE_DECLARE int load_from_wfs_paged_ex(sqlite3 * sqlite, const char *wfs_version,
-						const char *path_or_url,
-						const char *alt_describe_uri,
-						const char *layer_name,
-						int swap_axes,
-						const char *table,
-						const char *pk_column_name,
-						int spatial_index,
-						int page_size, int *rows,
-						char **err_msg,
-						void (*progress_callback)
-						(int, void *),
-						void *callback_ptr);
+    SPATIALITE_DECLARE int load_from_wfs_paged_ex (sqlite3 * sqlite,
+						   const char *wfs_version,
+						   const char *path_or_url,
+						   const char *alt_describe_uri,
+						   const char *layer_name,
+						   int swap_axes,
+						   const char *table,
+						   const char *pk_column_name,
+						   int spatial_index,
+						   int page_size, int *rows,
+						   char **err_msg,
+						   void (*progress_callback)
+						   (int, void *),
+						   void *callback_ptr);
 
 /**
  Creates a Catalog for some WFS service 

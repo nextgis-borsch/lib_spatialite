@@ -1,7 +1,7 @@
 /*
  gg_advanced.h -- Gaia common support for geometries: advanced
   
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -23,7 +23,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -82,9 +82,13 @@ extern "C"
 {
 #endif
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-#ifndef OMIT_PROJ		/* including PROJ */
+#if defined(_WIN32) && !defined(__MINGW32__)
+#include <spatialite/gaiaconfig-msvc.h>
+#else
+#include <spatialite/gaiaconfig.h>
 #endif
+
+#ifndef OMIT_PROJ		/* including PROJ */
 
 /**
  Resets the PROJ error messages to an empty state

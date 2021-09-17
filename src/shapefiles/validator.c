@@ -2,7 +2,7 @@
 
  validator.c -- implements geometry validation and repair
 
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 Alternatively, the contents of this file may be used under the terms of
@@ -1957,7 +1957,11 @@ sanitize_geometry_column_common (const void *p_cache, sqlite3 * sqlite,
       }
 
 /* opening the HTML report */
+#ifdef _WIN32
+    out = gaia_win_fopen (report_path, "wb");
+#else
     out = fopen (report_path, "wb");
+#endif
     if (out == NULL)
 	goto stop;
 
@@ -2478,7 +2482,11 @@ sanitize_all_geometry_columns_common (const void *p_cache, sqlite3 * sqlite,
 
 /* opening the HTML report */
     report = sqlite3_mprintf ("%s/index.html", output_dir);
+#ifdef _WIN32
+    out = gaia_win_fopen (report, "wb");
+#else
     out = fopen (report, "wb");
+#endif
     sqlite3_free (report);
     if (out == NULL)
 	goto stop;
@@ -3107,7 +3115,11 @@ check_geometry_column_common (const void *p_cache, sqlite3 * sqlite,
       }
 
 /* opening the HTML report */
+#ifdef _WIN32
+    out = gaia_win_fopen (report_path, "wb");
+#else
     out = fopen (report_path, "wb");
+#endif
     if (out == NULL)
 	goto stop;
 
@@ -3471,7 +3483,11 @@ check_all_geometry_columns_common (const void *p_cache, sqlite3 * sqlite,
 
 /* opening the HTML report */
     report = sqlite3_mprintf ("%s/index.html", output_dir);
+#ifdef _WIN32
+    out = gaia_win_fopen (report, "wb");
+#else
     out = fopen (report, "wb");
+#endif
     sqlite3_free (report);
     if (out == NULL)
 	goto stop;

@@ -2,7 +2,7 @@
 
  gg_ewkt.c -- EWKT parser/lexer 
   
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2011-2015
+Portions created by the Initial Developer are Copyright (C) 2011-2021
 the Initial Developer. All Rights Reserved.
 
 Alternatively, the contents of this file may be used under the terms of
@@ -549,7 +549,7 @@ ewkt_point_xym (struct ewkt_data *p_data, double *x, double *y, double *m)
  * Returns a gaiaPointPtr pointing the created 4D point with an m value.
  */
 gaiaPointPtr
-ewkt_point_xyzm (struct ewkt_data * p_data, double *x, double *y, double *z,
+ewkt_point_xyzm (struct ewkt_data *p_data, double *x, double *y, double *z,
 		 double *m)
 {
     gaiaPointPtr pt = gaiaAllocPointXYZM (*x, *y, *z, *m);

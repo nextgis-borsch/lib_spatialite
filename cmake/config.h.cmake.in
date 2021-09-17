@@ -208,6 +208,9 @@
 /* Define to the version of this package. */
 #cmakedefine PACKAGE_VERSION "@PACKAGE_VERSION@"
 
+/* Define to the spatialite version. */
+#define SPATIALITE_VERSION "@PACKAGE_VERSION@"
+
 /* Should be defined in order to enable PROJ.6 support. */
 #cmakedefine PROJ_NEW
 
@@ -216,6 +219,8 @@
 
 /* Should contain a text-string describing the intended target CPU */
 #cmakedefine TARGET_CPU "@TARGET_CPU@"
+
+#define SPATIALITE_TARGET_CPU "@TARGET_CPU@"
 
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #cmakedefine TIME_WITH_SYS_TIME 1

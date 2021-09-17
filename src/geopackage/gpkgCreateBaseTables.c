@@ -39,16 +39,21 @@ the terms of any one of the MPL, the GPL or the LGPL.
 
 
 #include "spatialite/geopackage.h"
-#include "config.h"
 #include "geopackage_internal.h"
+
+#if defined(_WIN32) && !defined(__MINGW32__)
+#include "config-msvc.h"
+#else
+#include "config.h"
+#endif
 
 #define GAIA_UNUSED() if (argc || argv) argc = argc;
 
 #ifdef ENABLE_GEOPACKAGE
 
 GEOPACKAGE_PRIVATE void
-fnct_gpkgCreateBaseTables (sqlite3_context * context, int argc
-			   __attribute__ ((unused)), sqlite3_value ** argv)
+fnct_gpkgCreateBaseTables (sqlite3_context * context, int argc,
+			   sqlite3_value ** argv)
 {
 /* SQL function:
 / gpkgCreateBaseTables()
@@ -67,8 +72,7 @@ fnct_gpkgCreateBaseTables (sqlite3_context * context, int argc
 	"PRAGMA application_id = 1196437808",
 
 	/* GeoPackage specification Table 18 */
-	"CREATE TABLE gpkg_spatial_ref_sys (\n"
-	    "srs_name TEXT NOT NULL,\n"
+	"CREATE TABLE gpkg_spatial_ref_sys (\n" "srs_name TEXT NOT NULL,\n"
 	    "srs_id INTEGER NOT NULL PRIMARY KEY,\n"
 	    "organization TEXT NOT NULL,\n"
 	    "organization_coordsys_id INTEGER NOT NULL,\n"
@@ -83,24 +87,17 @@ fnct_gpkgCreateBaseTables (sqlite3_context * context, int argc
 	/* Note that NULL is distinct on UNIQUE columns, so identifier definition isn't quite that far out-there */
 	"CREATE TABLE gpkg_contents (\n"
 	    "table_name TEXT NOT NULL PRIMARY KEY,\n"
-	    "data_type TEXT NOT NULL,\n"
-	    "identifier TEXT UNIQUE,\n"
+	    "data_type TEXT NOT NULL,\n" "identifier TEXT UNIQUE,\n"
 	    "description TEXT DEFAULT '',\n"
 	    "last_change DATETIME NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ',CURRENT_TIMESTAMP)),\n"
-	    "min_x DOUBLE,\n"
-	    "min_y DOUBLE,\n"
-	    "max_x DOUBLE,\n"
-	    "max_y DOUBLE,\n"
-	    "srs_id INTEGER,\n"
+	    "min_x DOUBLE,\n" "min_y DOUBLE,\n" "max_x DOUBLE,\n"
+	    "max_y DOUBLE,\n" "srs_id INTEGER,\n"
 	    "CONSTRAINT fk_gc_r_srid FOREIGN KEY (srs_id) REFERENCES gpkg_spatial_ref_sys(srs_id))",
 
 	/* GeoPackage specification Table 6 / Table 22 */
-	"CREATE TABLE gpkg_geometry_columns (\n"
-	    "table_name TEXT NOT NULL,\n"
-	    "column_name TEXT NOT NULL,\n"
-	    "geometry_type_name TEXT NOT NULL,\n"
-	    "srs_id INTEGER NOT NULL,\n"
-	    "z TINYINT NOT NULL,\n"
+	"CREATE TABLE gpkg_geometry_columns (\n" "table_name TEXT NOT NULL,\n"
+	    "column_name TEXT NOT NULL,\n" "geometry_type_name TEXT NOT NULL,\n"
+	    "srs_id INTEGER NOT NULL,\n" "z TINYINT NOT NULL,\n"
 	    "m TINYINT NOT NULL,\n"
 	    "CONSTRAINT pk_geom_cols PRIMARY KEY (table_name, column_name),\n"
 	    "CONSTRAINT uk_gc_table_name UNIQUE (table_name),\n"
@@ -110,36 +107,25 @@ fnct_gpkgCreateBaseTables (sqlite3_context * context, int argc
 	/* GeoPackage specification Table 8 / Table 26 */
 	"CREATE TABLE gpkg_tile_matrix_set (\n"
 	    "table_name TEXT NOT NULL PRIMARY KEY,\n"
-	    "srs_id INTEGER NOT NULL,\n"
-	    "min_x DOUBLE NOT NULL,\n"
-	    "min_y DOUBLE NOT NULL,\n"
-	    "max_x DOUBLE NOT NULL,\n"
+	    "srs_id INTEGER NOT NULL,\n" "min_x DOUBLE NOT NULL,\n"
+	    "min_y DOUBLE NOT NULL,\n" "max_x DOUBLE NOT NULL,\n"
 	    "max_y DOUBLE NOT NULL,\n"
 	    "CONSTRAINT fk_gtms_table_name FOREIGN KEY (table_name) REFERENCES gpkg_contents(table_name),\n"
 	    "CONSTRAINT fk_gtms_srs FOREIGN KEY (srs_id) REFERENCES gpkg_spatial_ref_sys (srs_id))",
 
 	/* Geopackage specification Table 9 / Table 27 */
-	"CREATE TABLE gpkg_tile_matrix (\n"
-	    "table_name TEXT NOT NULL,\n"
-	    "zoom_level INTEGER NOT NULL,\n"
-	    "matrix_width INTEGER NOT NULL,\n"
-	    "matrix_height INTEGER NOT NULL,\n"
-	    "tile_width INTEGER NOT NULL,\n"
-	    "tile_height INTEGER NOT NULL,\n"
-	    "pixel_x_size DOUBLE NOT NULL,\n"
+	"CREATE TABLE gpkg_tile_matrix (\n" "table_name TEXT NOT NULL,\n"
+	    "zoom_level INTEGER NOT NULL,\n" "matrix_width INTEGER NOT NULL,\n"
+	    "matrix_height INTEGER NOT NULL,\n" "tile_width INTEGER NOT NULL,\n"
+	    "tile_height INTEGER NOT NULL,\n" "pixel_x_size DOUBLE NOT NULL,\n"
 	    "pixel_y_size DOUBLE NOT NULL,\n"
 	    "CONSTRAINT pk_ttm PRIMARY KEY (table_name, zoom_level),\n"
 	    "CONSTRAINT fk_tmm_table_name FOREIGN KEY (table_name) REFERENCES gpkg_contents(table_name))",
 
 	/* GeoPackage specification Table 11 / Table 31 */
-	"CREATE TABLE gpkg_data_columns (\n"
-	    "table_name TEXT NOT NULL,\n"
-	    "column_name TEXT NOT NULL,\n"
-	    "name TEXT,\n"
-	    "title TEXT,\n"
-	    "description TEXT,\n"
-	    "mime_type TEXT,\n"
-	    "constraint_name TEXT,\n"
+	"CREATE TABLE gpkg_data_columns (\n" "table_name TEXT NOT NULL,\n"
+	    "column_name TEXT NOT NULL,\n" "name TEXT,\n" "title TEXT,\n"
+	    "description TEXT,\n" "mime_type TEXT,\n" "constraint_name TEXT,\n"
 	    "CONSTRAINT pk_gdc PRIMARY KEY (table_name, column_name),\n"
 	    "CONSTRAINT fk_gdc_tn FOREIGN KEY (table_name) REFERENCES gpkg_contents(table_name))",
 
@@ -176,12 +162,9 @@ fnct_gpkgCreateBaseTables (sqlite3_context * context, int argc
 	    "CONSTRAINT crmr_mpi_fk FOREIGN KEY (md_parent_id) REFERENCES gpkg_metadata(id))",
 
 	/* GeoPackage specification Table 17 / Table 36 */
-	"CREATE TABLE gpkg_extensions (\n"
-	    "table_name TEXT,\n"
-	    "column_name TEXT,\n"
-	    "extension_name TEXT NOT NULL,\n"
-	    "definition TEXT NOT NULL,\n"
-	    "scope TEXT NOT NULL,\n"
+	"CREATE TABLE gpkg_extensions (\n" "table_name TEXT,\n"
+	    "column_name TEXT,\n" "extension_name TEXT NOT NULL,\n"
+	    "definition TEXT NOT NULL,\n" "scope TEXT NOT NULL,\n"
 	    "CONSTRAINT ge_tce UNIQUE (table_name, column_name, extension_name))",
 
 	/* Next 10 constraints are from GeoPackage specification Table 37 */
@@ -353,6 +336,9 @@ fnct_gpkgCreateBaseTables (sqlite3_context * context, int argc
 
 	NULL
     };
+
+    if (argc == 0)
+	argc = 0;		/* suppressing stupid compiler warnings */
 
     GAIA_UNUSED ();		/* LCOV_EXCL_LINE */
 

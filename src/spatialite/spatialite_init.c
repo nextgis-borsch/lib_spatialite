@@ -2,7 +2,7 @@
 
  spatialite_init.c -- SQLite3 spatial extension
 
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -67,7 +67,7 @@ Regione Toscana - Settore Sistema Informativo Territoriale ed Ambientale
 
 #include <spatialite/sqlite.h>
 
-#include <spatialite/spatialite.h>
+#include <spatialite/spatialite_ext.h>
 #include <spatialite.h>
 #include <spatialite_private.h>
 

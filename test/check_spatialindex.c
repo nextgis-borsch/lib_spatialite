@@ -46,7 +46,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include <stdio.h>
 #include <string.h>
 
-#include "config.h"
+#include <spatialite/gaiaconfig.h>
 
 #include "sqlite3.h"
 #include "spatialite.h"
@@ -1659,32 +1659,32 @@ main (int argc, char *argv[])
 
 /* expected failures */
     ret =
-	sqlite3_exec (handle, "SELECT InitSpatialMetadata('a', 1)", NULL, NULL,
+	sqlite3_exec (handle, "SELECT InitSpatialMetadataFull('a', 1)", NULL, NULL,
 		      &err_msg);
     if (ret != SQLITE_OK)
       {
-	  fprintf (stderr, "InitSpatialMetadata('a', 1) error: %s\n", err_msg);
+	  fprintf (stderr, "InitSpatialMetadataFull('a', 1) error: %s\n", err_msg);
 	  sqlite3_free (err_msg);
 	  sqlite3_close (handle);
 	  return -113;
       }
     ret =
-	sqlite3_exec (handle, "SELECT InitSpatialMetadata(1, 2)", NULL, NULL,
+	sqlite3_exec (handle, "SELECT InitSpatialMetadataFull(1, 2)", NULL, NULL,
 		      &err_msg);
     if (ret != SQLITE_OK)
       {
-	  fprintf (stderr, "InitSpatialMetadata(1, 2) error: %s\n", err_msg);
+	  fprintf (stderr, "InitSpatialMetadataFull(1, 2) error: %s\n", err_msg);
 	  sqlite3_free (err_msg);
 	  sqlite3_close (handle);
 	  return -114;
       }
 
     ret =
-	sqlite3_exec (handle, "SELECT InitSpatialMetadata()", NULL, NULL,
+	sqlite3_exec (handle, "SELECT InitSpatialMetadataFull()", NULL, NULL,
 		      &err_msg);
     if (ret != SQLITE_OK)
       {
-	  fprintf (stderr, "InitSpatialMetadata() error: %s\n", err_msg);
+	  fprintf (stderr, "InitSpatialMetadataFull() error: %s\n", err_msg);
 	  sqlite3_free (err_msg);
 	  sqlite3_close (handle);
 	  return -2;
@@ -1724,11 +1724,11 @@ main (int argc, char *argv[])
     spatialite_init_ex (handle, cache, 0);
 
     ret =
-	sqlite3_exec (handle, "SELECT InitSpatialMetadata()", NULL, NULL,
+	sqlite3_exec (handle, "SELECT InitSpatialMetadataFull()", NULL, NULL,
 		      &err_msg);
     if (ret != SQLITE_OK)
       {
-	  fprintf (stderr, "InitSpatialMetadata() error: %s\n", err_msg);
+	  fprintf (stderr, "InitSpatialMetadataFull() error: %s\n", err_msg);
 	  sqlite3_free (err_msg);
 	  sqlite3_close (handle);
 	  return -103;

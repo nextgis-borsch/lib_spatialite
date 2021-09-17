@@ -44,6 +44,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #include "sqlite3.h"
 #include "spatialite.h"
@@ -60,28 +61,28 @@ main (int argc, char *argv[])
 	argc = 1;		/* silencing stupid compiler warnings */
 
     result = math_round (3.4);
-    if (abs (result - 3) > double_eps)
+    if (fabs (result - 3) > double_eps)
       {
 	  fprintf (stderr, "bad math_round() result for 3.4: %f\n", result);
 	  return -1;
       }
 
     result = math_round (3.6);
-    if (abs (result - 4) > double_eps)
+    if (fabs (result - 4) > double_eps)
       {
 	  fprintf (stderr, "bad math_round() result for 3.6: %f\n", result);
 	  return -2;
       }
 
     result = math_round (-3.4);
-    if (abs (result + 3) > double_eps)
+    if (fabs (result + 3) > double_eps)
       {
 	  fprintf (stderr, "bad math_round() result for -3.4: %f\n", result);
 	  return -3;
       }
 
     result = math_round (-3.6);
-    if (abs (result + 4) > double_eps)
+    if (fabs (result + 4) > double_eps)
       {
 	  fprintf (stderr, "bad math_round() result for -3.6: %f\n", result);
 	  return -4;

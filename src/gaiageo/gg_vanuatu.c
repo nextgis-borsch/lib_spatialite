@@ -2,7 +2,7 @@
 
  gg_vanuatu.c -- WKT parser/lexer 
   
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 The Vanuatu Team - University of Toronto - Supervisor:
@@ -578,7 +578,7 @@ vanuatu_point_xym (struct vanuatu_data *p_data, double *x, double *y, double *m)
  * Returns a gaiaPointPtr pointing the created 4D point with an m value.
  */
 gaiaPointPtr
-vanuatu_point_xyzm (struct vanuatu_data * p_data, double *x, double *y,
+vanuatu_point_xyzm (struct vanuatu_data *p_data, double *x, double *y,
 		    double *z, double *m)
 {
     gaiaPointPtr pt = gaiaAllocPointXYZM (*x, *y, *z, *m);

@@ -38,13 +38,18 @@ the terms of any one of the MPL, the GPL or the LGPL.
 */
 
 #include "spatialite/geopackage.h"
-#include "config.h"
 #include "geopackage_internal.h"
+
+#if defined(_WIN32) && !defined(__MINGW32__)
+#include "config-msvc.h"
+#else
+#include "config.h"
+#endif
 
 #ifdef ENABLE_GEOPACKAGE
 GEOPACKAGE_PRIVATE void
-fnct_gpkgCreateTilesTable (sqlite3_context * context, int argc
-			   __attribute__ ((unused)), sqlite3_value ** argv)
+fnct_gpkgCreateTilesTable (sqlite3_context * context, int argc,
+			   sqlite3_value ** argv)
 {
 /* SQL function:
 / gpkgCreateTilesTable(table_name, srid, min_x, min_y, max_x, max_y)
@@ -78,8 +83,7 @@ fnct_gpkgCreateTilesTable (sqlite3_context * context, int argc
     };
 
     const char *tableSchemas[] = {
-	"CREATE TABLE \"%w\" (\n"
-	    "id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+	"CREATE TABLE \"%w\" (\n" "id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
 	    "zoom_level INTEGER NOT NULL DEFAULT 0,\n"
 	    "tile_column INTEGER NOT NULL DEFAULT 0,\n"
 	    "tile_row INTEGER NOT NULL DEFAULT 0,\n"
@@ -90,6 +94,9 @@ fnct_gpkgCreateTilesTable (sqlite3_context * context, int argc
 
 	NULL
     };
+
+    if (argc == 0)
+	argc = 0;		/* suppressing stupid compiler warnings */
 
     if (sqlite3_value_type (argv[0]) != SQLITE_TEXT)
       {

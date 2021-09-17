@@ -87,6 +87,8 @@ set(CSOURCES srs_init.c
 	epsg_inlined_55.c
 	epsg_inlined_56.c
 	epsg_inlined_57.c
+	epsg_inlined_58.c
+	epsg_inlined_59.c
 	epsg_inlined_wgs84_00.c
 	epsg_inlined_wgs84_01.c
 	epsg_inlined_prussian.c

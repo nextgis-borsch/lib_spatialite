@@ -2,7 +2,7 @@
 
  srs_init.c -- populating the SPATIAL_REF_SYS table
 
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2020
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -376,10 +376,11 @@ free_epsg (struct epsg_defs *first)
       }
 }
 
-static void
+SPATIALITE_PRIVATE int
 create_spatial_ref_sys_aux (sqlite3 * handle)
 {
 /* just in case, we'll create the SPATIAL_REF_SYS_AUX table */
+    int ret;
     const char *sql = "CREATE TABLE IF NOT EXISTS spatial_ref_sys_aux (\n"
 	"\tsrid INTEGER NOT NULL PRIMARY KEY,\n"
 	"\tis_geographic INTEGER,\n"
@@ -395,7 +396,9 @@ create_spatial_ref_sys_aux (sqlite3 * handle)
 	"\taxis_2_orientation TEXT,\n"
 	"\tCONSTRAINT fk_sprefsys FOREIGN KEY (srid) "
 	"\tREFERENCES spatial_ref_sys (srid))";
-    sqlite3_exec (handle, sql, NULL, NULL, NULL);
+    ret = sqlite3_exec (handle, sql, NULL, NULL, NULL);
+    if (ret != SQLITE_OK)
+	return 0;
 /* creating the SPATIAL_REF_SYS_ALL view */
     sql = "CREATE VIEW IF NOT EXISTS spatial_ref_sys_all AS\n"
 	"SELECT a.srid AS srid, a.auth_name AS auth_name, "
@@ -411,7 +414,10 @@ create_spatial_ref_sys_aux (sqlite3 * handle)
 	"a.proj4text AS proj4text, a.srtext AS srtext\n"
 	"FROM spatial_ref_sys AS a\n"
 	"LEFT JOIN spatial_ref_sys_aux AS b ON (a.srid = b.srid)";
-    sqlite3_exec (handle, sql, NULL, NULL, NULL);
+    ret = sqlite3_exec (handle, sql, NULL, NULL, NULL);
+    if (ret != SQLITE_OK)
+	return 0;
+    return 1;
 }
 
 static int

@@ -1,7 +1,7 @@
 /* 
  spatialite.h -- Gaia spatial support for SQLite 
   
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -23,7 +23,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -52,7 +52,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #ifdef DLL_EXPORT
 #define SPATIALITE_DECLARE __declspec(dllexport)
 #else
-#define SPATIALITE_DECLARE __declspec(dllimport)
+#define SPATIALITE_DECLARE extern
 #endif
 #else
 #define SPATIALITE_DECLARE __attribute__ ((visibility("default")))
@@ -476,7 +476,7 @@ extern "C"
 
  \return 0 on failure, any other value on success
 
- \sa load_shapefile, load_shapefile_ex, load_shapefile_ex2
+ \sa load_shapefile, load_shapefile_ex, load_shapefile_ex2, load_zip_shapefile
 
  \note the Shapefile format doesn't supports any distinction between
   LINESTRINGs and MULTILINESTRINGs, or between POLYGONs and MULTIPOLYGONs;
@@ -487,10 +487,66 @@ extern "C"
   will be skipped at all thus introducing a noticeable performance gain.
  \n Anyway, declaring a mismatching geometry type will surely cause a failure.
  */
-    SPATIALITE_DECLARE int load_shapefile_ex3 (sqlite3 * sqlite, char *shp_path,
-					       char *table, char *charset,
-					       int srid, char *geo_column,
-					       char *gtype, char *pk_column,
+    SPATIALITE_DECLARE int load_shapefile_ex3 (sqlite3 * sqlite,
+					       const char *shp_path,
+					       const char *table,
+					       const char *charset, int srid,
+					       const char *geo_column,
+					       const char *gtype,
+					       const char *pk_column,
+					       int coerce2d, int compressed,
+					       int verbose, int spatial_index,
+					       int text_date, int *rows,
+					       int colname_case, char *err_msg);
+
+/**
+ Loads an external Shapefile (from Zipfile) into a newly created table
+
+ \param sqlite handle to current DB connection
+ \param zip_path pathname of the Zipfile 
+ \param shp_path pseudo-pathname of the Shapefile to be imported (no suffix) 
+ \param table the name of the table to be created
+ \param charset a valid GNU ICONV charset to be used for DBF text strings
+ \param srid the SRID to be set for Geometries
+ \param geo_column the name of the geometry column
+ \param gtype expected to be one of: "LINESTRING", "LINESTRINGZ", 
+  "LINESTRINGM", "LINESTRINGZM", "MULTILINESTRING", "MULTILINESTRINGZ",
+  "MULTILINESTRINGM", "MULTILINESTRINGZM", "POLYGON", "POLYGONZ", "POLYGONM", 
+  "POLYGONZM", "MULTIPOLYGON", "MULTIPOLYGONZ", "MULTIPOLYGONM", 
+  "MULTIPOLYGONZM" or "AUTO".
+ \param pk_column name of the Primary Key column; if NULL or mismatching
+ then "PK_UID" will be assumed by default.
+ \param coerce2d if TRUE any Geometry will be casted to 2D [XY]
+ \param compressed if TRUE compressed Geometries will be created
+ \param verbose if TRUE a short report is shown on stderr
+ \param spatial_index if TRUE an R*Tree Spatial Index will be created
+ \param text_dates is TRUE all DBF dates will be considered as TEXT
+ \param rows on completion will contain the total number of imported rows
+ \param colname_case one between GAIA_DBF_COLNAME_LOWERCASE, 
+	GAIA_DBF_COLNAME_UPPERCASE or GAIA_DBF_COLNAME_CASE_IGNORE.
+ \param err_msg on completion will contain an error message (if any)
+
+ \return 0 on failure, any other value on success
+
+ \sa load_shapefile_ex3
+
+ \note the Shapefile format doesn't supports any distinction between
+  LINESTRINGs and MULTILINESTRINGs, or between POLYGONs and MULTIPOLYGONs;
+  as does not allows to clearly distinguish if the M-measure is required.
+ \n So a first preliminary scan of the Shapefile is required in order to
+  correctly identify the actual payload (gtype = "AUTO", default case).
+ \n By explicitly specifying some expected geometry type this first scan
+  will be skipped at all thus introducing a noticeable performance gain.
+ \n Anyway, declaring a mismatching geometry type will surely cause a failure.
+ */
+    SPATIALITE_DECLARE int load_zip_shapefile (sqlite3 * sqlite,
+					       const char *zip_path,
+					       const char *shp_path,
+					       const char *table,
+					       const char *charset, int srid,
+					       const char *geo_column,
+					       const char *gtype,
+					       const char *pk_column,
 					       int coerce2d, int compressed,
 					       int verbose, int spatial_index,
 					       int text_date, int *rows,
@@ -580,13 +636,47 @@ extern "C"
 	GAIA_DBF_COLNAME_UPPERCASE or GAIA_DBF_COLNAME_CASE_IGNORE.
  \param err_msg on completion will contain an error message (if any)
 
- \sa load_dbf, load_dbf_ex, load_dbf_ex2
+ \sa load_dbf, load_dbf_ex, load_dbf_ex2, load_zip_dbf
 
  \return 0 on failure, any other value on success
  */
-    SPATIALITE_DECLARE int load_dbf_ex3 (sqlite3 * sqlite, char *dbf_path,
-					 char *table, char *pk_column,
-					 char *charset, int verbose,
+    SPATIALITE_DECLARE int load_dbf_ex3 (sqlite3 * sqlite, const char *dbf_path,
+					 const char *table,
+					 const char *pk_column,
+					 const char *charset, int verbose,
+					 int text_date, int *rows,
+					 int colname_case, char *err_msg);
+
+/**
+ Loads an external DBF file (from Zipfile) into a newly created table
+
+ \param sqlite handle to current DB connection
+ \param zip_path pathname of the Zipfile 
+ \param shp_path pseudo-pathname of the Shapefile to be imported (no suffix) 
+
+ \param sqlite handle to current DB connection
+ \param zip_path pathname of the Zipfile 
+ \param filenamepseudo-pathname of the DBF file to be imported (including the '.dbf' suffix) 
+ \param table the name of the table to be created
+ \param pk_column name of the Primary Key column; if NULL or mismatching
+ then "PK_UID" will be assumed by default.
+ \param charset a valid GNU ICONV charset to be used for DBF text strings
+ \param verbose if TRUE a short report is shown on stderr
+ \param text_dates is TRUE all DBF dates will be considered as TEXT
+ \param rows on completion will contain the total number of imported rows
+ \param colname_case one between GAIA_DBF_COLNAME_LOWERCASE, 
+	GAIA_DBF_COLNAME_UPPERCASE or GAIA_DBF_COLNAME_CASE_IGNORE.
+ \param err_msg on completion will contain an error message (if any)
+
+ \sa load_dbf_ex3
+
+ \return 0 on failure, any other value on success
+ */
+    SPATIALITE_DECLARE int load_zip_dbf (sqlite3 * sqlite, const char *zip_file,
+					 const char *dbf_path,
+					 const char *table,
+					 const char *pk_column,
+					 const char *charset, int verbose,
 					 int text_date, int *rows,
 					 int colname_case, char *err_msg);
 

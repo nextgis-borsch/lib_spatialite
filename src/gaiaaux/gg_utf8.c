@@ -2,7 +2,7 @@
 
  gg_utf8.c -- locale charset handling
   
- version 4.3, 2015 June 29
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2008-2015
+Portions created by the Initial Developer are Copyright (C) 2008-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -55,6 +55,10 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include "config.h"
 #endif
 
+#include <spatialite/sqlite.h>
+#include <spatialite/gaiaaux.h>
+#include <spatialite_private.h>
+
 #if OMIT_ICONV == 0		/* ICONV is absolutely required */
 
 #if defined(__MINGW32__) || defined(_WIN32)
@@ -77,10 +81,6 @@ extern const char *locale_charset (void);
 #include <langinfo.h>
 #endif
 #endif
-
-#include <spatialite/sqlite.h>
-#include <spatialite/gaiaaux.h>
-#include <spatialite_private.h>
 
 GAIAAUX_DECLARE const char *
 gaiaGetLocaleCharset ()
@@ -211,7 +211,7 @@ url_toUtf8 (const char *url, const char *in_charset)
 #if !defined(__MINGW32__) && defined(_WIN32)
     const char *pBuf = url;
 #else /* not WIN32 */
-    char *pBuf = (char *)url;
+    char *pBuf = (char *) url;
 #endif
 
     if (url == NULL || in_charset == NULL)
@@ -250,7 +250,7 @@ url_fromUtf8 (const char *url, const char *out_charset)
 #if !defined(__MINGW32__) && defined(_WIN32)
     const char *pBuf = url;
 #else /* not WIN32 */
-    char *pBuf = (char *)url;
+    char *pBuf = (char *) url;
 #endif
 
     if (url == NULL || out_charset == NULL)
@@ -276,4 +276,12 @@ url_fromUtf8 (const char *url, const char *out_charset)
     return NULL;
 }
 
+#else
+GAIAAUX_DECLARE char *
+gaiaConvertToUTF8 (void *cvtCS, const char *buf, int buflen, int *err)
+{
+	if (cvtCS == NULL || buf == NULL || err == NULL || buflen == 0)
+    return NULL;
+    return NULL;
+}
 #endif /* ICONV enabled/disabled */

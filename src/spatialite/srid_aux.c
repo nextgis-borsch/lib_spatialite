@@ -2,7 +2,7 @@
 
  srid_aux.c -- SRID auxiliary functions
 
- version 4.3.0, 2014 December 4
+ version 5.0, 2020 August 1
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -24,7 +24,7 @@ The Original Code is the SpatiaLite library
 
 The Initial Developer of the Original Code is Alessandro Furieri
  
-Portions created by the Initial Developer are Copyright (C) 2014-2015
+Portions created by the Initial Developer are Copyright (C) 2014-2021
 the Initial Developer. All Rights Reserved.
 
 Contributor(s):
@@ -180,7 +180,7 @@ static char *
 check_wkt (const char *wkt, const char *key, char axis, char axis_mode)
 {
 /* parsing a WKT string so to find a given key:value */
-    char mux[16][128];
+    char mux[16][1024];
     char *o;
     const char *p = wkt;
     int level = 0;

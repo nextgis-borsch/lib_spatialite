@@ -82,24 +82,25 @@
 **    YY_MAX_REDUCE      Maximum value for reduce actions
 */
 #ifndef INTERFACE
-# define INTERFACE 1
+#define INTERFACE 1
 #endif
 /************* Begin control #defines *****************************************/
 #define YYCODETYPE unsigned char
 #define YYNOCODE 28
 #define YYACTIONTYPE unsigned char
 #define ParseTOKENTYPE void *
-typedef union {
-  int yyinit;
-  ParseTOKENTYPE yy0;
+typedef union
+{
+    int yyinit;
+    ParseTOKENTYPE yy0;
 } YYMINORTYPE;
 #ifndef YYSTACKDEPTH
 #define YYSTACKDEPTH 1000000
 #endif
 #define ParseARG_SDECL  struct gml_data *p_data ;
-#define ParseARG_PDECL , struct gml_data *p_data 
-#define ParseARG_FETCH  struct gml_data *p_data  = yypParser->p_data 
-#define ParseARG_STORE yypParser->p_data  = p_data 
+#define ParseARG_PDECL , struct gml_data *p_data
+#define ParseARG_FETCH  struct gml_data *p_data  = yypParser->p_data
+#define ParseARG_STORE yypParser->p_data  = p_data
 #define YYNSTATE             27
 #define YYNRULE              34
 #define YYNTOKEN             9
@@ -122,7 +123,7 @@ typedef union {
 ** for testing.
 */
 #ifndef yytestcase
-# define yytestcase(X)
+#define yytestcase(X)
 #endif
 
 
@@ -178,44 +179,49 @@ typedef union {
 *********** Begin parsing tables **********************************************/
 #define YY_ACTTAB_COUNT (63)
 static const YYACTIONTYPE yy_action[] = {
- /*     0 */    26,   26,   26,    4,   87,    5,    2,    2,    5,    5,
- /*    10 */   100,   84,    1,  100,  100,  105,  106,    3,    8,    5,
- /*    20 */    25,    6,   74,   23,  100,  109,   24,   12,  115,   23,
- /*    30 */    13,   19,   14,   16,   95,   17,   99,    8,   21,    7,
- /*    40 */    10,   10,   18,   97,  110,   15,  113,  114,   66,   14,
- /*    50 */     9,   23,  101,   66,   20,   11,   65,   53,   70,   52,
- /*    60 */    51,   22,   80,
+    /*     0 */ 26, 26, 26, 4, 87, 5, 2, 2, 5, 5,
+    /*    10 */ 100, 84, 1, 100, 100, 105, 106, 3, 8, 5,
+    /*    20 */ 25, 6, 74, 23, 100, 109, 24, 12, 115, 23,
+    /*    30 */ 13, 19, 14, 16, 95, 17, 99, 8, 21, 7,
+    /*    40 */ 10, 10, 18, 97, 110, 15, 113, 114, 66, 14,
+    /*    50 */ 9, 23, 101, 66, 20, 11, 65, 53, 70, 52,
+    /*    60 */ 51, 22, 80,
 };
+
 static const YYCODETYPE yy_lookahead[] = {
- /*     0 */    12,   13,   14,   15,   16,   17,   15,   15,   17,   17,
- /*    10 */    22,   10,   11,   22,   22,   24,   24,   15,   18,   17,
- /*    20 */     2,    3,    8,    5,   22,   25,    2,    3,    0,    5,
- /*    30 */    18,   19,    4,   20,   21,   20,   21,   18,    2,    3,
- /*    40 */    20,   20,   20,   21,   25,    2,   26,   26,    5,    4,
- /*    50 */    18,    5,   23,    5,   23,   20,    3,    3,    7,    3,
- /*    60 */     3,    6,    1,   27,   27,   27,   27,   27,   27,   27,
- /*    70 */    27,   27,
+    /*     0 */ 12, 13, 14, 15, 16, 17, 15, 15, 17, 17,
+    /*    10 */ 22, 10, 11, 22, 22, 24, 24, 15, 18, 17,
+    /*    20 */ 2, 3, 8, 5, 22, 25, 2, 3, 0, 5,
+    /*    30 */ 18, 19, 4, 20, 21, 20, 21, 18, 2, 3,
+    /*    40 */ 20, 20, 20, 21, 25, 2, 26, 26, 5, 4,
+    /*    50 */ 18, 5, 23, 5, 23, 20, 3, 3, 7, 3,
+    /*    60 */ 3, 6, 1, 27, 27, 27, 27, 27, 27, 27,
+    /*    70 */ 27, 27,
 };
+
 #define YY_SHIFT_COUNT    (26)
 #define YY_SHIFT_MIN      (0)
 #define YY_SHIFT_MAX      (61)
 static const unsigned char yy_shift_ofst[] = {
- /*     0 */    63,   28,   45,   45,   45,   18,   14,   14,   46,   46,
- /*    10 */    14,   14,   14,   24,   43,   48,   14,   14,   14,   36,
- /*    20 */    53,   54,   51,   55,   56,   57,   61,
+    /*     0 */ 63, 28, 45, 45, 45, 18, 14, 14, 46, 46,
+    /*    10 */ 14, 14, 14, 24, 43, 48, 14, 14, 14, 36,
+    /*    20 */ 53, 54, 51, 55, 56, 57, 61,
 };
+
 #define YY_REDUCE_COUNT (18)
 #define YY_REDUCE_MIN   (-12)
 #define YY_REDUCE_MAX   (35)
 static const signed char yy_reduce_ofst[] = {
- /*     0 */     1,  -12,   -9,   -8,    2,   12,   13,   15,    0,   19,
- /*    10 */    20,   21,   22,   32,   29,   31,   35,   35,   35,
+    /*     0 */ 1, -12, -9, -8, 2, 12, 13, 15, 0, 19,
+    /*    10 */ 20, 21, 22, 32, 29, 31, 35, 35, 35,
 };
+
 static const YYACTIONTYPE yy_default[] = {
- /*     0 */   116,   83,  104,  104,   86,   83,   91,   93,  108,  108,
- /*    10 */   112,  112,   92,   83,   83,   83,   94,   98,   96,   83,
- /*    20 */    83,   83,   83,   83,   83,   83,   83,
+    /*     0 */ 116, 83, 104, 104, 86, 83, 91, 93, 108, 108,
+    /*    10 */ 112, 112, 92, 83, 83, 83, 94, 98, 96, 83,
+    /*    20 */ 83, 83, 83, 83, 83, 83, 83,
 };
+
 /********** End of lemon-generated parsing tables *****************************/
 
 /* The next table maps tokens (terminal symbols) into fallback tokens.  
@@ -253,33 +259,35 @@ static const YYCODETYPE yyFallback[] = {
 ** actually contains the reduce action for the second half of the
 ** SHIFTREDUCE.
 */
-struct yyStackEntry {
-  YYACTIONTYPE stateno;  /* The state-number, or reduce action in SHIFTREDUCE */
-  YYCODETYPE major;      /* The major token value.  This is the code
-                         ** number for the token at this stack level */
-  YYMINORTYPE minor;     /* The user-supplied minor token value.  This
-                         ** is the value of the token  */
+struct yyStackEntry
+{
+    YYACTIONTYPE stateno;	/* The state-number, or reduce action in SHIFTREDUCE */
+    YYCODETYPE major;		/* The major token value.  This is the code
+				 ** number for the token at this stack level */
+    YYMINORTYPE minor;		/* The user-supplied minor token value.  This
+				 ** is the value of the token  */
 };
 typedef struct yyStackEntry yyStackEntry;
 
 /* The state of the parser is completely contained in an instance of
 ** the following structure */
-struct yyParser {
-  yyStackEntry *yytos;          /* Pointer to top element of the stack */
+struct yyParser
+{
+    yyStackEntry *yytos;	/* Pointer to top element of the stack */
 #ifdef YYTRACKMAXSTACKDEPTH
-  int yyhwm;                    /* High-water mark of the stack */
+    int yyhwm;			/* High-water mark of the stack */
 #endif
 #ifndef YYNOERRORRECOVERY
-  int yyerrcnt;                 /* Shifts left before out of the error */
+    int yyerrcnt;		/* Shifts left before out of the error */
 #endif
-  ParseARG_SDECL                /* A place to hold %extra_argument */
+      ParseARG_SDECL		/* A place to hold %extra_argument */
 #if YYSTACKDEPTH<=0
-  int yystksz;                  /* Current side of the stack */
-  yyStackEntry *yystack;        /* The parser's stack */
-  yyStackEntry yystk0;          /* First stack entry */
+    int yystksz;		/* Current side of the stack */
+    yyStackEntry *yystack;	/* The parser's stack */
+    yyStackEntry yystk0;	/* First stack entry */
 #else
-  yyStackEntry yystack[YYSTACKDEPTH];  /* The parser's stack */
-  yyStackEntry *yystackEnd;            /* Last entry in the stack */
+      yyStackEntry yystack[YYSTACKDEPTH];	/* The parser's stack */
+    yyStackEntry *yystackEnd;	/* Last entry in the stack */
 #endif
 };
 typedef struct yyParser yyParser;
@@ -308,45 +316,49 @@ static char *yyTracePrompt = 0;
 ** Outputs:
 ** None.
 */
-void ParseTrace(FILE *TraceFILE, char *zTracePrompt){
-  yyTraceFILE = TraceFILE;
-  yyTracePrompt = zTracePrompt;
-  if( yyTraceFILE==0 ) yyTracePrompt = 0;
-  else if( yyTracePrompt==0 ) yyTraceFILE = 0;
+void
+ParseTrace (FILE * TraceFILE, char *zTracePrompt)
+{
+    yyTraceFILE = TraceFILE;
+    yyTracePrompt = zTracePrompt;
+    if (yyTraceFILE == 0)
+	yyTracePrompt = 0;
+    else if (yyTracePrompt == 0)
+	yyTraceFILE = 0;
 }
 #endif /* NDEBUG */
 
 #if defined(YYCOVERAGE) || !defined(NDEBUG)
 /* For tracing shifts, the names of all terminals and nonterminals
 ** are required.  The following table supplies these names */
-static const char *const yyTokenName[] = { 
-  /*    0 */ "$",
-  /*    1 */ "GML_NEWLINE",
-  /*    2 */ "GML_END",
-  /*    3 */ "GML_CLOSE",
-  /*    4 */ "GML_OPEN",
-  /*    5 */ "GML_KEYWORD",
-  /*    6 */ "GML_EQ",
-  /*    7 */ "GML_VALUE",
-  /*    8 */ "GML_COORD",
-  /*    9 */ "error",
-  /*   10 */ "main",
-  /*   11 */ "in",
-  /*   12 */ "state",
-  /*   13 */ "program",
-  /*   14 */ "gml_tree",
-  /*   15 */ "node",
-  /*   16 */ "node_chain",
-  /*   17 */ "open_tag",
-  /*   18 */ "attr",
-  /*   19 */ "attributes",
-  /*   20 */ "coord",
-  /*   21 */ "coord_chain",
-  /*   22 */ "close_tag",
-  /*   23 */ "keyword",
-  /*   24 */ "extra_nodes",
-  /*   25 */ "extra_attr",
-  /*   26 */ "extra_coord",
+static const char *const yyTokenName[] = {
+    /*    0 */ "$",
+    /*    1 */ "GML_NEWLINE",
+    /*    2 */ "GML_END",
+    /*    3 */ "GML_CLOSE",
+    /*    4 */ "GML_OPEN",
+    /*    5 */ "GML_KEYWORD",
+    /*    6 */ "GML_EQ",
+    /*    7 */ "GML_VALUE",
+    /*    8 */ "GML_COORD",
+    /*    9 */ "error",
+    /*   10 */ "main",
+    /*   11 */ "in",
+    /*   12 */ "state",
+    /*   13 */ "program",
+    /*   14 */ "gml_tree",
+    /*   15 */ "node",
+    /*   16 */ "node_chain",
+    /*   17 */ "open_tag",
+    /*   18 */ "attr",
+    /*   19 */ "attributes",
+    /*   20 */ "coord",
+    /*   21 */ "coord_chain",
+    /*   22 */ "close_tag",
+    /*   23 */ "keyword",
+    /*   24 */ "extra_nodes",
+    /*   25 */ "extra_attr",
+    /*   26 */ "extra_coord",
 };
 #endif /* defined(YYCOVERAGE) || !defined(NDEBUG) */
 
@@ -354,40 +366,40 @@ static const char *const yyTokenName[] = {
 /* For tracing reduce actions, the names of all rules are required.
 */
 static const char *const yyRuleName[] = {
- /*   0 */ "gml_tree ::= node",
- /*   1 */ "gml_tree ::= node_chain",
- /*   2 */ "node ::= open_tag GML_END GML_CLOSE",
- /*   3 */ "node ::= open_tag attr GML_END GML_CLOSE",
- /*   4 */ "node ::= open_tag attributes GML_END GML_CLOSE",
- /*   5 */ "node ::= open_tag GML_CLOSE",
- /*   6 */ "node ::= open_tag attr GML_CLOSE",
- /*   7 */ "node ::= open_tag attributes GML_CLOSE",
- /*   8 */ "node ::= open_tag GML_CLOSE coord",
- /*   9 */ "node ::= open_tag GML_CLOSE coord_chain",
- /*  10 */ "node ::= open_tag attr GML_CLOSE coord",
- /*  11 */ "node ::= open_tag attr GML_CLOSE coord_chain",
- /*  12 */ "node ::= open_tag attributes GML_CLOSE coord",
- /*  13 */ "node ::= open_tag attributes GML_CLOSE coord_chain",
- /*  14 */ "node ::= close_tag",
- /*  15 */ "open_tag ::= GML_OPEN keyword",
- /*  16 */ "close_tag ::= GML_OPEN GML_END keyword GML_CLOSE",
- /*  17 */ "keyword ::= GML_KEYWORD",
- /*  18 */ "extra_nodes ::=",
- /*  19 */ "extra_nodes ::= node extra_nodes",
- /*  20 */ "node_chain ::= node node extra_nodes",
- /*  21 */ "attr ::= GML_KEYWORD GML_EQ GML_VALUE",
- /*  22 */ "extra_attr ::=",
- /*  23 */ "extra_attr ::= attr extra_attr",
- /*  24 */ "attributes ::= attr attr extra_attr",
- /*  25 */ "coord ::= GML_COORD",
- /*  26 */ "extra_coord ::=",
- /*  27 */ "extra_coord ::= coord extra_coord",
- /*  28 */ "coord_chain ::= coord coord extra_coord",
- /*  29 */ "main ::= in",
- /*  30 */ "in ::=",
- /*  31 */ "in ::= in state GML_NEWLINE",
- /*  32 */ "state ::= program",
- /*  33 */ "program ::= gml_tree",
+    /*   0 */ "gml_tree ::= node",
+    /*   1 */ "gml_tree ::= node_chain",
+    /*   2 */ "node ::= open_tag GML_END GML_CLOSE",
+    /*   3 */ "node ::= open_tag attr GML_END GML_CLOSE",
+    /*   4 */ "node ::= open_tag attributes GML_END GML_CLOSE",
+    /*   5 */ "node ::= open_tag GML_CLOSE",
+    /*   6 */ "node ::= open_tag attr GML_CLOSE",
+    /*   7 */ "node ::= open_tag attributes GML_CLOSE",
+    /*   8 */ "node ::= open_tag GML_CLOSE coord",
+    /*   9 */ "node ::= open_tag GML_CLOSE coord_chain",
+    /*  10 */ "node ::= open_tag attr GML_CLOSE coord",
+    /*  11 */ "node ::= open_tag attr GML_CLOSE coord_chain",
+    /*  12 */ "node ::= open_tag attributes GML_CLOSE coord",
+    /*  13 */ "node ::= open_tag attributes GML_CLOSE coord_chain",
+    /*  14 */ "node ::= close_tag",
+    /*  15 */ "open_tag ::= GML_OPEN keyword",
+    /*  16 */ "close_tag ::= GML_OPEN GML_END keyword GML_CLOSE",
+    /*  17 */ "keyword ::= GML_KEYWORD",
+    /*  18 */ "extra_nodes ::=",
+    /*  19 */ "extra_nodes ::= node extra_nodes",
+    /*  20 */ "node_chain ::= node node extra_nodes",
+    /*  21 */ "attr ::= GML_KEYWORD GML_EQ GML_VALUE",
+    /*  22 */ "extra_attr ::=",
+    /*  23 */ "extra_attr ::= attr extra_attr",
+    /*  24 */ "attributes ::= attr attr extra_attr",
+    /*  25 */ "coord ::= GML_COORD",
+    /*  26 */ "extra_coord ::=",
+    /*  27 */ "extra_coord ::= coord extra_coord",
+    /*  28 */ "coord_chain ::= coord coord extra_coord",
+    /*  29 */ "main ::= in",
+    /*  30 */ "in ::=",
+    /*  31 */ "in ::= in state GML_NEWLINE",
+    /*  32 */ "state ::= program",
+    /*  33 */ "program ::= gml_tree",
 };
 #endif /* NDEBUG */
 
@@ -397,31 +409,39 @@ static const char *const yyRuleName[] = {
 ** Try to increase the size of the parser stack.  Return the number
 ** of errors.  Return 0 on success.
 */
-static int yyGrowStack(yyParser *p){
-  int newSize;
-  int idx;
-  yyStackEntry *pNew;
+static int
+yyGrowStack (yyParser * p)
+{
+    int newSize;
+    int idx;
+    yyStackEntry *pNew;
 
-  newSize = p->yystksz*2 + 100;
-  idx = p->yytos ? (int)(p->yytos - p->yystack) : 0;
-  if( p->yystack==&p->yystk0 ){
-    pNew = malloc(newSize*sizeof(pNew[0]));
-    if( pNew ) pNew[0] = p->yystk0;
-  }else{
-    pNew = realloc(p->yystack, newSize*sizeof(pNew[0]));
-  }
-  if( pNew ){
-    p->yystack = pNew;
-    p->yytos = &p->yystack[idx];
+    newSize = p->yystksz * 2 + 100;
+    idx = p->yytos ? (int) (p->yytos - p->yystack) : 0;
+    if (p->yystack == &p->yystk0)
+      {
+	  pNew = malloc (newSize * sizeof (pNew[0]));
+	  if (pNew)
+	      pNew[0] = p->yystk0;
+      }
+    else
+      {
+	  pNew = realloc (p->yystack, newSize * sizeof (pNew[0]));
+      }
+    if (pNew)
+      {
+	  p->yystack = pNew;
+	  p->yytos = &p->yystack[idx];
 #ifndef NDEBUG
-    if( yyTraceFILE ){
-      fprintf(yyTraceFILE,"%sStack grows from %d to %d entries.\n",
-              yyTracePrompt, p->yystksz, newSize);
-    }
+	  if (yyTraceFILE)
+	    {
+		fprintf (yyTraceFILE, "%sStack grows from %d to %d entries.\n",
+			 yyTracePrompt, p->yystksz, newSize);
+	    }
 #endif
-    p->yystksz = newSize;
-  }
-  return pNew==0; 
+	  p->yystksz = newSize;
+      }
+    return pNew == 0;
 }
 #endif
 
@@ -431,33 +451,36 @@ static int yyGrowStack(yyParser *p){
 ** grammar.
 */
 #ifndef YYMALLOCARGTYPE
-# define YYMALLOCARGTYPE size_t
+#define YYMALLOCARGTYPE size_t
 #endif
 
 /* Initialize a new parser that has already been allocated.
 */
-static void ParseInit(void *yypParser){
-  yyParser *pParser = (yyParser*)yypParser;
+static void
+ParseInit (void *yypParser)
+{
+    yyParser *pParser = (yyParser *) yypParser;
 #ifdef YYTRACKMAXSTACKDEPTH
-  pParser->yyhwm = 0;
+    pParser->yyhwm = 0;
 #endif
 #if YYSTACKDEPTH<=0
-  pParser->yytos = NULL;
-  pParser->yystack = NULL;
-  pParser->yystksz = 0;
-  if( yyGrowStack(pParser) ){
-    pParser->yystack = &pParser->yystk0;
-    pParser->yystksz = 1;
-  }
+    pParser->yytos = NULL;
+    pParser->yystack = NULL;
+    pParser->yystksz = 0;
+    if (yyGrowStack (pParser))
+      {
+	  pParser->yystack = &pParser->yystk0;
+	  pParser->yystksz = 1;
+      }
 #endif
 #ifndef YYNOERRORRECOVERY
-  pParser->yyerrcnt = -1;
+    pParser->yyerrcnt = -1;
 #endif
-  pParser->yytos = pParser->yystack;
-  pParser->yystack[0].stateno = 0;
-  pParser->yystack[0].major = 0;
+    pParser->yytos = pParser->yystack;
+    pParser->yystack[0].stateno = 0;
+    pParser->yystack[0].major = 0;
 #if YYSTACKDEPTH>0
-  pParser->yystackEnd = &pParser->yystack[YYSTACKDEPTH-1];
+    pParser->yystackEnd = &pParser->yystack[YYSTACKDEPTH - 1];
 #endif
 }
 
@@ -474,11 +497,14 @@ static void ParseInit(void *yypParser){
 ** A pointer to a parser.  This pointer is used in subsequent calls
 ** to Parse and ParseFree.
 */
-void *ParseAlloc(void *(*mallocProc)(YYMALLOCARGTYPE)){
-  yyParser *pParser;
-  pParser = (yyParser*)(*mallocProc)( (YYMALLOCARGTYPE)sizeof(yyParser) );
-  if( pParser ) ParseInit(pParser);
-  return pParser;
+void *
+ParseAlloc (void *(*mallocProc) (YYMALLOCARGTYPE))
+{
+    yyParser *pParser;
+    pParser = (yyParser *) (*mallocProc) ((YYMALLOCARGTYPE) sizeof (yyParser));
+    if (pParser)
+	ParseInit (pParser);
+    return pParser;
 }
 #endif /* Parse_ENGINEALWAYSONSTACK */
 
@@ -490,27 +516,30 @@ void *ParseAlloc(void *(*mallocProc)(YYMALLOCARGTYPE)){
 ** deletions is derived from the %destructor and/or %token_destructor
 ** directives of the input grammar.
 */
-static void yy_destructor(
-  yyParser *yypParser,    /* The parser */
-  YYCODETYPE yymajor,     /* Type code for object to destroy */
-  YYMINORTYPE *yypminor   /* The object to be destroyed */
-){
-  ParseARG_FETCH;
-  switch( yymajor ){
-    /* Here is inserted the actions which take place when a
-    ** terminal or non-terminal is destroyed.  This can happen
-    ** when the symbol is popped from the stack during a
-    ** reduce or during error processing or when a parser is 
-    ** being destroyed before it is finished parsing.
-    **
-    ** Note: during a reduce, the only symbols destroyed are those
-    ** which appear on the RHS of the rule, but which are *not* used
-    ** inside the C code.
-    */
+static void
+yy_destructor (yyParser * yypParser,	/* The parser */
+	       YYCODETYPE yymajor,	/* Type code for object to destroy */
+	       YYMINORTYPE * yypminor	/* The object to be destroyed */
+    )
+{
+    ParseARG_FETCH;
+    switch (yymajor)
+      {
+	  /* Here is inserted the actions which take place when a
+	   ** terminal or non-terminal is destroyed.  This can happen
+	   ** when the symbol is popped from the stack during a
+	   ** reduce or during error processing or when a parser is 
+	   ** being destroyed before it is finished parsing.
+	   **
+	   ** Note: during a reduce, the only symbols destroyed are those
+	   ** which appear on the RHS of the rule, but which are *not* used
+	   ** inside the C code.
+	   */
 /********* Begin destructor definitions ***************************************/
 /********* End destructor definitions *****************************************/
-    default:  break;   /* If no destructor action specified: do nothing */
-  }
+      default:
+	  break;		/* If no destructor action specified: do nothing */
+      }
 }
 
 /*
@@ -519,29 +548,35 @@ static void yy_destructor(
 ** If there is a destructor routine associated with the token which
 ** is popped from the stack, then call it.
 */
-static void yy_pop_parser_stack(yyParser *pParser){
-  yyStackEntry *yytos;
-  assert( pParser->yytos!=0 );
-  assert( pParser->yytos > pParser->yystack );
-  yytos = pParser->yytos--;
+static void
+yy_pop_parser_stack (yyParser * pParser)
+{
+    yyStackEntry *yytos;
+    assert (pParser->yytos != 0);
+    assert (pParser->yytos > pParser->yystack);
+    yytos = pParser->yytos--;
 #ifndef NDEBUG
-  if( yyTraceFILE ){
-    fprintf(yyTraceFILE,"%sPopping %s\n",
-      yyTracePrompt,
-      yyTokenName[yytos->major]);
-  }
+    if (yyTraceFILE)
+      {
+	  fprintf (yyTraceFILE, "%sPopping %s\n",
+		   yyTracePrompt, yyTokenName[yytos->major]);
+      }
 #endif
-  yy_destructor(pParser, yytos->major, &yytos->minor);
+    yy_destructor (pParser, yytos->major, &yytos->minor);
 }
 
 /*
 ** Clear all secondary memory allocations from the parser
 */
-static void ParseFinalize(void *p){
-  yyParser *pParser = (yyParser*)p;
-  while( pParser->yytos>pParser->yystack ) yy_pop_parser_stack(pParser);
+static void
+ParseFinalize (void *p)
+{
+    yyParser *pParser = (yyParser *) p;
+    while (pParser->yytos > pParser->yystack)
+	yy_pop_parser_stack (pParser);
 #if YYSTACKDEPTH<=0
-  if( pParser->yystack!=&pParser->yystk0 ) free(pParser->yystack);
+    if (pParser->yystack != &pParser->yystk0)
+	free (pParser->yystack);
 #endif
 }
 
@@ -554,15 +589,17 @@ static void ParseFinalize(void *p){
 ** is defined in a %include section of the input grammar) then it is
 ** assumed that the input pointer is never NULL.
 */
-void ParseFree(
-  void *p,                    /* The parser to be deleted */
-  void (*freeProc)(void*)     /* Function used to reclaim memory */
-){
+void
+ParseFree (void *p,		/* The parser to be deleted */
+	   void (*freeProc) (void *)	/* Function used to reclaim memory */
+    )
+{
 #ifndef YYPARSEFREENEVERNULL
-  if( p==0 ) return;
+    if (p == 0)
+	return;
 #endif
-  ParseFinalize(p);
-  (*freeProc)(p);
+    ParseFinalize (p);
+    (*freeProc) (p);
 }
 #endif /* Parse_ENGINEALWAYSONSTACK */
 
@@ -570,9 +607,11 @@ void ParseFree(
 ** Return the peak depth of the stack for a parser.
 */
 #ifdef YYTRACKMAXSTACKDEPTH
-int ParseStackPeak(void *p){
-  yyParser *pParser = (yyParser*)p;
-  return pParser->yyhwm;
+int
+ParseStackPeak (void *p)
+{
+    yyParser *pParser = (yyParser *) p;
+    return pParser->yyhwm;
 }
 #endif
 
@@ -594,22 +633,30 @@ static unsigned char yycoverage[YYNSTATE][YYNTOKEN];
 ** Return the number of missed state/lookahead combinations.
 */
 #if defined(YYCOVERAGE)
-int ParseCoverage(FILE *out){
-  int stateno, iLookAhead, i;
-  int nMissed = 0;
-  for(stateno=0; stateno<YYNSTATE; stateno++){
-    i = yy_shift_ofst[stateno];
-    for(iLookAhead=0; iLookAhead<YYNTOKEN; iLookAhead++){
-      if( yy_lookahead[i+iLookAhead]!=iLookAhead ) continue;
-      if( yycoverage[stateno][iLookAhead]==0 ) nMissed++;
-      if( out ){
-        fprintf(out,"State %d lookahead %s %s\n", stateno,
-                yyTokenName[iLookAhead],
-                yycoverage[stateno][iLookAhead] ? "ok" : "missed");
+int
+ParseCoverage (FILE * out)
+{
+    int stateno, iLookAhead, i;
+    int nMissed = 0;
+    for (stateno = 0; stateno < YYNSTATE; stateno++)
+      {
+	  i = yy_shift_ofst[stateno];
+	  for (iLookAhead = 0; iLookAhead < YYNTOKEN; iLookAhead++)
+	    {
+		if (yy_lookahead[i + iLookAhead] != iLookAhead)
+		    continue;
+		if (yycoverage[stateno][iLookAhead] == 0)
+		    nMissed++;
+		if (out)
+		  {
+		      fprintf (out, "State %d lookahead %s %s\n", stateno,
+			       yyTokenName[iLookAhead],
+			       yycoverage[stateno][iLookAhead] ? "ok" :
+			       "missed");
+		  }
+	    }
       }
-    }
-  }
-  return nMissed;
+    return nMissed;
 }
 #endif
 
@@ -617,228 +664,262 @@ int ParseCoverage(FILE *out){
 ** Find the appropriate action for a parser given the terminal
 ** look-ahead token iLookAhead.
 */
-static unsigned int yy_find_shift_action(
-  yyParser *pParser,        /* The parser */
-  YYCODETYPE iLookAhead     /* The look-ahead token */
-){
-  int i;
-  int stateno = pParser->yytos->stateno;
- 
-  if( stateno>YY_MAX_SHIFT ) return stateno;
-  assert( stateno <= YY_SHIFT_COUNT );
+static unsigned int
+yy_find_shift_action (yyParser * pParser,	/* The parser */
+		      YYCODETYPE iLookAhead	/* The look-ahead token */
+    )
+{
+    int i;
+    int stateno = pParser->yytos->stateno;
+
+    if (stateno > YY_MAX_SHIFT)
+	return stateno;
+    assert (stateno <= YY_SHIFT_COUNT);
 #if defined(YYCOVERAGE)
-  yycoverage[stateno][iLookAhead] = 1;
+    yycoverage[stateno][iLookAhead] = 1;
 #endif
-  do{
-    i = yy_shift_ofst[stateno];
-    assert( i>=0 );
-    assert( i+YYNTOKEN<=(int)sizeof(yy_lookahead)/sizeof(yy_lookahead[0]) );
-    assert( iLookAhead!=YYNOCODE );
-    assert( iLookAhead < YYNTOKEN );
-    i += iLookAhead;
-    if( yy_lookahead[i]!=iLookAhead ){
+    do
+      {
+	  i = yy_shift_ofst[stateno];
+	  assert (i >= 0);
+	  assert (i + YYNTOKEN <=
+		  (int) sizeof (yy_lookahead) / sizeof (yy_lookahead[0]));
+	  assert (iLookAhead != YYNOCODE);
+	  assert (iLookAhead < YYNTOKEN);
+	  i += iLookAhead;
+	  if (yy_lookahead[i] != iLookAhead)
+	    {
 #ifdef YYFALLBACK
-      YYCODETYPE iFallback;            /* Fallback token */
-      if( iLookAhead<sizeof(yyFallback)/sizeof(yyFallback[0])
-             && (iFallback = yyFallback[iLookAhead])!=0 ){
+		YYCODETYPE iFallback;	/* Fallback token */
+		if (iLookAhead < sizeof (yyFallback) / sizeof (yyFallback[0])
+		    && (iFallback = yyFallback[iLookAhead]) != 0)
+		  {
 #ifndef NDEBUG
-        if( yyTraceFILE ){
-          fprintf(yyTraceFILE, "%sFALLBACK %s => %s\n",
-             yyTracePrompt, yyTokenName[iLookAhead], yyTokenName[iFallback]);
-        }
+		      if (yyTraceFILE)
+			{
+			    fprintf (yyTraceFILE, "%sFALLBACK %s => %s\n",
+				     yyTracePrompt, yyTokenName[iLookAhead],
+				     yyTokenName[iFallback]);
+			}
 #endif
-        assert( yyFallback[iFallback]==0 ); /* Fallback loop must terminate */
-        iLookAhead = iFallback;
-        continue;
-      }
+		      assert (yyFallback[iFallback] == 0);	/* Fallback loop must terminate */
+		      iLookAhead = iFallback;
+		      continue;
+		  }
 #endif
 #ifdef YYWILDCARD
-      {
-        int j = i - iLookAhead + YYWILDCARD;
-        if( 
+		{
+		    int j = i - iLookAhead + YYWILDCARD;
+		    if (
 #if YY_SHIFT_MIN+YYWILDCARD<0
-          j>=0 &&
+			   j >= 0 &&
 #endif
 #if YY_SHIFT_MAX+YYWILDCARD>=YY_ACTTAB_COUNT
-          j<YY_ACTTAB_COUNT &&
+			   j < YY_ACTTAB_COUNT &&
 #endif
-          yy_lookahead[j]==YYWILDCARD && iLookAhead>0
-        ){
+			   yy_lookahead[j] == YYWILDCARD && iLookAhead > 0)
+		      {
 #ifndef NDEBUG
-          if( yyTraceFILE ){
-            fprintf(yyTraceFILE, "%sWILDCARD %s => %s\n",
-               yyTracePrompt, yyTokenName[iLookAhead],
-               yyTokenName[YYWILDCARD]);
-          }
+			  if (yyTraceFILE)
+			    {
+				fprintf (yyTraceFILE, "%sWILDCARD %s => %s\n",
+					 yyTracePrompt, yyTokenName[iLookAhead],
+					 yyTokenName[YYWILDCARD]);
+			    }
 #endif /* NDEBUG */
-          return yy_action[j];
-        }
-      }
+			  return yy_action[j];
+		      }
+		}
 #endif /* YYWILDCARD */
-      return yy_default[stateno];
-    }else{
-      return yy_action[i];
-    }
-  }while(1);
+		return yy_default[stateno];
+	    }
+	  else
+	    {
+		return yy_action[i];
+	    }
+      }
+    while (1);
 }
 
 /*
 ** Find the appropriate action for a parser given the non-terminal
 ** look-ahead token iLookAhead.
 */
-static int yy_find_reduce_action(
-  int stateno,              /* Current state number */
-  YYCODETYPE iLookAhead     /* The look-ahead token */
-){
-  int i;
+static int
+yy_find_reduce_action (int stateno,	/* Current state number */
+		       YYCODETYPE iLookAhead	/* The look-ahead token */
+    )
+{
+    int i;
 #ifdef YYERRORSYMBOL
-  if( stateno>YY_REDUCE_COUNT ){
-    return yy_default[stateno];
-  }
+    if (stateno > YY_REDUCE_COUNT)
+      {
+	  return yy_default[stateno];
+      }
 #else
-  assert( stateno<=YY_REDUCE_COUNT );
+    assert (stateno <= YY_REDUCE_COUNT);
 #endif
-  i = yy_reduce_ofst[stateno];
-  assert( iLookAhead!=YYNOCODE );
-  i += iLookAhead;
+    i = yy_reduce_ofst[stateno];
+    assert (iLookAhead != YYNOCODE);
+    i += iLookAhead;
 #ifdef YYERRORSYMBOL
-  if( i<0 || i>=YY_ACTTAB_COUNT || yy_lookahead[i]!=iLookAhead ){
-    return yy_default[stateno];
-  }
+    if (i < 0 || i >= YY_ACTTAB_COUNT || yy_lookahead[i] != iLookAhead)
+      {
+	  return yy_default[stateno];
+      }
 #else
-  assert( i>=0 && i<YY_ACTTAB_COUNT );
-  assert( yy_lookahead[i]==iLookAhead );
+    assert (i >= 0 && i < YY_ACTTAB_COUNT);
+    assert (yy_lookahead[i] == iLookAhead);
 #endif
-  return yy_action[i];
+    return yy_action[i];
 }
 
 /*
 ** The following routine is called if the stack overflows.
 */
-static void yyStackOverflow(yyParser *yypParser){
-   ParseARG_FETCH;
+static void
+yyStackOverflow (yyParser * yypParser)
+{
+    ParseARG_FETCH;
 #ifndef NDEBUG
-   if( yyTraceFILE ){
-     fprintf(yyTraceFILE,"%sStack Overflow!\n",yyTracePrompt);
-   }
+    if (yyTraceFILE)
+      {
+	  fprintf (yyTraceFILE, "%sStack Overflow!\n", yyTracePrompt);
+      }
 #endif
-   while( yypParser->yytos>yypParser->yystack ) yy_pop_parser_stack(yypParser);
-   /* Here code is inserted which will execute if the parser
-   ** stack every overflows */
+    while (yypParser->yytos > yypParser->yystack)
+	yy_pop_parser_stack (yypParser);
+    /* Here code is inserted which will execute if the parser
+     ** stack every overflows */
 /******** Begin %stack_overflow code ******************************************/
 
-     spatialite_e( "Giving up.  Parser stack overflow\n");
+    spatialite_e ("Giving up.  Parser stack overflow\n");
 /******** End %stack_overflow code ********************************************/
-   ParseARG_STORE; /* Suppress warning about unused %extra_argument var */
+    ParseARG_STORE;		/* Suppress warning about unused %extra_argument var */
 }
 
 /*
 ** Print tracing information for a SHIFT action
 */
 #ifndef NDEBUG
-static void yyTraceShift(yyParser *yypParser, int yyNewState, const char *zTag){
-  if( yyTraceFILE ){
-    if( yyNewState<YYNSTATE ){
-      fprintf(yyTraceFILE,"%s%s '%s', go to state %d\n",
-         yyTracePrompt, zTag, yyTokenName[yypParser->yytos->major],
-         yyNewState);
-    }else{
-      fprintf(yyTraceFILE,"%s%s '%s', pending reduce %d\n",
-         yyTracePrompt, zTag, yyTokenName[yypParser->yytos->major],
-         yyNewState - YY_MIN_REDUCE);
-    }
-  }
+static void
+yyTraceShift (yyParser * yypParser, int yyNewState, const char *zTag)
+{
+    if (yyTraceFILE)
+      {
+	  if (yyNewState < YYNSTATE)
+	    {
+		fprintf (yyTraceFILE, "%s%s '%s', go to state %d\n",
+			 yyTracePrompt, zTag,
+			 yyTokenName[yypParser->yytos->major], yyNewState);
+	    }
+	  else
+	    {
+		fprintf (yyTraceFILE, "%s%s '%s', pending reduce %d\n",
+			 yyTracePrompt, zTag,
+			 yyTokenName[yypParser->yytos->major],
+			 yyNewState - YY_MIN_REDUCE);
+	    }
+      }
 }
 #else
-# define yyTraceShift(X,Y,Z)
+#define yyTraceShift(X,Y,Z)
 #endif
 
 /*
 ** Perform a shift action.
 */
-static void yy_shift(
-  yyParser *yypParser,          /* The parser to be shifted */
-  int yyNewState,               /* The new state to shift in */
-  int yyMajor,                  /* The major token to shift in */
-  ParseTOKENTYPE yyMinor        /* The minor token to shift in */
-){
-  yyStackEntry *yytos;
-  yypParser->yytos++;
+static void
+yy_shift (yyParser * yypParser,	/* The parser to be shifted */
+	  int yyNewState,	/* The new state to shift in */
+	  int yyMajor,		/* The major token to shift in */
+	  ParseTOKENTYPE yyMinor	/* The minor token to shift in */
+    )
+{
+    yyStackEntry *yytos;
+    yypParser->yytos++;
 #ifdef YYTRACKMAXSTACKDEPTH
-  if( (int)(yypParser->yytos - yypParser->yystack)>yypParser->yyhwm ){
-    yypParser->yyhwm++;
-    assert( yypParser->yyhwm == (int)(yypParser->yytos - yypParser->yystack) );
-  }
+    if ((int) (yypParser->yytos - yypParser->yystack) > yypParser->yyhwm)
+      {
+	  yypParser->yyhwm++;
+	  assert (yypParser->yyhwm ==
+		  (int) (yypParser->yytos - yypParser->yystack));
+      }
 #endif
-#if YYSTACKDEPTH>0 
-  if( yypParser->yytos>yypParser->yystackEnd ){
-    yypParser->yytos--;
-    yyStackOverflow(yypParser);
-    return;
-  }
+#if YYSTACKDEPTH>0
+    if (yypParser->yytos > yypParser->yystackEnd)
+      {
+	  yypParser->yytos--;
+	  yyStackOverflow (yypParser);
+	  return;
+      }
 #else
-  if( yypParser->yytos>=&yypParser->yystack[yypParser->yystksz] ){
-    if( yyGrowStack(yypParser) ){
-      yypParser->yytos--;
-      yyStackOverflow(yypParser);
-      return;
-    }
-  }
+    if (yypParser->yytos >= &yypParser->yystack[yypParser->yystksz])
+      {
+	  if (yyGrowStack (yypParser))
+	    {
+		yypParser->yytos--;
+		yyStackOverflow (yypParser);
+		return;
+	    }
+      }
 #endif
-  if( yyNewState > YY_MAX_SHIFT ){
-    yyNewState += YY_MIN_REDUCE - YY_MIN_SHIFTREDUCE;
-  }
-  yytos = yypParser->yytos;
-  yytos->stateno = (YYACTIONTYPE)yyNewState;
-  yytos->major = (YYCODETYPE)yyMajor;
-  yytos->minor.yy0 = yyMinor;
-  yyTraceShift(yypParser, yyNewState, "Shift");
+    if (yyNewState > YY_MAX_SHIFT)
+      {
+	  yyNewState += YY_MIN_REDUCE - YY_MIN_SHIFTREDUCE;
+      }
+    yytos = yypParser->yytos;
+    yytos->stateno = (YYACTIONTYPE) yyNewState;
+    yytos->major = (YYCODETYPE) yyMajor;
+    yytos->minor.yy0 = yyMinor;
+    yyTraceShift (yypParser, yyNewState, "Shift");
 }
 
 /* The following table contains information about every rule that
 ** is used during the reduce.
 */
-static const struct {
-  YYCODETYPE lhs;       /* Symbol on the left-hand side of the rule */
-  signed char nrhs;     /* Negative of the number of RHS symbols in the rule */
+static const struct
+{
+    YYCODETYPE lhs;		/* Symbol on the left-hand side of the rule */
+    signed char nrhs;		/* Negative of the number of RHS symbols in the rule */
 } yyRuleInfo[] = {
-  {   14,   -1 }, /* (0) gml_tree ::= node */
-  {   14,   -1 }, /* (1) gml_tree ::= node_chain */
-  {   15,   -3 }, /* (2) node ::= open_tag GML_END GML_CLOSE */
-  {   15,   -4 }, /* (3) node ::= open_tag attr GML_END GML_CLOSE */
-  {   15,   -4 }, /* (4) node ::= open_tag attributes GML_END GML_CLOSE */
-  {   15,   -2 }, /* (5) node ::= open_tag GML_CLOSE */
-  {   15,   -3 }, /* (6) node ::= open_tag attr GML_CLOSE */
-  {   15,   -3 }, /* (7) node ::= open_tag attributes GML_CLOSE */
-  {   15,   -3 }, /* (8) node ::= open_tag GML_CLOSE coord */
-  {   15,   -3 }, /* (9) node ::= open_tag GML_CLOSE coord_chain */
-  {   15,   -4 }, /* (10) node ::= open_tag attr GML_CLOSE coord */
-  {   15,   -4 }, /* (11) node ::= open_tag attr GML_CLOSE coord_chain */
-  {   15,   -4 }, /* (12) node ::= open_tag attributes GML_CLOSE coord */
-  {   15,   -4 }, /* (13) node ::= open_tag attributes GML_CLOSE coord_chain */
-  {   15,   -1 }, /* (14) node ::= close_tag */
-  {   17,   -2 }, /* (15) open_tag ::= GML_OPEN keyword */
-  {   22,   -4 }, /* (16) close_tag ::= GML_OPEN GML_END keyword GML_CLOSE */
-  {   23,   -1 }, /* (17) keyword ::= GML_KEYWORD */
-  {   24,    0 }, /* (18) extra_nodes ::= */
-  {   24,   -2 }, /* (19) extra_nodes ::= node extra_nodes */
-  {   16,   -3 }, /* (20) node_chain ::= node node extra_nodes */
-  {   18,   -3 }, /* (21) attr ::= GML_KEYWORD GML_EQ GML_VALUE */
-  {   25,    0 }, /* (22) extra_attr ::= */
-  {   25,   -2 }, /* (23) extra_attr ::= attr extra_attr */
-  {   19,   -3 }, /* (24) attributes ::= attr attr extra_attr */
-  {   20,   -1 }, /* (25) coord ::= GML_COORD */
-  {   26,    0 }, /* (26) extra_coord ::= */
-  {   26,   -2 }, /* (27) extra_coord ::= coord extra_coord */
-  {   21,   -3 }, /* (28) coord_chain ::= coord coord extra_coord */
-  {   10,   -1 }, /* (29) main ::= in */
-  {   11,    0 }, /* (30) in ::= */
-  {   11,   -3 }, /* (31) in ::= in state GML_NEWLINE */
-  {   12,   -1 }, /* (32) state ::= program */
-  {   13,   -1 }, /* (33) program ::= gml_tree */
+    {14, -1},			/* (0) gml_tree ::= node */
+    {14, -1},			/* (1) gml_tree ::= node_chain */
+    {15, -3},			/* (2) node ::= open_tag GML_END GML_CLOSE */
+    {15, -4},			/* (3) node ::= open_tag attr GML_END GML_CLOSE */
+    {15, -4},			/* (4) node ::= open_tag attributes GML_END GML_CLOSE */
+    {15, -2},			/* (5) node ::= open_tag GML_CLOSE */
+    {15, -3},			/* (6) node ::= open_tag attr GML_CLOSE */
+    {15, -3},			/* (7) node ::= open_tag attributes GML_CLOSE */
+    {15, -3},			/* (8) node ::= open_tag GML_CLOSE coord */
+    {15, -3},			/* (9) node ::= open_tag GML_CLOSE coord_chain */
+    {15, -4},			/* (10) node ::= open_tag attr GML_CLOSE coord */
+    {15, -4},			/* (11) node ::= open_tag attr GML_CLOSE coord_chain */
+    {15, -4},			/* (12) node ::= open_tag attributes GML_CLOSE coord */
+    {15, -4},			/* (13) node ::= open_tag attributes GML_CLOSE coord_chain */
+    {15, -1},			/* (14) node ::= close_tag */
+    {17, -2},			/* (15) open_tag ::= GML_OPEN keyword */
+    {22, -4},			/* (16) close_tag ::= GML_OPEN GML_END keyword GML_CLOSE */
+    {23, -1},			/* (17) keyword ::= GML_KEYWORD */
+    {24, 0},			/* (18) extra_nodes ::= */
+    {24, -2},			/* (19) extra_nodes ::= node extra_nodes */
+    {16, -3},			/* (20) node_chain ::= node node extra_nodes */
+    {18, -3},			/* (21) attr ::= GML_KEYWORD GML_EQ GML_VALUE */
+    {25, 0},			/* (22) extra_attr ::= */
+    {25, -2},			/* (23) extra_attr ::= attr extra_attr */
+    {19, -3},			/* (24) attributes ::= attr attr extra_attr */
+    {20, -1},			/* (25) coord ::= GML_COORD */
+    {26, 0},			/* (26) extra_coord ::= */
+    {26, -2},			/* (27) extra_coord ::= coord extra_coord */
+    {21, -3},			/* (28) coord_chain ::= coord coord extra_coord */
+    {10, -1},			/* (29) main ::= in */
+    {11, 0},			/* (30) in ::= */
+    {11, -3},			/* (31) in ::= in state GML_NEWLINE */
+    {12, -1},			/* (32) state ::= program */
+    {13, -1},			/* (33) program ::= gml_tree */
 };
 
-static void yy_accept(yyParser*);  /* Forward Declaration */
+static void yy_accept (yyParser *);	/* Forward Declaration */
 
 /*
 ** Perform a reduce action and the shift that must immediately
@@ -850,227 +931,317 @@ static void yy_accept(yyParser*);  /* Forward Declaration */
 ** only called from one place, optimizing compilers will in-line it, which
 ** means that the extra parameters have no performance impact.
 */
-static void yy_reduce(
-  yyParser *yypParser,         /* The parser */
-  unsigned int yyruleno,       /* Number of the rule by which to reduce */
-  int yyLookahead,             /* Lookahead token, or YYNOCODE if none */
-  ParseTOKENTYPE yyLookaheadToken  /* Value of the lookahead token */
-){
-  int yygoto;                     /* The next state */
-  int yyact;                      /* The next action */
-  yyStackEntry *yymsp;            /* The top of the parser's stack */
-  int yysize;                     /* Amount to pop the stack */
-  ParseARG_FETCH;
-  (void)yyLookahead;
-  (void)yyLookaheadToken;
-  yymsp = yypParser->yytos;
+static void
+yy_reduce (yyParser * yypParser,	/* The parser */
+	   unsigned int yyruleno,	/* Number of the rule by which to reduce */
+	   int yyLookahead,	/* Lookahead token, or YYNOCODE if none */
+	   ParseTOKENTYPE yyLookaheadToken	/* Value of the lookahead token */
+    )
+{
+    int yygoto;			/* The next state */
+    int yyact;			/* The next action */
+    yyStackEntry *yymsp;	/* The top of the parser's stack */
+    int yysize;			/* Amount to pop the stack */
+    ParseARG_FETCH;
+    (void) yyLookahead;
+    (void) yyLookaheadToken;
+    yymsp = yypParser->yytos;
 #ifndef NDEBUG
-  if( yyTraceFILE && yyruleno<(int)(sizeof(yyRuleName)/sizeof(yyRuleName[0])) ){
-    yysize = yyRuleInfo[yyruleno].nrhs;
-    if( yysize ){
-      fprintf(yyTraceFILE, "%sReduce %d [%s], go to state %d.\n",
-        yyTracePrompt,
-        yyruleno, yyRuleName[yyruleno], yymsp[yysize].stateno);
-    }else{
-      fprintf(yyTraceFILE, "%sReduce %d [%s].\n",
-        yyTracePrompt, yyruleno, yyRuleName[yyruleno]);
-    }
-  }
+    if (yyTraceFILE
+	&& yyruleno < (int) (sizeof (yyRuleName) / sizeof (yyRuleName[0])))
+      {
+	  yysize = yyRuleInfo[yyruleno].nrhs;
+	  if (yysize)
+	    {
+		fprintf (yyTraceFILE, "%sReduce %d [%s], go to state %d.\n",
+			 yyTracePrompt,
+			 yyruleno, yyRuleName[yyruleno], yymsp[yysize].stateno);
+	    }
+	  else
+	    {
+		fprintf (yyTraceFILE, "%sReduce %d [%s].\n",
+			 yyTracePrompt, yyruleno, yyRuleName[yyruleno]);
+	    }
+      }
 #endif /* NDEBUG */
 
-  /* Check that the stack is large enough to grow by a single entry
-  ** if the RHS of the rule is empty.  This ensures that there is room
-  ** enough on the stack to push the LHS value */
-  if( yyRuleInfo[yyruleno].nrhs==0 ){
+    /* Check that the stack is large enough to grow by a single entry
+     ** if the RHS of the rule is empty.  This ensures that there is room
+     ** enough on the stack to push the LHS value */
+    if (yyRuleInfo[yyruleno].nrhs == 0)
+      {
 #ifdef YYTRACKMAXSTACKDEPTH
-    if( (int)(yypParser->yytos - yypParser->yystack)>yypParser->yyhwm ){
-      yypParser->yyhwm++;
-      assert( yypParser->yyhwm == (int)(yypParser->yytos - yypParser->yystack));
-    }
+	  if ((int) (yypParser->yytos - yypParser->yystack) > yypParser->yyhwm)
+	    {
+		yypParser->yyhwm++;
+		assert (yypParser->yyhwm ==
+			(int) (yypParser->yytos - yypParser->yystack));
+	    }
 #endif
-#if YYSTACKDEPTH>0 
-    if( yypParser->yytos>=yypParser->yystackEnd ){
-      yyStackOverflow(yypParser);
-      return;
-    }
+#if YYSTACKDEPTH>0
+	  if (yypParser->yytos >= yypParser->yystackEnd)
+	    {
+		yyStackOverflow (yypParser);
+		return;
+	    }
 #else
-    if( yypParser->yytos>=&yypParser->yystack[yypParser->yystksz-1] ){
-      if( yyGrowStack(yypParser) ){
-        yyStackOverflow(yypParser);
-        return;
-      }
-      yymsp = yypParser->yytos;
-    }
+	  if (yypParser->yytos >= &yypParser->yystack[yypParser->yystksz - 1])
+	    {
+		if (yyGrowStack (yypParser))
+		  {
+		      yyStackOverflow (yypParser);
+		      return;
+		  }
+		yymsp = yypParser->yytos;
+	    }
 #endif
-  }
+      }
 
-  switch( yyruleno ){
-  /* Beginning here are the reduction cases.  A typical example
-  ** follows:
-  **   case 0:
-  **  #line <lineno> <grammarfile>
-  **     { ... }           // User supplied code
-  **  #line <lineno> <thisfile>
-  **     break;
-  */
+    switch (yyruleno)
+      {
+	  /* Beginning here are the reduction cases.  A typical example
+	   ** follows:
+	   **   case 0:
+	   **  #line <lineno> <grammarfile>
+	   **     { ... }           // User supplied code
+	   **  #line <lineno> <thisfile>
+	   **     break;
+	   */
 /********** Begin reduce actions **********************************************/
-        YYMINORTYPE yylhsminor;
-      case 0: /* gml_tree ::= node */
-      case 1: /* gml_tree ::= node_chain */ yytestcase(yyruleno==1);
-{ p_data->result = yymsp[0].minor.yy0; }
-        break;
-      case 2: /* node ::= open_tag GML_END GML_CLOSE */
-{ yylhsminor.yy0 = gml_createSelfClosedNode( p_data, (void *)yymsp[-2].minor.yy0, NULL); }
-  yymsp[-2].minor.yy0 = yylhsminor.yy0;
-        break;
-      case 3: /* node ::= open_tag attr GML_END GML_CLOSE */
-      case 4: /* node ::= open_tag attributes GML_END GML_CLOSE */ yytestcase(yyruleno==4);
-{ yylhsminor.yy0 = gml_createSelfClosedNode( p_data, (void *)yymsp[-3].minor.yy0, (void *)yymsp[-2].minor.yy0); }
-  yymsp[-3].minor.yy0 = yylhsminor.yy0;
-        break;
-      case 5: /* node ::= open_tag GML_CLOSE */
-{ yylhsminor.yy0 = gml_createNode( p_data, (void *)yymsp[-1].minor.yy0, NULL, NULL); }
-  yymsp[-1].minor.yy0 = yylhsminor.yy0;
-        break;
-      case 6: /* node ::= open_tag attr GML_CLOSE */
-      case 7: /* node ::= open_tag attributes GML_CLOSE */ yytestcase(yyruleno==7);
-{ yylhsminor.yy0 = gml_createNode( p_data, (void *)yymsp[-2].minor.yy0, (void *)yymsp[-1].minor.yy0, NULL); }
-  yymsp[-2].minor.yy0 = yylhsminor.yy0;
-        break;
-      case 8: /* node ::= open_tag GML_CLOSE coord */
-      case 9: /* node ::= open_tag GML_CLOSE coord_chain */ yytestcase(yyruleno==9);
-{ yylhsminor.yy0 = gml_createNode( p_data, (void *)yymsp[-2].minor.yy0, NULL, (void *)yymsp[0].minor.yy0); }
-  yymsp[-2].minor.yy0 = yylhsminor.yy0;
-        break;
-      case 10: /* node ::= open_tag attr GML_CLOSE coord */
-      case 11: /* node ::= open_tag attr GML_CLOSE coord_chain */ yytestcase(yyruleno==11);
-      case 12: /* node ::= open_tag attributes GML_CLOSE coord */ yytestcase(yyruleno==12);
-      case 13: /* node ::= open_tag attributes GML_CLOSE coord_chain */ yytestcase(yyruleno==13);
-{ yylhsminor.yy0 = gml_createNode( p_data, (void *)yymsp[-3].minor.yy0, (void *)yymsp[-2].minor.yy0, (void *)yymsp[0].minor.yy0); }
-  yymsp[-3].minor.yy0 = yylhsminor.yy0;
-        break;
-      case 14: /* node ::= close_tag */
-{ yylhsminor.yy0 = gml_closingNode( p_data, (void *)yymsp[0].minor.yy0); }
-  yymsp[0].minor.yy0 = yylhsminor.yy0;
-        break;
-      case 15: /* open_tag ::= GML_OPEN keyword */
-{ yymsp[-1].minor.yy0 = yymsp[0].minor.yy0; }
-        break;
-      case 16: /* close_tag ::= GML_OPEN GML_END keyword GML_CLOSE */
-{ yymsp[-3].minor.yy0 = yymsp[-1].minor.yy0; }
-        break;
-      case 17: /* keyword ::= GML_KEYWORD */
-{ yylhsminor.yy0 = yymsp[0].minor.yy0; }
-  yymsp[0].minor.yy0 = yylhsminor.yy0;
-        break;
-      case 18: /* extra_nodes ::= */
-      case 22: /* extra_attr ::= */ yytestcase(yyruleno==22);
-      case 26: /* extra_coord ::= */ yytestcase(yyruleno==26);
-{ yymsp[1].minor.yy0 = NULL; }
-        break;
-      case 19: /* extra_nodes ::= node extra_nodes */
-{ ((gmlNodePtr)yymsp[-1].minor.yy0)->Next = (gmlNodePtr)yymsp[0].minor.yy0;  yylhsminor.yy0 = yymsp[-1].minor.yy0; }
-  yymsp[-1].minor.yy0 = yylhsminor.yy0;
-        break;
-      case 20: /* node_chain ::= node node extra_nodes */
-{ 
-	   ((gmlNodePtr)yymsp[-1].minor.yy0)->Next = (gmlNodePtr)yymsp[0].minor.yy0; 
-	   ((gmlNodePtr)yymsp[-2].minor.yy0)->Next = (gmlNodePtr)yymsp[-1].minor.yy0;
-	   yylhsminor.yy0 = yymsp[-2].minor.yy0;
-	}
-  yymsp[-2].minor.yy0 = yylhsminor.yy0;
-        break;
-      case 21: /* attr ::= GML_KEYWORD GML_EQ GML_VALUE */
-{ yylhsminor.yy0 = gml_attribute( p_data, (void *)yymsp[-2].minor.yy0, (void *)yymsp[0].minor.yy0); }
-  yymsp[-2].minor.yy0 = yylhsminor.yy0;
-        break;
-      case 23: /* extra_attr ::= attr extra_attr */
-{ ((gmlAttrPtr)yymsp[-1].minor.yy0)->Next = (gmlAttrPtr)yymsp[0].minor.yy0;  yylhsminor.yy0 = yymsp[-1].minor.yy0; }
-  yymsp[-1].minor.yy0 = yylhsminor.yy0;
-        break;
-      case 24: /* attributes ::= attr attr extra_attr */
-{ 
-	   ((gmlAttrPtr)yymsp[-1].minor.yy0)->Next = (gmlAttrPtr)yymsp[0].minor.yy0; 
-	   ((gmlAttrPtr)yymsp[-2].minor.yy0)->Next = (gmlAttrPtr)yymsp[-1].minor.yy0;
-	   yylhsminor.yy0 = yymsp[-2].minor.yy0;
-	}
-  yymsp[-2].minor.yy0 = yylhsminor.yy0;
-        break;
-      case 25: /* coord ::= GML_COORD */
-{ yylhsminor.yy0 = gml_coord( p_data, (void *)yymsp[0].minor.yy0); }
-  yymsp[0].minor.yy0 = yylhsminor.yy0;
-        break;
-      case 27: /* extra_coord ::= coord extra_coord */
-{ ((gmlCoordPtr)yymsp[-1].minor.yy0)->Next = (gmlCoordPtr)yymsp[0].minor.yy0;  yylhsminor.yy0 = yymsp[-1].minor.yy0; }
-  yymsp[-1].minor.yy0 = yylhsminor.yy0;
-        break;
-      case 28: /* coord_chain ::= coord coord extra_coord */
-{ 
-	   ((gmlCoordPtr)yymsp[-1].minor.yy0)->Next = (gmlCoordPtr)yymsp[0].minor.yy0; 
-	   ((gmlCoordPtr)yymsp[-2].minor.yy0)->Next = (gmlCoordPtr)yymsp[-1].minor.yy0;
-	   yylhsminor.yy0 = yymsp[-2].minor.yy0;
-	}
-  yymsp[-2].minor.yy0 = yylhsminor.yy0;
-        break;
+	  YYMINORTYPE yylhsminor;
+      case 0:			/* gml_tree ::= node */
+      case 1:			/* gml_tree ::= node_chain */
+	  yytestcase (yyruleno == 1);
+	  {
+	      p_data->result = yymsp[0].minor.yy0;
+	  }
+	  break;
+      case 2:			/* node ::= open_tag GML_END GML_CLOSE */
+	  {
+	      yylhsminor.yy0 =
+		  gml_createSelfClosedNode (p_data,
+					    (void *) yymsp[-2].minor.yy0, NULL);
+	  }
+	  yymsp[-2].minor.yy0 = yylhsminor.yy0;
+	  break;
+      case 3:			/* node ::= open_tag attr GML_END GML_CLOSE */
+      case 4:			/* node ::= open_tag attributes GML_END GML_CLOSE */
+	  yytestcase (yyruleno == 4);
+	  {
+	      yylhsminor.yy0 =
+		  gml_createSelfClosedNode (p_data,
+					    (void *) yymsp[-3].minor.yy0,
+					    (void *) yymsp[-2].minor.yy0);
+	  }
+	  yymsp[-3].minor.yy0 = yylhsminor.yy0;
+	  break;
+      case 5:			/* node ::= open_tag GML_CLOSE */
+	  {
+	      yylhsminor.yy0 =
+		  gml_createNode (p_data, (void *) yymsp[-1].minor.yy0, NULL,
+				  NULL);
+	  }
+	  yymsp[-1].minor.yy0 = yylhsminor.yy0;
+	  break;
+      case 6:			/* node ::= open_tag attr GML_CLOSE */
+      case 7:			/* node ::= open_tag attributes GML_CLOSE */
+	  yytestcase (yyruleno == 7);
+	  {
+	      yylhsminor.yy0 =
+		  gml_createNode (p_data, (void *) yymsp[-2].minor.yy0,
+				  (void *) yymsp[-1].minor.yy0, NULL);
+	  }
+	  yymsp[-2].minor.yy0 = yylhsminor.yy0;
+	  break;
+      case 8:			/* node ::= open_tag GML_CLOSE coord */
+      case 9:			/* node ::= open_tag GML_CLOSE coord_chain */
+	  yytestcase (yyruleno == 9);
+	  {
+	      yylhsminor.yy0 =
+		  gml_createNode (p_data, (void *) yymsp[-2].minor.yy0, NULL,
+				  (void *) yymsp[0].minor.yy0);
+	  }
+	  yymsp[-2].minor.yy0 = yylhsminor.yy0;
+	  break;
+      case 10:			/* node ::= open_tag attr GML_CLOSE coord */
+      case 11:			/* node ::= open_tag attr GML_CLOSE coord_chain */
+	  yytestcase (yyruleno == 11);
+      case 12:			/* node ::= open_tag attributes GML_CLOSE coord */
+	  yytestcase (yyruleno == 12);
+      case 13:			/* node ::= open_tag attributes GML_CLOSE coord_chain */
+	  yytestcase (yyruleno == 13);
+	  {
+	      yylhsminor.yy0 =
+		  gml_createNode (p_data, (void *) yymsp[-3].minor.yy0,
+				  (void *) yymsp[-2].minor.yy0,
+				  (void *) yymsp[0].minor.yy0);
+	  }
+	  yymsp[-3].minor.yy0 = yylhsminor.yy0;
+	  break;
+      case 14:			/* node ::= close_tag */
+	  {
+	      yylhsminor.yy0 =
+		  gml_closingNode (p_data, (void *) yymsp[0].minor.yy0);
+	  }
+	  yymsp[0].minor.yy0 = yylhsminor.yy0;
+	  break;
+      case 15:			/* open_tag ::= GML_OPEN keyword */
+	  {
+	      yymsp[-1].minor.yy0 = yymsp[0].minor.yy0;
+	  }
+	  break;
+      case 16:			/* close_tag ::= GML_OPEN GML_END keyword GML_CLOSE */
+	  {
+	      yymsp[-3].minor.yy0 = yymsp[-1].minor.yy0;
+	  }
+	  break;
+      case 17:			/* keyword ::= GML_KEYWORD */
+	  {
+	      yylhsminor.yy0 = yymsp[0].minor.yy0;
+	  }
+	  yymsp[0].minor.yy0 = yylhsminor.yy0;
+	  break;
+      case 18:			/* extra_nodes ::= */
+      case 22:			/* extra_attr ::= */
+	  yytestcase (yyruleno == 22);
+      case 26:			/* extra_coord ::= */
+	  yytestcase (yyruleno == 26);
+	  {
+	      yymsp[1].minor.yy0 = NULL;
+	  }
+	  break;
+      case 19:			/* extra_nodes ::= node extra_nodes */
+	  {
+	      ((gmlNodePtr) yymsp[-1].minor.yy0)->Next =
+		  (gmlNodePtr) yymsp[0].minor.yy0;
+	      yylhsminor.yy0 = yymsp[-1].minor.yy0;
+	  }
+	  yymsp[-1].minor.yy0 = yylhsminor.yy0;
+	  break;
+      case 20:			/* node_chain ::= node node extra_nodes */
+	  {
+	      ((gmlNodePtr) yymsp[-1].minor.yy0)->Next =
+		  (gmlNodePtr) yymsp[0].minor.yy0;
+	      ((gmlNodePtr) yymsp[-2].minor.yy0)->Next =
+		  (gmlNodePtr) yymsp[-1].minor.yy0;
+	      yylhsminor.yy0 = yymsp[-2].minor.yy0;
+	  }
+	  yymsp[-2].minor.yy0 = yylhsminor.yy0;
+	  break;
+      case 21:			/* attr ::= GML_KEYWORD GML_EQ GML_VALUE */
+	  {
+	      yylhsminor.yy0 =
+		  gml_attribute (p_data, (void *) yymsp[-2].minor.yy0,
+				 (void *) yymsp[0].minor.yy0);
+	  }
+	  yymsp[-2].minor.yy0 = yylhsminor.yy0;
+	  break;
+      case 23:			/* extra_attr ::= attr extra_attr */
+	  {
+	      ((gmlAttrPtr) yymsp[-1].minor.yy0)->Next =
+		  (gmlAttrPtr) yymsp[0].minor.yy0;
+	      yylhsminor.yy0 = yymsp[-1].minor.yy0;
+	  }
+	  yymsp[-1].minor.yy0 = yylhsminor.yy0;
+	  break;
+      case 24:			/* attributes ::= attr attr extra_attr */
+	  {
+	      ((gmlAttrPtr) yymsp[-1].minor.yy0)->Next =
+		  (gmlAttrPtr) yymsp[0].minor.yy0;
+	      ((gmlAttrPtr) yymsp[-2].minor.yy0)->Next =
+		  (gmlAttrPtr) yymsp[-1].minor.yy0;
+	      yylhsminor.yy0 = yymsp[-2].minor.yy0;
+	  }
+	  yymsp[-2].minor.yy0 = yylhsminor.yy0;
+	  break;
+      case 25:			/* coord ::= GML_COORD */
+	  {
+	      yylhsminor.yy0 = gml_coord (p_data, (void *) yymsp[0].minor.yy0);
+	  }
+	  yymsp[0].minor.yy0 = yylhsminor.yy0;
+	  break;
+      case 27:			/* extra_coord ::= coord extra_coord */
+	  {
+	      ((gmlCoordPtr) yymsp[-1].minor.yy0)->Next =
+		  (gmlCoordPtr) yymsp[0].minor.yy0;
+	      yylhsminor.yy0 = yymsp[-1].minor.yy0;
+	  }
+	  yymsp[-1].minor.yy0 = yylhsminor.yy0;
+	  break;
+      case 28:			/* coord_chain ::= coord coord extra_coord */
+	  {
+	      ((gmlCoordPtr) yymsp[-1].minor.yy0)->Next =
+		  (gmlCoordPtr) yymsp[0].minor.yy0;
+	      ((gmlCoordPtr) yymsp[-2].minor.yy0)->Next =
+		  (gmlCoordPtr) yymsp[-1].minor.yy0;
+	      yylhsminor.yy0 = yymsp[-2].minor.yy0;
+	  }
+	  yymsp[-2].minor.yy0 = yylhsminor.yy0;
+	  break;
       default:
-      /* (29) main ::= in */ yytestcase(yyruleno==29);
-      /* (30) in ::= */ yytestcase(yyruleno==30);
-      /* (31) in ::= in state GML_NEWLINE */ yytestcase(yyruleno==31);
-      /* (32) state ::= program (OPTIMIZED OUT) */ assert(yyruleno!=32);
-      /* (33) program ::= gml_tree (OPTIMIZED OUT) */ assert(yyruleno!=33);
-        break;
+	  /* (29) main ::= in */ yytestcase (yyruleno == 29);
+	  /* (30) in ::= */ yytestcase (yyruleno == 30);
+	  /* (31) in ::= in state GML_NEWLINE */ yytestcase (yyruleno == 31);
+	  /* (32) state ::= program (OPTIMIZED OUT) */ assert (yyruleno != 32);
+	  /* (33) program ::= gml_tree (OPTIMIZED OUT) */ assert (yyruleno !=
+								  33);
+	  break;
 /********** End reduce actions ************************************************/
-  };
-  assert( yyruleno<sizeof(yyRuleInfo)/sizeof(yyRuleInfo[0]) );
-  yygoto = yyRuleInfo[yyruleno].lhs;
-  yysize = yyRuleInfo[yyruleno].nrhs;
-  yyact = yy_find_reduce_action(yymsp[yysize].stateno,(YYCODETYPE)yygoto);
+      };
+    assert (yyruleno < sizeof (yyRuleInfo) / sizeof (yyRuleInfo[0]));
+    yygoto = yyRuleInfo[yyruleno].lhs;
+    yysize = yyRuleInfo[yyruleno].nrhs;
+    yyact = yy_find_reduce_action (yymsp[yysize].stateno, (YYCODETYPE) yygoto);
 
-  /* There are no SHIFTREDUCE actions on nonterminals because the table
-  ** generator has simplified them to pure REDUCE actions. */
-  assert( !(yyact>YY_MAX_SHIFT && yyact<=YY_MAX_SHIFTREDUCE) );
+    /* There are no SHIFTREDUCE actions on nonterminals because the table
+     ** generator has simplified them to pure REDUCE actions. */
+    assert (!(yyact > YY_MAX_SHIFT && yyact <= YY_MAX_SHIFTREDUCE));
 
-  /* It is not possible for a REDUCE to be followed by an error */
-  assert( yyact!=YY_ERROR_ACTION );
+    /* It is not possible for a REDUCE to be followed by an error */
+    assert (yyact != YY_ERROR_ACTION);
 
-  yymsp += yysize+1;
-  yypParser->yytos = yymsp;
-  yymsp->stateno = (YYACTIONTYPE)yyact;
-  yymsp->major = (YYCODETYPE)yygoto;
-  yyTraceShift(yypParser, yyact, "... then shift");
+    yymsp += yysize + 1;
+    yypParser->yytos = yymsp;
+    yymsp->stateno = (YYACTIONTYPE) yyact;
+    yymsp->major = (YYCODETYPE) yygoto;
+    yyTraceShift (yypParser, yyact, "... then shift");
 }
 
 /*
 ** The following code executes when the parse fails
 */
 #ifndef YYNOERRORRECOVERY
-static void yy_parse_failed(
-  yyParser *yypParser           /* The parser */
-){
-  ParseARG_FETCH;
+static void
+yy_parse_failed (yyParser * yypParser	/* The parser */
+    )
+{
+    ParseARG_FETCH;
 #ifndef NDEBUG
-  if( yyTraceFILE ){
-    fprintf(yyTraceFILE,"%sFail!\n",yyTracePrompt);
-  }
+    if (yyTraceFILE)
+      {
+	  fprintf (yyTraceFILE, "%sFail!\n", yyTracePrompt);
+      }
 #endif
-  while( yypParser->yytos>yypParser->yystack ) yy_pop_parser_stack(yypParser);
-  /* Here code is inserted which will be executed whenever the
-  ** parser fails */
+    while (yypParser->yytos > yypParser->yystack)
+	yy_pop_parser_stack (yypParser);
+    /* Here code is inserted which will be executed whenever the
+     ** parser fails */
 /************ Begin %parse_failure code ***************************************/
 /************ End %parse_failure code *****************************************/
-  ParseARG_STORE; /* Suppress warning about unused %extra_argument variable */
+    ParseARG_STORE;		/* Suppress warning about unused %extra_argument variable */
 }
 #endif /* YYNOERRORRECOVERY */
 
 /*
 ** The following code executes when a syntax error first occurs.
 */
-static void yy_syntax_error(
-  yyParser *yypParser,           /* The parser */
-  int yymajor,                   /* The major type of the error token */
-  ParseTOKENTYPE yyminor         /* The minor type of the error token */
-){
-  ParseARG_FETCH;
+static void
+yy_syntax_error (yyParser * yypParser,	/* The parser */
+		 int yymajor,	/* The major type of the error token */
+		 ParseTOKENTYPE yyminor	/* The minor type of the error token */
+    )
+{
+    ParseARG_FETCH;
 #define TOKEN yyminor
 /************ Begin %syntax_error code ****************************************/
 
@@ -1078,33 +1249,35 @@ static void yy_syntax_error(
 ** when the LEMON parser encounters an error
 ** then this global variable is set 
 */
-	p_data->gml_parse_error = 1;
-	p_data->result = NULL;
+    p_data->gml_parse_error = 1;
+    p_data->result = NULL;
 /************ End %syntax_error code ******************************************/
-  ParseARG_STORE; /* Suppress warning about unused %extra_argument variable */
+    ParseARG_STORE;		/* Suppress warning about unused %extra_argument variable */
 }
 
 /*
 ** The following is executed when the parser accepts
 */
-static void yy_accept(
-  yyParser *yypParser           /* The parser */
-){
-  ParseARG_FETCH;
+static void
+yy_accept (yyParser * yypParser	/* The parser */
+    )
+{
+    ParseARG_FETCH;
 #ifndef NDEBUG
-  if( yyTraceFILE ){
-    fprintf(yyTraceFILE,"%sAccept!\n",yyTracePrompt);
-  }
+    if (yyTraceFILE)
+      {
+	  fprintf (yyTraceFILE, "%sAccept!\n", yyTracePrompt);
+      }
 #endif
 #ifndef YYNOERRORRECOVERY
-  yypParser->yyerrcnt = -1;
+    yypParser->yyerrcnt = -1;
 #endif
-  assert( yypParser->yytos==yypParser->yystack );
-  /* Here code is inserted which will be executed whenever the
-  ** parser accepts */
+    assert (yypParser->yytos == yypParser->yystack);
+    /* Here code is inserted which will be executed whenever the
+     ** parser accepts */
 /*********** Begin %parse_accept code *****************************************/
 /*********** End %parse_accept code *******************************************/
-  ParseARG_STORE; /* Suppress warning about unused %extra_argument variable */
+    ParseARG_STORE;		/* Suppress warning about unused %extra_argument variable */
 }
 
 /* The main parser program.
@@ -1126,170 +1299,202 @@ static void yy_accept(
 ** Outputs:
 ** None.
 */
-void Parse(
-  void *yyp,                   /* The parser */
-  int yymajor,                 /* The major token code number */
-  ParseTOKENTYPE yyminor       /* The value for the token */
-  ParseARG_PDECL               /* Optional %extra_argument parameter */
-){
-  YYMINORTYPE yyminorunion;
-  unsigned int yyact;   /* The parser action. */
+void
+Parse (void *yyp,		/* The parser */
+       int yymajor,		/* The major token code number */
+       ParseTOKENTYPE yyminor	/* The value for the token */
+       ParseARG_PDECL		/* Optional %extra_argument parameter */
+    )
+{
+    YYMINORTYPE yyminorunion;
+    unsigned int yyact;		/* The parser action. */
 #if !defined(YYERRORSYMBOL) && !defined(YYNOERRORRECOVERY)
-  int yyendofinput;     /* True if we are at the end of input */
+    int yyendofinput;		/* True if we are at the end of input */
 #endif
 #ifdef YYERRORSYMBOL
-  int yyerrorhit = 0;   /* True if yymajor has invoked an error */
+    int yyerrorhit = 0;		/* True if yymajor has invoked an error */
 #endif
-  yyParser *yypParser;  /* The parser */
+    yyParser *yypParser;	/* The parser */
 
-  yypParser = (yyParser*)yyp;
-  assert( yypParser->yytos!=0 );
+    yypParser = (yyParser *) yyp;
+    assert (yypParser->yytos != 0);
 #if !defined(YYERRORSYMBOL) && !defined(YYNOERRORRECOVERY)
-  yyendofinput = (yymajor==0);
+    yyendofinput = (yymajor == 0);
 #endif
-  ParseARG_STORE;
+    ParseARG_STORE;
 
 #ifndef NDEBUG
-  if( yyTraceFILE ){
-    int stateno = yypParser->yytos->stateno;
-    if( stateno < YY_MIN_REDUCE ){
-      fprintf(yyTraceFILE,"%sInput '%s' in state %d\n",
-              yyTracePrompt,yyTokenName[yymajor],stateno);
-    }else{
-      fprintf(yyTraceFILE,"%sInput '%s' with pending reduce %d\n",
-              yyTracePrompt,yyTokenName[yymajor],stateno-YY_MIN_REDUCE);
-    }
-  }
+    if (yyTraceFILE)
+      {
+	  int stateno = yypParser->yytos->stateno;
+	  if (stateno < YY_MIN_REDUCE)
+	    {
+		fprintf (yyTraceFILE, "%sInput '%s' in state %d\n",
+			 yyTracePrompt, yyTokenName[yymajor], stateno);
+	    }
+	  else
+	    {
+		fprintf (yyTraceFILE, "%sInput '%s' with pending reduce %d\n",
+			 yyTracePrompt, yyTokenName[yymajor],
+			 stateno - YY_MIN_REDUCE);
+	    }
+      }
 #endif
 
-  do{
-    yyact = yy_find_shift_action(yypParser,(YYCODETYPE)yymajor);
-    if( yyact >= YY_MIN_REDUCE ){
-      yy_reduce(yypParser,yyact-YY_MIN_REDUCE,yymajor,yyminor);
-    }else if( yyact <= YY_MAX_SHIFTREDUCE ){
-      yy_shift(yypParser,yyact,yymajor,yyminor);
+    do
+      {
+	  yyact = yy_find_shift_action (yypParser, (YYCODETYPE) yymajor);
+	  if (yyact >= YY_MIN_REDUCE)
+	    {
+		yy_reduce (yypParser, yyact - YY_MIN_REDUCE, yymajor, yyminor);
+	    }
+	  else if (yyact <= YY_MAX_SHIFTREDUCE)
+	    {
+		yy_shift (yypParser, yyact, yymajor, yyminor);
 #ifndef YYNOERRORRECOVERY
-      yypParser->yyerrcnt--;
+		yypParser->yyerrcnt--;
 #endif
-      yymajor = YYNOCODE;
-    }else if( yyact==YY_ACCEPT_ACTION ){
-      yypParser->yytos--;
-      yy_accept(yypParser);
-      return;
-    }else{
-      assert( yyact == YY_ERROR_ACTION );
-      yyminorunion.yy0 = yyminor;
+		yymajor = YYNOCODE;
+	    }
+	  else if (yyact == YY_ACCEPT_ACTION)
+	    {
+		yypParser->yytos--;
+		yy_accept (yypParser);
+		return;
+	    }
+	  else
+	    {
+		assert (yyact == YY_ERROR_ACTION);
+		yyminorunion.yy0 = yyminor;
 #ifdef YYERRORSYMBOL
-      int yymx;
+		int yymx;
 #endif
 #ifndef NDEBUG
-      if( yyTraceFILE ){
-        fprintf(yyTraceFILE,"%sSyntax Error!\n",yyTracePrompt);
-      }
+		if (yyTraceFILE)
+		  {
+		      fprintf (yyTraceFILE, "%sSyntax Error!\n", yyTracePrompt);
+		  }
 #endif
 #ifdef YYERRORSYMBOL
-      /* A syntax error has occurred.
-      ** The response to an error depends upon whether or not the
-      ** grammar defines an error token "ERROR".  
-      **
-      ** This is what we do if the grammar does define ERROR:
-      **
-      **  * Call the %syntax_error function.
-      **
-      **  * Begin popping the stack until we enter a state where
-      **    it is legal to shift the error symbol, then shift
-      **    the error symbol.
-      **
-      **  * Set the error count to three.
-      **
-      **  * Begin accepting and shifting new tokens.  No new error
-      **    processing will occur until three tokens have been
-      **    shifted successfully.
-      **
-      */
-      if( yypParser->yyerrcnt<0 ){
-        yy_syntax_error(yypParser,yymajor,yyminor);
-      }
-      yymx = yypParser->yytos->major;
-      if( yymx==YYERRORSYMBOL || yyerrorhit ){
+		/* A syntax error has occurred.
+		 ** The response to an error depends upon whether or not the
+		 ** grammar defines an error token "ERROR".  
+		 **
+		 ** This is what we do if the grammar does define ERROR:
+		 **
+		 **  * Call the %syntax_error function.
+		 **
+		 **  * Begin popping the stack until we enter a state where
+		 **    it is legal to shift the error symbol, then shift
+		 **    the error symbol.
+		 **
+		 **  * Set the error count to three.
+		 **
+		 **  * Begin accepting and shifting new tokens.  No new error
+		 **    processing will occur until three tokens have been
+		 **    shifted successfully.
+		 **
+		 */
+		if (yypParser->yyerrcnt < 0)
+		  {
+		      yy_syntax_error (yypParser, yymajor, yyminor);
+		  }
+		yymx = yypParser->yytos->major;
+		if (yymx == YYERRORSYMBOL || yyerrorhit)
+		  {
 #ifndef NDEBUG
-        if( yyTraceFILE ){
-          fprintf(yyTraceFILE,"%sDiscard input token %s\n",
-             yyTracePrompt,yyTokenName[yymajor]);
-        }
+		      if (yyTraceFILE)
+			{
+			    fprintf (yyTraceFILE, "%sDiscard input token %s\n",
+				     yyTracePrompt, yyTokenName[yymajor]);
+			}
 #endif
-        yy_destructor(yypParser, (YYCODETYPE)yymajor, &yyminorunion);
-        yymajor = YYNOCODE;
-      }else{
-        while( yypParser->yytos >= yypParser->yystack
-            && yymx != YYERRORSYMBOL
-            && (yyact = yy_find_reduce_action(
-                        yypParser->yytos->stateno,
-                        YYERRORSYMBOL)) >= YY_MIN_REDUCE
-        ){
-          yy_pop_parser_stack(yypParser);
-        }
-        if( yypParser->yytos < yypParser->yystack || yymajor==0 ){
-          yy_destructor(yypParser,(YYCODETYPE)yymajor,&yyminorunion);
-          yy_parse_failed(yypParser);
+		      yy_destructor (yypParser, (YYCODETYPE) yymajor,
+				     &yyminorunion);
+		      yymajor = YYNOCODE;
+		  }
+		else
+		  {
+		      while (yypParser->yytos >= yypParser->yystack
+			     && yymx != YYERRORSYMBOL
+			     && (yyact =
+				 yy_find_reduce_action (yypParser->
+							yytos->stateno,
+							YYERRORSYMBOL)) >=
+			     YY_MIN_REDUCE)
+			{
+			    yy_pop_parser_stack (yypParser);
+			}
+		      if (yypParser->yytos < yypParser->yystack || yymajor == 0)
+			{
+			    yy_destructor (yypParser, (YYCODETYPE) yymajor,
+					   &yyminorunion);
+			    yy_parse_failed (yypParser);
 #ifndef YYNOERRORRECOVERY
-          yypParser->yyerrcnt = -1;
+			    yypParser->yyerrcnt = -1;
 #endif
-          yymajor = YYNOCODE;
-        }else if( yymx!=YYERRORSYMBOL ){
-          yy_shift(yypParser,yyact,YYERRORSYMBOL,yyminor);
-        }
-      }
-      yypParser->yyerrcnt = 3;
-      yyerrorhit = 1;
+			    yymajor = YYNOCODE;
+			}
+		      else if (yymx != YYERRORSYMBOL)
+			{
+			    yy_shift (yypParser, yyact, YYERRORSYMBOL, yyminor);
+			}
+		  }
+		yypParser->yyerrcnt = 3;
+		yyerrorhit = 1;
 #elif defined(YYNOERRORRECOVERY)
-      /* If the YYNOERRORRECOVERY macro is defined, then do not attempt to
-      ** do any kind of error recovery.  Instead, simply invoke the syntax
-      ** error routine and continue going as if nothing had happened.
-      **
-      ** Applications can set this macro (for example inside %include) if
-      ** they intend to abandon the parse upon the first syntax error seen.
-      */
-      yy_syntax_error(yypParser,yymajor, yyminor);
-      yy_destructor(yypParser,(YYCODETYPE)yymajor,&yyminorunion);
-      yymajor = YYNOCODE;
-      
-#else  /* YYERRORSYMBOL is not defined */
-      /* This is what we do if the grammar does not define ERROR:
-      **
-      **  * Report an error message, and throw away the input token.
-      **
-      **  * If the input token is $, then fail the parse.
-      **
-      ** As before, subsequent error messages are suppressed until
-      ** three input tokens have been successfully shifted.
-      */
-      if( yypParser->yyerrcnt<=0 ){
-        yy_syntax_error(yypParser,yymajor, yyminor);
-      }
-      yypParser->yyerrcnt = 3;
-      yy_destructor(yypParser,(YYCODETYPE)yymajor,&yyminorunion);
-      if( yyendofinput ){
-        yy_parse_failed(yypParser);
+		/* If the YYNOERRORRECOVERY macro is defined, then do not attempt to
+		 ** do any kind of error recovery.  Instead, simply invoke the syntax
+		 ** error routine and continue going as if nothing had happened.
+		 **
+		 ** Applications can set this macro (for example inside %include) if
+		 ** they intend to abandon the parse upon the first syntax error seen.
+		 */
+		yy_syntax_error (yypParser, yymajor, yyminor);
+		yy_destructor (yypParser, (YYCODETYPE) yymajor, &yyminorunion);
+		yymajor = YYNOCODE;
+
+#else /* YYERRORSYMBOL is not defined */
+		/* This is what we do if the grammar does not define ERROR:
+		 **
+		 **  * Report an error message, and throw away the input token.
+		 **
+		 **  * If the input token is $, then fail the parse.
+		 **
+		 ** As before, subsequent error messages are suppressed until
+		 ** three input tokens have been successfully shifted.
+		 */
+		if (yypParser->yyerrcnt <= 0)
+		  {
+		      yy_syntax_error (yypParser, yymajor, yyminor);
+		  }
+		yypParser->yyerrcnt = 3;
+		yy_destructor (yypParser, (YYCODETYPE) yymajor, &yyminorunion);
+		if (yyendofinput)
+		  {
+		      yy_parse_failed (yypParser);
 #ifndef YYNOERRORRECOVERY
-        yypParser->yyerrcnt = -1;
+		      yypParser->yyerrcnt = -1;
 #endif
+		  }
+		yymajor = YYNOCODE;
+#endif
+	    }
       }
-      yymajor = YYNOCODE;
-#endif
-    }
-  }while( yymajor!=YYNOCODE && yypParser->yytos>yypParser->yystack );
+    while (yymajor != YYNOCODE && yypParser->yytos > yypParser->yystack);
 #ifndef NDEBUG
-  if( yyTraceFILE ){
-    yyStackEntry *i;
-    char cDiv = '[';
-    fprintf(yyTraceFILE,"%sReturn. Stack=",yyTracePrompt);
-    for(i=&yypParser->yystack[1]; i<=yypParser->yytos; i++){
-      fprintf(yyTraceFILE,"%c%s", cDiv, yyTokenName[i->major]);
-      cDiv = ' ';
-    }
-    fprintf(yyTraceFILE,"]\n");
-  }
+    if (yyTraceFILE)
+      {
+	  yyStackEntry *i;
+	  char cDiv = '[';
+	  fprintf (yyTraceFILE, "%sReturn. Stack=", yyTracePrompt);
+	  for (i = &yypParser->yystack[1]; i <= yypParser->yytos; i++)
+	    {
+		fprintf (yyTraceFILE, "%c%s", cDiv, yyTokenName[i->major]);
+		cDiv = ' ';
+	    }
+	  fprintf (yyTraceFILE, "]\n");
+      }
 #endif
-  return;
+    return;
 }
