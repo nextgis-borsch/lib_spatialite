@@ -53,7 +53,10 @@ set(PRIV_HEADERS
     spatialite_private.h
 )
 
+configure_file(${CMAKE_SOURCE_DIR}/cmake/config.h.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/spatialite/gaiaconfig.h IMMEDIATE @ONLY)
+
 set(MAIN_HEADERS ${MAIN_HEADERS} PARENT_SCOPE)
+set(SPL_HEADERS ${SPL_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/spatialite/gaiaconfig.h PARENT_SCOPE)
 
 if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)
     install(FILES ${MAIN_HEADERS} DESTINATION "${INSTALL_INC_DIR}")
