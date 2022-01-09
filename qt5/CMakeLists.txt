@@ -3,7 +3,8 @@
 # Purpose:  CMake build scripts
 # Author:   Dmitry Baryshnikov, dmitry.baryshnikov@nextgis.com
 ################################################################################
-# Copyright (C) 2020, NextGIS <info@nextgis.com>
+# Copyright (C) 2020-2022, NextGIS <info@nextgis.com>
+# Copyright (C) 2022 Dmitry Baryshnikov
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -25,38 +26,35 @@
 ################################################################################
 
 find_anyproject(Qt5 REQUIRED COMPONENTS Core Sql)
-set(CMAKE_AUTOMOC ON)
 
-add_definitions(${QT_DEFINITIONS})
-add_definitions(-DQT_PLUGIN)
-add_definitions(-DQT_NO_DEBUG)
-add_definitions(-DQT_SHARED)
+add_definitions(${QT_DEFINITIONS} -DQT_PLUGIN -DQT_NO_DEBUG -DQT_SHARED)
 
 include_directories(SYSTEM
     ${SQLITE3_INCLUDE_DIR}
     ${Qt5Sql_PRIVATE_INCLUDE_DIRS}
 )
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+set(QSQLSPATIALITE_HEADERS
+    qsql_spatialite.h
+    smain.h
+) 
+
 set(QSQLSPATIALITE_SRC 
     qsql_spatialite.cpp
     smain.cpp
-    qgssqliteutils.cpp
-    qgsspatialiteutils.cpp
 )
 
-add_library(qsqlspatialite SHARED ${QSQLSPATIALITE_SRC})
+add_library(qsqlspatialite SHARED ${QSQLSPATIALITE_HEADERS} ${QSQLSPATIALITE_SRC})
 
-target_link_libraries(qsqlspatialite
+set_target_properties(qsqlspatialite PROPERTIES AUTOMOC TRUE)
+target_link_libraries(qsqlspatialite PRIVATE
     Qt5::Core
     Qt5::Sql
     ${LIB_NAME}
     ${SPATIALITE_LIBRARY}
     ${SQLITE3_LIBRARIES}
-)
-
-install(TARGETS qsqlspatialite
-  LIBRARY DESTINATION ${INSTALL_LIB_DIR}/qt5/plugins/sqldrivers
-  RUNTIME DESTINATION ${INSTALL_LIB_DIR}/qt5/plugins/sqldrivers
 )
 
 if(OSX_FRAMEWORK)
