@@ -39,11 +39,15 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(QSQLSPATIALITE_HEADERS
     qsql_spatialite.h
     smain.h
+    qgssqliteutils.h
+    qgsspatialiteutils.h
 ) 
 
 set(QSQLSPATIALITE_SRC 
     qsql_spatialite.cpp
     smain.cpp
+    qgssqliteutils.cpp
+    qgsspatialiteutils.cpp
 )
 
 add_library(qsqlspatialite SHARED ${QSQLSPATIALITE_HEADERS} ${QSQLSPATIALITE_SRC})
