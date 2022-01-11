@@ -18,7 +18,7 @@
 #ifndef QGSSQLITEUTILS_H
 #define QGSSQLITEUTILS_H
 
-// #include <memory>
+#include <memory>
 #include <QString>
 
 struct sqlite3;
