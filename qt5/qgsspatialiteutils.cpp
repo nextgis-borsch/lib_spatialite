@@ -17,7 +17,6 @@
 
 
 #include "qgsspatialiteutils.h"
-#include "qgslogger.h"
 
 #include <sqlite3.h>
 
@@ -115,7 +114,9 @@ void QgsSpatialiteCloser::operator()( sqlite3 *handle )
   const int res = sqlite3_close_v2( handle );
   if ( res != SQLITE_OK )
   {
-    QgsDebugMsg( QStringLiteral( "sqlite3_close_v2() failed: %1" ).arg( res ) );
+#ifdef SPATIALITE_PRINT_ALL_SQL      
+    qDebug() << "sqlite3_close_v2() failed: " << res;
+#endif    
   }
 
 #ifdef HAVE_SPATIALITE

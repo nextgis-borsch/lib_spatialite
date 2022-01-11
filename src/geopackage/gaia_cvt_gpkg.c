@@ -58,6 +58,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
 
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <stdio.h>
 
 #include <spatialite/sqlite.h>

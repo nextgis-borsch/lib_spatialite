@@ -26,7 +26,8 @@
 
 set(TARGET_NAME gaiageo)
 
-set(CSOURCES gg_advanced.c 
+set(CSOURCES 
+    gg_advanced.c 
 	gg_endian.c 
 	gg_geodesic.c 
 	gg_geometries.c 

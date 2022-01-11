@@ -49,9 +49,6 @@ else()
     exec_program(${CMAKE_C_COMPILER}
         ARGS -dumpmachine
         OUTPUT_VARIABLE TARGET_CPU)
-    if(APPLE)
-        add_definitions(-D_ANSI_SOURCE)
-    endif()
 endif()
 
 
@@ -115,9 +112,7 @@ check_function_exists(strstr HAVE_STRSTR)
 
 set(LT_OBJDIR .libs)
 
-#if( CMAKE_BUILD_TYPE MATCHES "Release" OR CMAKE_BUILD_TYPE MATCHES "MinSizeRel")
-    set(NDEBUG ON)
-#endif()
+set(NDEBUG ON)
 
 set(PACKAGE ${PROJECT_NAME})
 set(PACKAGE_BUGREPORT "a.furieri@lqt.it")

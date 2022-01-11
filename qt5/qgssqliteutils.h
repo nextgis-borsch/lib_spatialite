@@ -18,15 +18,16 @@
 #ifndef QGSSQLITEUTILS_H
 #define QGSSQLITEUTILS_H
 
-#include "qgis_core.h"
-#include "qgis_sip.h"
-
-#include <memory>
+// #include <memory>
 #include <QString>
 
 struct sqlite3;
 struct sqlite3_stmt;
 class QVariant;
+
+#define CORE_EXPORT
+#define SIP_SKIP
+#define SIP_OUT
 
 #ifndef SIP_RUN
 

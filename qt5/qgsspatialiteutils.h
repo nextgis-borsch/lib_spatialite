@@ -20,7 +20,6 @@
 
 #define SIP_NO_FILE
 
-#include "qgis_core.h"
 #include "qgssqliteutils.h"
 #include <functional>
 

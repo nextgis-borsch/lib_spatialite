@@ -27,9 +27,10 @@
 
 find_anyproject(Qt5 REQUIRED COMPONENTS Core Sql)
 
-add_definitions(${QT_DEFINITIONS} -DQT_PLUGIN -DQT_NO_DEBUG -DQT_SHARED)
+add_definitions(${QT_DEFINITIONS} -DQT_BUILD_SQL_LIB -DQT_PLUGIN -DQT_NO_DEBUG -DQT_SHARED)
 
 include_directories(SYSTEM
+    ${CMAKE_CURRENT_SOURCE_DIR}
     ${SQLITE3_INCLUDE_DIR}
     ${Qt5Sql_PRIVATE_INCLUDE_DIRS}
 )
@@ -51,7 +52,6 @@ set(QSQLSPATIALITE_SRC
 )
 
 add_library(qsqlspatialite SHARED ${QSQLSPATIALITE_HEADERS} ${QSQLSPATIALITE_SRC})
-
 set_target_properties(qsqlspatialite PROPERTIES AUTOMOC TRUE)
 target_link_libraries(qsqlspatialite PRIVATE
     Qt5::Core

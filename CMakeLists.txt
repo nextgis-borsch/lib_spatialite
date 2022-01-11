@@ -25,7 +25,8 @@
 # DEALINGS IN THE SOFTWARE.
 ################################################################################
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
+
 project(spatialite)
 
 if(NOT DEFINED PACKAGE_VENDOR)
@@ -88,6 +89,7 @@ if(SQLITE3_FOUND)
     set(HAVE_LIBSQLITE3 ON)
     set(HAVE_SQLITE3_H ON)
 endif()
+
 find_anyproject(ZLIB REQUIRED)
 if(ZLIB_FOUND)
     set(HAVE_LIBZ ON)
@@ -169,11 +171,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 include(configure)
 
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-if(COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif()
+set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration")
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 set(LIB_NAME ${PROJECT_NAME})
