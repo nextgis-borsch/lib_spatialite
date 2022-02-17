@@ -50,7 +50,10 @@ the terms of any one of the MPL, the GPL or the LGPL.
 #include <math.h>
 #include <float.h>
 #include <string.h>
-#include <strings.h>
+
+#ifdef __APPLE__
+#	include <strings.h>
+#endif
 
 #if defined(_WIN32) && !defined(__MINGW32__)
 #include "config-msvc.h"

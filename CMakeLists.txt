@@ -172,7 +172,10 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 include(configure)
 
 set (CMAKE_CXX_STANDARD 11)
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration")
+
+if(OSX_FRAMEWORK)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration")
+endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 set(LIB_NAME ${PROJECT_NAME})

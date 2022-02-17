@@ -27,7 +27,7 @@
 
 find_anyproject(Qt5 REQUIRED COMPONENTS Core Sql)
 
-add_definitions(${QT_DEFINITIONS} -DQT_BUILD_SQL_LIB -DQT_PLUGIN -DQT_NO_DEBUG -DQT_SHARED)
+add_definitions(${QT_DEFINITIONS} -DQT_PLUGIN -DQT_NO_DEBUG -DQT_SHARED)
 
 include_directories(SYSTEM
     ${CMAKE_CURRENT_SOURCE_DIR}
