@@ -48,7 +48,7 @@ IF(WIN32)
     ENDIF (GEOS_LIBRARY)
   ENDIF (MSVC)
 
-ELSE(WIN32)
+ELSE()
 
  IF(UNIX)
 
@@ -157,12 +157,12 @@ ELSE(WIN32)
         ENDIF (APPLE)
         #MESSAGE("DBG  GEOS_LIBRARY=${GEOS_LIBRARY}")
 
-      ELSE(GEOS_CONFIG)
+      ELSE()
         MESSAGE("FindGEOS.cmake: geos-config not found. Please set it manually. GEOS_CONFIG=${GEOS_CONFIG}")
-      ENDIF(GEOS_CONFIG)
-    ENDIF(NOT GEOS_INCLUDE_DIR OR NOT GEOS_LIBRARY OR NOT GEOS_CONFIG)
-  ENDIF(UNIX)
-ENDIF(WIN32)
+      ENDIF()
+    ENDIF()
+  ENDIF()
+ENDIF()
 
 # Handle the QUIETLY and REQUIRED arguments and set GEOS_FOUND to TRUE
 # if all listed variables are TRUE
