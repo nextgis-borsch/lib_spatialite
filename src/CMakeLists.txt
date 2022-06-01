@@ -70,7 +70,7 @@ if(BUILD_SHARED_LIBS)
     add_library(${LIB_NAME} SHARED ${CSOURCES} ${TARGET_OBJECTS} ${PRIV_HEADERS} ${MAIN_HEADERS})
     set_target_properties (${LIB_NAME} PROPERTIES
         VERSION ${VERSION}
-        SOVERSION ${SOVERSION}
+        SOVERSION ${SOVERSION})
     if(MSVC)
         set_target_properties (${LIB_NAME} PROPERTIES
             DEFINE_SYMBOL DLL_EXPORT)
