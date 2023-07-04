@@ -64,8 +64,8 @@ ELSE()
         IF (GEOS_LIBRARY)
           # they're all the same in a framework
           SET (GEOS_INCLUDE_DIR ${GEOS_LIBRARY}/Headers CACHE PATH "Path to a file.")
-          # set GEOS_CONFIG to make later test happy, not used here, may not exist
-          SET (GEOS_CONFIG ${GEOS_LIBRARY}/unix/bin/geos-config CACHE FILEPATH "Path to a program.")
+          # set GEOS_CONFIG_TOOL to make later test happy, not used here, may not exist
+          SET (GEOS_CONFIG_TOOL ${GEOS_LIBRARY}/unix/bin/geos-config CACHE FILEPATH "Path to a program.")
           # version in info.plist
           GET_VERSION_PLIST (${GEOS_LIBRARY}/Resources/Info.plist GEOS_VERSION)
           IF (NOT GEOS_VERSION)
@@ -78,26 +78,26 @@ ELSE()
       ENDIF ()
     ENDIF (APPLE)
 
-    IF (NOT GEOS_INCLUDE_DIR OR NOT GEOS_LIBRARY OR NOT GEOS_CONFIG)
+    IF (NOT GEOS_INCLUDE_DIR OR NOT GEOS_LIBRARY OR NOT GEOS_CONFIG_TOOL)
       # didn't find OS X framework, and was not set by user
       SET(GEOS_CONFIG_PREFER_PATH "$ENV{GEOS_HOME}/bin" CACHE STRING "preferred path to GEOS (geos-config)")
-      FIND_PROGRAM(GEOS_CONFIG geos-config
+      FIND_PROGRAM(GEOS_CONFIG_TOOL geos-config
           ${GEOS_CONFIG_PREFER_PATH}
           /usr/local/bin/
           /usr/bin/
           )
-      #MESSAGE("DBG GEOS_CONFIG ${GEOS_CONFIG}")
+      #MESSAGE("DBG GEOS_CONFIG_TOOL ${GEOS_CONFIG_TOOL}")
 
-      IF (GEOS_CONFIG)
+      IF (GEOS_CONFIG_TOOL)
 
-        EXEC_PROGRAM(${GEOS_CONFIG}
+        EXEC_PROGRAM(${GEOS_CONFIG_TOOL}
             ARGS --version
             OUTPUT_VARIABLE GEOS_VERSION)
         STRING(REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+)" "\\1" GEOS_VERSION_MAJOR "${GEOS_VERSION}")
         STRING(REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+)" "\\2" GEOS_VERSION_MINOR "${GEOS_VERSION}")
 
         # set INCLUDE_DIR to prefix+include
-        EXEC_PROGRAM(${GEOS_CONFIG}
+        EXEC_PROGRAM(${GEOS_CONFIG_TOOL}
             ARGS --prefix
             OUTPUT_VARIABLE GEOS_PREFIX)
 
@@ -109,7 +109,7 @@ ELSE()
             )
 
         ## extract link dirs for rpath
-        EXEC_PROGRAM(${GEOS_CONFIG}
+        EXEC_PROGRAM(${GEOS_CONFIG_TOOL}
             ARGS --libs
             OUTPUT_VARIABLE GEOS_CONFIG_LIBS )
 
@@ -158,7 +158,7 @@ ELSE()
         #MESSAGE("DBG  GEOS_LIBRARY=${GEOS_LIBRARY}")
 
       ELSE()
-        MESSAGE("FindGEOS.cmake: geos-config not found. Please set it manually. GEOS_CONFIG=${GEOS_CONFIG}")
+        MESSAGE("FindGEOS.cmake: geos-config not found. Please set it manually. GEOS_CONFIG=${GEOS_CONFIG_TOOL}")
       ENDIF()
     ENDIF()
   ENDIF()
